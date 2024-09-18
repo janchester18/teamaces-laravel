@@ -1,0 +1,475 @@
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: rgba(50, 50, 50, 0.75) !important;
+            border-bottom: .1px solid rgb(90, 90, 90);
+            padding-left: 20px;
+            padding-right: 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: top 0.3s ease;
+            /* Smooth transition for the hide/show effect */
+        }
+
+        .navbar-brand img {
+            height: 50px;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: none;
+            width: 30px;
+            height: 30px;
+            position: relative;
+        }
+
+        .navbar-toggler-icon::before {
+            content: "\2630";
+            font-size: 24px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .navbar-nav {
+            text-align: center;
+        }
+
+        .navbar-nav .nav-item {
+            margin: 0 15px;
+            /* Increase space between nav items */
+        }
+
+        .navbar-nav .nav-link {
+            display: block;
+            padding: 10px;
+            color: white !important;
+            font-weight: bold;
+            /* Make text bold */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effects */
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #f0f0f0 !important;
+            /* Lighter color on hover */
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+            /* Add text shadow on hover */
+        }
+
+        .hero {
+            height: 100vh;
+            background-image: url("images/user-background.png");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            /* Initially hide the hero section */
+            animation: fadeInUp 1s forwards;
+            /* Apply fadeInUp animation */
+        }
+
+        .hero h1,
+        .hero h2,
+        .hero .btn {
+            opacity: 0;
+            /* Initially hide elements */
+            animation: fadeInUp 1s forwards;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 50px;
+            animation-delay: 0.3s;
+            /* Delay animation for h1 */
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            animation-delay: 0.6s;
+            /* Delay animation for h2 */
+        }
+
+        .hero .btn {
+            padding: 10px 30px;
+            font-size: 1.2rem;
+            animation-delay: 0.9s;
+            /* Delay animation for button */
+        }
+
+        /* Keyframes for entry animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Why Choose TeamAces Section */
+.choose-teamaces {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #FCF8F3;
+  text-align: center;
+}
+
+.choose-teamaces h2 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.choose-teamaces .choose-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 -15px; /* Adjust spacing between columns */
+}
+
+.choose-teamaces .choose-item {
+  padding: 0 15px;
+  margin-bottom: 30px;
+}
+
+.choose-teamaces .choose-item h3 {
+  font-size: 1.25rem;
+  margin-top: 15px;
+}
+
+.choose-teamaces .choose-item p {
+  font-size: 1rem;
+}
+
+.choose-teamaces .choose-image {
+  max-width: 200px; /* Adjust this based on your desired size */
+  height: auto;
+  margin-bottom: 15px;
+}
+
+
+/* Awards Section */
+.awards-section {
+  padding: 0px 20px;
+  background-color: #f8f9fa;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.awards-section h2 {
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.awards-section img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.awards-section .awards-grid {
+  margin: 0 -50px; /* Increase negative margin to adjust for more padding */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center the items when fewer than 3 */
+}
+
+.awards-section .award-item {
+  padding: 0 50px; /* Increase padding inside each item */
+  margin-bottom: 30px; /* Space below each item */
+}
+
+.awards-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.awards-section p {
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.awards-section button {
+    margin-bottom: 10px;
+}
+
+/* Ensure collapsible section appears correctly */
+.collapse {
+  display: block;
+}
+
+/* Pricing Section */
+.pricing-content{position:relative;}
+.pricing_design{
+    position: relative;
+    margin: 0px 0px;
+}
+.pricing_design .single-pricing{
+    background:#00214E;
+    padding: 60px 40px;
+    border-radius:30px;
+    box-shadow: 0 10px 40px -10px rgba(0,64,128,.2);
+    position: relative;
+    z-index: 1;
+}
+.pricing_design .single-pricing:before{
+    content: "";
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    border-radius: 18px 18px 190px 18px;
+    border: 1px solid #eee;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+}
+.price-head{}
+.price-head h2 {
+	margin-bottom: 20px;
+	font-size: 26px;
+	font-weight: 600;
+}
+.price-head h1 {
+	font-weight: 600;
+	margin-top: 30px;
+	margin-bottom: 5px;
+}
+.price-head span{}
+.single-pricing ul{list-style:none;margin-top: 30px;}
+.single-pricing ul li {
+	line-height: 36px;
+}
+.single-pricing ul li i {
+	background: #00214E;
+	color: #fff;
+	width: 20px;
+	height: 20px;
+	border-radius: 30px;
+	font-size: 11px;
+	text-align: center;
+	line-height: 20px;
+	margin-right: 6px;
+}
+
+.single-pricing {
+    margin-bottom: 20px;
+}
+
+.pricing-price{}
+
+.price_btn {
+	background: #00214E;
+	padding: 10px 30px;
+	color: #fff;
+	display: inline-block;
+	margin-top: 20px;
+	border-radius: 2px;
+	-webkit-transition: 0.3s;
+	transition: 0.3s;
+}
+.price_btn:hover{background:#00429EFF;}
+a{
+text-decoration:none;
+}
+
+.section-title {
+    margin-bottom: 60px;
+}
+.text-center {
+    text-align: center!important;
+}
+
+.section-title h2 {
+    font-size: 45px;
+    font-weight: 600;
+    margin-top: 0;
+    position: relative;
+    text-transform: capitalize;
+}
+
+
+
+
+        .navbar-hidden {
+            position: fixed;
+            top: -110px;
+            /* Adjust this value based on your navbar height */
+            transition: top 0.3s;
+            /* Smooth transition for the hide/show effect */
+        }
+
+        /* Location Section */
+        .location-section {
+            padding: 50px 20px;
+            background-color: #f8f9fa;
+            text-align: center;
+            border-top: 2px solid #e0e0e0;
+            /* Border to separate from the awards section */
+        }
+
+        .location-section h2 {
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .responsive-map {
+            position: relative;
+            overflow: hidden;
+            padding-top: 56.25%;
+            /* Aspect ratio 16:9 */
+        }
+
+        .responsive-map iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .google-reviews-widget {
+            margin-top: 30px;
+            max-width: 100%;
+            overflow: hidden;
+            /* Ensure the widget does not overflow */
+        }
+
+        .google-reviews-widget iframe {
+            border: 0;
+            width: 100%;
+            height: 1000px;
+            /* You can adjust this height as needed */
+        }
+
+/* Footer Section */
+.footer-content {
+    background: #000D1FFF;
+    color: #fff;
+    padding: 40px 0;
+}
+
+.footer-content h4 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.footer-content p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.contact-item {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.footer-content .social-media {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-content .social-media li {
+    display: inline;
+    margin-right: 10px;
+}
+
+.footer-content .social-icon {
+    color: #fff;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.footer-content .social-icon:hover {
+    color: #FFC107;
+}
+
+.footer-content .footer-bottom {
+    margin-top: 5px;
+}
+
+.footer-content .footer-bottom p {
+    margin: 0;
+    font-size: 14px;
+}
+
+
+
+
+        /* Responsive font sizes */
+        @media (max-width: 1199.98px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .hero h2 {
+                font-size: 1.25rem;
+            }
+
+            .hero .btn {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero h2 {
+                font-size: 1.1rem;
+            }
+
+            .hero .btn {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero h2 {
+                font-size: 1rem;
+            }
+
+            .hero .btn {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero h2 {
+                font-size: 0.9rem;
+            }
+
+            .hero .btn {
+                font-size: 0.8rem;
+            }
+        }

@@ -273,13 +273,13 @@
                         <a class="nav-link" href="{{ route('branches') }}">Branches</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contact') }}">Contact Us</a>
+                        <a id="contact" class="nav-link" href="{{ route('contact') }}">Contact Us</a>
                     </li>
                     <li class="nav-item">
                         <a id="highlights" class="nav-link" href="{{ route('user.gallery') }}">Highlights</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.portal') }}">Portal</a>
+                        <a id="portal" class="nav-link" href="{{ route('user.portal') }}">Portal</a>
                     </li>
                 </ul>
             </div>

@@ -64,6 +64,52 @@ Route::get('/verify-email', [EnrollmentController::class, 'showVerificationForm'
 // Route for handling the email verification
 Route::post('/verify-email', [EnrollmentController::class, 'verifyEmail'])->name('enrollment.verify');
 
+//Admin Routes
+// branch_analytics
+Route::get('/branch_analytics', function () {
+    return view('admin.branch_analytics');
+})->name('branch_analytics');
+
+// class_scheduling
+Route::get('/class_scheduling', function () {
+    return view('admin.class_scheduling');
+})->name('class_scheduling');
+
+// branch_management
+Route::get('/branch_management', function () {
+    return view('admin.branch_management');
+})->name('branch_management');
+
+// pending_enrollments
+Route::get('/pending_enrollments', function () {
+    return view('admin.pending_enrollments');
+})->name('pending_enrollments');
+
+// staff_management
+Route::get('/staff_management', function () {
+    return view('admin.staff_management');
+})->name('staff_management');
+
+// student_management
+Route::get('/student_management', function () {
+    return view('admin.student_management');
+})->name('student_management');
+
+// reports
+Route::get('/reports', function () {
+    return view('admin.student_management');
+})->name('reports');
+
+// settings
+Route::get('/settings', function () {
+    return view('admin.student_management');
+})->name('settings');
+
+// logout
+Route::get('/logout', function () {
+    return view('admin.student_management');
+})->name('logout');
+
 
 
 

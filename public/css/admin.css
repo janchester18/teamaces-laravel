@@ -1,0 +1,187 @@
+/* Sidebar */
+.sidebar {
+    background-color: #141820 !important; /* Dark bluish sidebar */
+    color: #fff;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    width: 220px;
+}
+
+.sidebar-logo {
+    width: 95%;
+    height: auto;
+    margin: -30px 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 25px;
+}
+
+.sidebar ul li {
+    margin: 3px 0;
+}
+
+.sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.sidebar ul li a i {
+    margin-right: 12px;
+}
+
+.sidebar ul li a:hover {
+    background-color: #1b4b80; /* Hover effect */
+}
+
+.logout-btn {
+    margin-top: auto;
+    margin-bottom: 20px;
+}
+
+/* Main Content with Background Image */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background: url('Images/bg.png') no-repeat center center fixed; /* Set background image */
+    background-size: cover; /* Make sure the background covers the entire area */
+    color: #141820;
+    min-height: 100vh;
+}
+
+/* Add Student Section Card */
+.card {
+    border: none; /* Remove default border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0; /* Sharp edges */
+}
+
+.card-header {
+    background-color: #141820;
+    color: #ffffff;
+    border-radius: 0; /* Sharp edges */
+}
+
+/* Update the input fields for sharp edges */
+.form-control {
+    border-radius: 0; /* Sharp edges */
+}
+
+.btn {
+    border-radius: 0; /* Sharp edges for buttons */
+}
+
+/* Assuming the side panel buttons are smaller, we adjust card size accordingly */
+.card-custom {
+    background: rgba(255, 255, 255, 0.2); /* Default transparent background */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Border for visual effect */
+    color: #000000;
+    border-radius: 0; /* Sharp edges */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 250px; /* Adjusted card width to be proportionate to side panel buttons */
+    padding: 10px; /* Smaller padding */
+    margin: 10px auto; /* Center the card */
+}
+
+/* Only apply backdrop-filter if supported */
+@supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+    .card-custom {
+        -webkit-backdrop-filter: blur(10px); /* WebKit-based browsers */
+        backdrop-filter: blur(10px); /* Standard */
+    }
+}
+
+/* Calendar */
+.calendar-container {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-nav button {
+    border: none;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+}
+
+.calendar div {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.calendar div:hover {
+    background-color: #f0f0f0;
+}
+
+/* Overview of Scheduled Classes */
+.class-overview {
+    margin-top: 20px;
+}
+
+/* Student List Table */
+.table-responsive {
+    margin-top: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.table thead th {
+    background-color: #141820;
+    color: #ffffff;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Recent Activities */
+.list-group-item {
+    background-color: rgba(255, 255, 255, 0.5); /* 50% transparent */
+    color: #000000;
+    border: none;
+    border-radius: 0px; /* Sharp edges */
+    margin-bottom: 5px;
+}

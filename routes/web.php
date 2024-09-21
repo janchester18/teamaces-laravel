@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
 
 Route::get('/', function () {
@@ -105,12 +106,30 @@ Route::get('/settings', function () {
     return view('admin.student_management');
 })->name('settings');
 
-// logout
-Route::get('/logout', function () {
-    return view('admin.student_management');
+// admin_login
+Route::get('/admin_login', function () {
+    return view('admin.admin_login');
+})->name('login');
+
+
+//LOGIN LOGIC////////////////////////////////////////////////////////////////////////////////////////////////////////
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+
+// Owner and staff redirection routes
+Route::get('/owner/branch_analytics', function () {
+    return view('owner.branch_analytics');
+})->name('owner.branch_analytics')->middleware('auth');
+
+Route::get('/admin/branch_analytics', function () {
+    return view('admin.branch_analytics');
+})->name('admin.branch_analytics')->middleware('auth');
+
+//LOGOUT LOGIC////////////////////////////////////////////////////////////////////////////////////////////////////////
+Route::post('/logout', function () {
+    Auth::logout(); // Logs the user out
+    return redirect('/login'); // Redirect to login page after logout
 })->name('logout');
-
-
 
 
 

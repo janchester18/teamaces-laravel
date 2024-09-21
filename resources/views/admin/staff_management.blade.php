@@ -16,7 +16,7 @@
             <!-- Sidebar -->
             <nav class="col-md-2 d-md-block bg-dark sidebar">
                 <div class="logo-container text-center py-4">
-                    <img src="images/admin/aceslogo.png" alt="Logo" class="sidebar-logo">
+                    <img src="{{ asset('images/admin/aceslogo.png') }}" alt="Logo" class="sidebar-logo">
                 </div>
                 <ul class="nav flex-column">
                   <li class="nav-item">
@@ -41,8 +41,13 @@
                     <a class="nav-link text-light" href="{{ route('settings') }}"><i class="fas fa-cogs"></i> Settings</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link text-light logout-btn" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                  </li>
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf <!-- CSRF token for security -->
+                        <button type="submit" class="nav-link text-light btn btn-link logout-btn" style="border: none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </li>
                 </ul>
               </nav>
 

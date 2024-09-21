@@ -15,9 +15,17 @@
         <div class="row">
             <!-- Sidebar -->
             <nav class="col-md-2 d-md-block bg-dark sidebar">
-              <div class="logo-container text-center py-4">
-                <img src="images/admin/aceslogo.png" alt="Logo" class="sidebar-logo">
+              <div class="logo-container text-center pt-4">
+                <img src="{{ asset('images/admin/aceslogo.png') }}" alt="Logo" class="sidebar-logo">
               </div>
+
+            <!-- User Info -->
+            <div class="user-info text-center text-light">
+                <h5>{{ Auth::user()->name }}</h5> <!-- Display User's Name -->
+                <p class="mb-2">{{ Auth::user()->branch ? Auth::user()->branch->name : 'No Branch Assigned' }}</p> <!-- Display Branch Name -->
+                <p>{{ ucfirst(strtolower(Auth::user()->role)) }}</p> <!-- Display Role in Sentence Case -->
+            </div>
+
               <ul class="nav flex-column">
                 <li class="nav-item">
                   <a class="nav-link text-light" href="{{ route('branch_analytics') }}"><i class="fas fa-home"></i> Dashboard</a>
@@ -41,7 +49,12 @@
                   <a class="nav-link text-light" href="{{ route('settings') }}"><i class="fas fa-cogs"></i> Settings</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link text-light logout-btn" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf <!-- CSRF token for security -->
+                        <button type="submit" class="nav-link text-light btn btn-link logout-btn" style="border: none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
                 </li>
               </ul>
             </nav>

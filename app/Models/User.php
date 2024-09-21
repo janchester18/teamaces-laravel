@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,6 +19,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',          // Add the 'role' field
+        'branch_id',     // Foreign key for the branch
     ];
 
     /**
@@ -43,5 +44,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Define the relationship to the Branch model.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);  // Each user belongs to one branch
     }
 }

@@ -10,6 +10,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="icon" href="{{ asset('images/aces.png') }}">
     <style>
         .navbar {
             background-color: rgba(50, 50, 50, 0.75) !important;
@@ -308,37 +309,39 @@ ul.list-group {
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
     <script>
-        // Initialize the map and set the default view
-        var map = L.map('map').setView([37.7749, -122.4194], 4); // Default view of the map
+    // Initialize the map and set the default view to the Philippines
+    var map = L.map('map').setView([12.8797, 121.7740], 6); // Default view of the map set to the Philippines
 
-        // Add OpenStreetMap tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-        // Branch list items click event
-        document.querySelectorAll('.branch-list-item').forEach(function(item) {
-            item.addEventListener('click', function() {
-                // Remove 'active' class from all list items
-                document.querySelectorAll('.branch-list-item').forEach(function(i) {
-                    i.classList.remove('active');
-                });
+    // Loop through each branch list item and add a marker for each branch
+    document.querySelectorAll('.branch-list-item').forEach(function(item) {
+        // Get latitude and longitude from the branch item
+        var lat = parseFloat(item.getAttribute('data-lat'));
+        var lng = parseFloat(item.getAttribute('data-lng'));
 
-                // Add 'active' class to clicked item
-                this.classList.add('active');
+        // Add a marker to the map for the branch location
+        L.marker([lat, lng]).addTo(map).bindPopup(item.innerText);
 
-                // Get latitude and longitude from the clicked item
-                var lat = parseFloat(this.getAttribute('data-lat'));
-                var lng = parseFloat(this.getAttribute('data-lng'));
-
-                // Set the map view to the selected branch location and zoom in
-                map.setView([lat, lng], 14);
-
-                // Optionally, add a marker to the map for the selected branch
-                L.marker([lat, lng]).addTo(map).bindPopup(this.innerText).openPopup();
+        // Optional: Add a click event for focusing the map when the branch is clicked
+        item.addEventListener('click', function() {
+            // Remove 'active' class from all list items
+            document.querySelectorAll('.branch-list-item').forEach(function(i) {
+                i.classList.remove('active');
             });
+
+            // Add 'active' class to clicked item
+            this.classList.add('active');
+
+            // Set the map view to the selected branch location and zoom in
+            map.setView([lat, lng], 14);
         });
-    </script>
+    });
+</script>
+
 
 
     <footer id="footer" class="footer-content section-padding">

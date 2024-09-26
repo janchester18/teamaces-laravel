@@ -7,7 +7,7 @@
     <title>TeamAces Driving Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-
+    <link rel="icon" href="{{ asset('images/aces.png') }}">
 </head>
 <style>
     #gallery-container {
@@ -42,7 +42,7 @@
 
     <!-- Navigation -->
 
-
+    @include('user.loading')
     @extends('layout.app')
 
 
@@ -119,6 +119,10 @@
 
 
     <script>
+        window.onload = function() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        };
         document.addEventListener('DOMContentLoaded', function () {
     let currentIndex = 0;
     const images = document.querySelectorAll('.gallery-img');

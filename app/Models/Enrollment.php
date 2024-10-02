@@ -10,7 +10,7 @@ class Enrollment extends Model
     use HasFactory;
 
     // Primary key as student ID
-    protected $primaryKey = 'student_id';
+    protected $primaryKey = 'id';
     public $incrementing = false; // Non-incrementing ID
 
     protected $fillable = [
@@ -20,15 +20,22 @@ class Enrollment extends Model
         'address',
         'phone_number',
         'email',
-        'course',
+        'course_id',
+        'branch_id',  // Add this line
         'is_email_verified',
         'is_approved',
     ];
+
 
     protected $casts = [
         'is_email_verified' => 'boolean',
         'is_approved' => 'boolean',
     ];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'course_id');
+    }
 
     // Automatically generate the student_id based on the current year and dob
     protected static function boot()
@@ -43,12 +50,12 @@ class Enrollment extends Model
             $randomNumber = sprintf('%05d', mt_rand(0, 99999)); // Ensures the number is always 5 digits long
 
             // Generate the student ID: last two digits of the year + '-' + 5-digit random number
-            $model->student_id = $currentYear . '-' . $randomNumber;
+            $model->id = $currentYear . '-' . $randomNumber;
 
             // Ensure the student ID is unique
-            while (self::where('student_id', $model->student_id)->exists()) {
+            while (self::where('id', $model->id)->exists()) {
                 $randomNumber = sprintf('%05d', mt_rand(0, 99999)); // Generate a new random number
-                $model->student_id = $currentYear . '-' . $randomNumber;
+                $model->id = $currentYear . '-' . $randomNumber;
             }
         });
     }

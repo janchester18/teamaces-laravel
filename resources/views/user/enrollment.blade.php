@@ -270,6 +270,26 @@
         <form action="{{ route('enrollment.store') }}" method="POST">
             @csrf <!-- CSRF token for Laravel form submission security -->
 
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Branch Selection Field -->
+            <div class="mb-3">
+                <label for="branch_id" class="form-label">Select Branch:</label>
+                <select class="form-control" name="branch_id" id="branch_id" required>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- First Name and Last Name Fields -->
             <div class="row mb-3">
                 <div class="col">
@@ -309,11 +329,13 @@
             <!-- Course Selection Field -->
             <div class="mb-3">
                 <label for="course" class="form-label">Course</label>
-                <select class="form-select" id="course" name="course" required>
+                <select class="form-select" id="course" name="course_id" required> <!-- Change name to course_id -->
                     <option selected disabled value="">Select a course</option>
-                    <option value="Course 1">Course 1</option>
-                    <option value="Course 2">Course 2</option>
-                    <option value="Course 3">Course 3</option>
+                    @foreach($courses as $course)
+                        <option value="{{ $course->id }}">
+                            {{ $course->name }} - ₱{{ number_format($course->price, 2) }} <!-- Display name and price -->
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -322,6 +344,7 @@
                 <button type="submit" class="btn btn-primary">Register</button>
             </div>
         </form>
+
     </div>
 
 

@@ -600,7 +600,7 @@ text-decoration:none;
     <section class="hero">
         <h2>TeamAces Driving Academy</h2>
         <h1><strong>Multi-Awarded Driving Academy and Home of the BEST Driving Lessons</strong></h1>
-        <a href="{{ route('enrollment') }}" class="btn btn-primary">Enroll Now</a>
+        <a href="{{ route('enrollment.form') }}" class="btn btn-primary">Enroll Now</a>
     </section>
 
 <!-- Why Choose TeamAces Section -->

@@ -2,8 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\ShowClassSchedule;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\ShowApprovedController;
+use App\Http\Controllers\ShowEnrollmentController;
+use App\Http\Controllers\ApproveEnrollmentController;
 
 Route::get('/', function () {
     return view('user.home'); // Make sure the view is located in resources/views/user/home.blade.php
@@ -54,10 +59,10 @@ Route::get('/branches', [BranchController::class, 'showBranches'])->name('branch
 /* enrollment routes */
 
 // Route for showing the enrollment form
-Route::get('/enroll', [EnrollmentController::class, 'showForm'])->name('enrollment.form');
+Route::get('/enrollment', [EnrollmentController::class, 'showForm'])->name('enrollment.form');
 
 // Route for storing the enrollment data
-Route::post('/enroll', [EnrollmentController::class, 'store'])->name('enrollment.store');
+Route::post('/enrollment', [EnrollmentController::class, 'store'])->name('enrollment.store');
 
 // Route for showing the email verification form
 Route::get('/verify-email', [EnrollmentController::class, 'showVerificationForm'])->name('enrollment.verify.form');
@@ -131,10 +136,14 @@ Route::post('/logout', function () {
     return redirect('/login'); // Redirect to login page after logout
 })->name('logout');
 
+//admin show routes
+Route::get('/pending_enrollments', [ShowEnrollmentController::class, 'showPendingEnrollments'])->name('pending_enrollments');
+Route::get('/student_management', [ShowApprovedController::class, 'index'])->name('student_management');
+Route::get('/class_scheduling', [ShowClassSchedule::class, 'showClassSchedule'])->name('class_scheduling');
 
 
-
-
-
+//staff-confirm payment route
+Route::post('/confirm-payment/{student_id}', [ApproveEnrollmentController::class, 'confirmPayment'])->name('confirm_payment');
+Route::post('/students', [StudentController::class, 'store'])->name('students.store');
 
 

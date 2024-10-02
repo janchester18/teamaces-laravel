@@ -177,6 +177,10 @@
     background-color: #f1f1f1;
 }
 
+.actions {
+    text-align: center !important;
+}
+
 /* Recent Activities */
 .list-group-item {
     background-color: rgba(255, 255, 255, 0.5); /* 50% transparent */

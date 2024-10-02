@@ -10,6 +10,26 @@
     <!-- Bootstrap 5.3.0 CDN link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <style>
+    .table {
+    width: 100%;
+    border-collapse: collapse;
+    }
+
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .class-slot {
+        cursor: pointer; /* Change cursor to pointer for clickable cells */
+    }
+
+    .class-slot:hover {
+        background-color: #f5f5f5; /* Change background color on hover */
+    }
+    </style>
 </head>
 
 <body>
@@ -17,86 +37,93 @@
         <div class="row">
             <!-- Sidebar -->
             <nav class="col-md-2 d-md-block bg-dark sidebar">
-                <div class="logo-container text-center py-4">
+                <div class="logo-container text-center pt-4">
                     <img src="{{ asset('images/admin/aceslogo.png') }}" alt="Logo" class="sidebar-logo">
                 </div>
+
+                            <!-- User Info -->
+            <div class="user-info text-center text-light">
+                <h5>{{ Auth::user()->name }}</h5> <!-- Display User's Name -->
+                <p class="mb-2">{{ Auth::user()->branch ? Auth::user()->branch->name : 'No Branch Assigned' }}</p> <!-- Display Branch Name -->
+                <p>{{ ucfirst(strtolower(Auth::user()->role)) }}</p> <!-- Display Role in Sentence Case -->
+            </div>
                 <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ route('branch_analytics') }}"><i class="fas fa-home"></i> Dashboard</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ route('class_scheduling') }}"><i class="fas fa-calendar-check"></i> Class Scheduling</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ route('student_management') }}"><i class="fas fa-user-graduate"></i> Student Management</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ route('staff_management') }}"><i class="fas fa-users"></i> Staff Management</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ route('branch_management') }}"><i class="fas fa-building"></i> Branch Management</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active text-light" href="{{ route('reports') }}"><i class="fas fa-chart-line"></i> Reports & Analytics</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ route('settings') }}"><i class="fas fa-cogs"></i> Settings</a>
-                  </li>
-                  <li class="nav-item">
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf <!-- CSRF token for security -->
-                        <button type="submit" class="nav-link text-light btn btn-link logout-btn" style="border: none;">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </form>
-                </li>
-                </ul>
+                    <li class="nav-item">
+                      <a class="nav-link text-light" href="{{ route('branch_analytics') }}"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link text-light" href="{{ route('class_scheduling') }}"><i class="fas fa-calendar-check"></i> Class Scheduling</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ route('student_management') }}"><i class="fas fa-user-graduate"></i> Student Management</a>
+                      </li>
+                    <li class="nav-item">
+                      <a class="nav-link text-light" href="{{ route('pending_enrollments') }}"><i class="fas fa-user-plus"></i> Pending Enrollments</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active text-light" href="{{ route('reports') }}"><i class="fas fa-chart-line"></i> Reports & Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link text-light" href="{{ route('settings') }}"><i class="fas fa-cogs"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf <!-- CSRF token for security -->
+                            <button type="submit" class="nav-link text-light btn btn-link logout-btn" style="border: none;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                  </ul>
               </nav>
 
             <!-- Main Content -->
-            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <!-- Top Nav -->
                 <header class="d-flex justify-content-between align-items-center py-3">
-                    <!-- Removed Search Bar, Notifications, and Profile -->
+                    <h2>Class Scheduling</h2>
+                    <div class="profile d-flex align-items-center">
+                        <!-- Notification Icon -->
+                        <a href="#" class="text-dark me-3">
+                            <i class="fas fa-bell"></i>
+                        </a>
+                        <!-- Profile Icon -->
+                        <a href="#" class="text-dark">
+                            <i class="fas fa-user-circle"></i> Profile
+                        </a>
+                    </div>
                 </header>
 
                 <!-- Class Scheduling -->
-                <section class="class-scheduling my-4">
-                    <h2>Class Scheduling</h2>
-                    <div class="calendar-container">
-                        <div class="calendar-header d-flex justify-content-between align-items-center">
-                            <button class="calendar-nav" id="prevMonth" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
-                            <div class="d-flex align-items-center">
-                                <label for="monthSelect" class="visually-hidden">Select Month</label>
-                                <select id="monthSelect" class="form-select me-2" aria-label="Select Month"></select>
-                                <label for="yearSelect" class="visually-hidden">Select Year</label>
-                                <select id="yearSelect" class="form-select" aria-label="Select Year"></select>
-                            </div>
-                            <button class="calendar-nav" id="nextMonth" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div id="calendar" class="calendar"></div>
-                    </div>
+<!-- Class Scheduling -->
+<section class="class-overview my-4">
+    <h4>Overview of Scheduled Classes</h4>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Student Name</th>
+                    <th>Course Acronym</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="classOverviewBody">
+                @foreach ($schedules as $schedule)
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('Y-m-d') }}</td>
+                        <td>{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }}</td>
+                        <td>{{ $schedule->course ? $schedule->course->acronym : 'N/A' }}</td> <!-- Check for existence -->
+                        <td>{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format('h:i A') }}</td>
 
-                    <!-- Overview of Created Classes -->
-                    <section class="class-overview my-4">
-                        <h4>Overview of Scheduled Classes</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Class Name</th>
-                                        <th>Time</th>
-                                        <th>Instructor</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="classOverviewBody">
-                                    <!-- Classes will be added here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </section>
+                    </tr>
+                @endforeach
+            </tbody>
+
+        </table>
+    </div>
+</section>
+
             </main>
         </div>
     </div>

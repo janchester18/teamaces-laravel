@@ -34,13 +34,10 @@
                   <a class="nav-link text-light" href="{{ route('class_scheduling') }}"><i class="fas fa-calendar-check"></i> Class Scheduling</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link text-light" href="{{ route('student_management') }}"><i class="fas fa-user-graduate"></i> Student Management</a>
-                </li>
+                    <a class="nav-link text-light" href="{{ route('student_management') }}"><i class="fas fa-user-graduate"></i> Student Management</a>
+                  </li>
                 <li class="nav-item">
-                  <a class="nav-link text-light" href="{{ route('staff_management') }}"><i class="fas fa-users"></i> Staff Management</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link text-light" href="{{ route('branch_management') }}"><i class="fas fa-building"></i> Branch Management</a>
+                  <a class="nav-link text-light" href="{{ route('pending_enrollments') }}"><i class="fas fa-user-plus"></i> Pending Enrollments</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active text-light" href="{{ route('reports') }}"><i class="fas fa-chart-line"></i> Reports & Analytics</a>
@@ -58,12 +55,20 @@
                 </li>
               </ul>
             </nav>
+
             <!-- Main Content -->
-            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <header class="d-flex justify-content-between align-items-center py-3">
                     <h2>Branch Analytics</h2>
-                    <div class="profile">
-                        <a href="#" class="text-dark"><i class="fas fa-user-circle"></i> Profile</a>
+                    <div class="profile d-flex align-items-center">
+                        <!-- Notification Icon -->
+                        <a href="#" class="text-dark me-3">
+                            <i class="fas fa-bell"></i>
+                        </a>
+                        <!-- Profile Icon -->
+                        <a href="#" class="text-dark">
+                            <i class="fas fa-user-circle"></i> Profile
+                        </a>
                     </div>
                 </header>
 

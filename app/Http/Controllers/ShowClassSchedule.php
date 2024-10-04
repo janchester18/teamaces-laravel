@@ -10,19 +10,33 @@ class ShowClassSchedule extends Controller
 {
     public function showClassSchedule()
     {
-        // Optional: Get the current date
-        $currentDate = Carbon::now();
+        // Get the current logged-in admin's branch_id
+        $adminBranchId = auth()->user()->branch_id;
 
-        // Fetch all schedules with student and course relationships
+        // Fetch schedules that belong to the same branch as the logged-in admin
         $schedules = Schedule::with(['student', 'course']) // Eager load student and course
-            // You can choose to remove the date filter if you want all schedules
-            // Commenting out the whereBetween clause to fetch all schedules
-            // ->whereBetween('scheduled_date', [
-            //     $monday->format('Y-m-d'),
-            //     $monday->copy()->endOfWeek()->format('Y-m-d')
-            // ])
+            ->where('branch_id', $adminBranchId)
             ->get();
 
-        return view('admin.class_scheduling', compact('schedules', 'currentDate'));
+        // Define the time slots (adjust as necessary)
+        $timeSlots = [
+            '8:00 AM', '9:00 AM', '10:00 AM',
+            '11:00 AM', '12:00 PM', '1:00 PM',
+            '2:00 PM', '3:00 PM', '4:00 PM'
+        ];
+
+        // Create a structure for the days of the week
+        $daysOfWeek = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = Carbon::now()->startOfWeek()->addDays($i);
+            $daysOfWeek[] = [
+                'name' => $date->format('l'), // Day name (e.g., Monday)
+                'date' => $date->format('Y-m-d') // Date (e.g., 2024-10-02)
+            ];
+        }
+
+        // Return the view with the filtered schedules, time slots, and days of the week
+        return view('admin.class_scheduling', compact('schedules', 'timeSlots', 'daysOfWeek'));
     }
+
 }

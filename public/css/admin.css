@@ -189,3 +189,58 @@
     border-radius: 0px; /* Sharp edges */
     margin-bottom: 5px;
 }
+
+    #calendar {
+        max-height: 600px; /* Adjust this value as needed */
+        overflow-y: auto; /* Enable vertical scrolling if content exceeds max height */
+    }
+
+/* Custom styles for FullCalendar */
+.fc {
+    font-family: 'Arial', sans-serif; /* Modern font */
+}
+
+/* Change the background color and text color of the header */
+.fc-toolbar {
+    background-color: #343a40; /* Dark background */
+    color: #ffffff; /* White text */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Style the title of the calendar */
+.fc-toolbar h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Style for the calendar day cells */
+.fc-daygrid-day {
+    border: 1px solid #dee2e6; /* Light border */
+}
+
+/* Change hover effect for days */
+.fc-daygrid-day:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+}
+
+/* Style the events */
+/* Remove hover effects from FullCalendar events */
+.fc-event {
+    color: #000000;
+    transition: none !important; /* Disable transitions */
+    cursor: default; /* Change cursor to default */
+}
+
+
+
+/* Style for selected days in the month view */
+.fc-daygrid-day.fc-day-today {
+    background-color: #e9ecef; /* Highlight today */
+}
+
+.fc-toolbar-chunk button {
+    background-color: #e9ecef !important;
+    color: #343a40 !important;
+}
+

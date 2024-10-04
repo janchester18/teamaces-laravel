@@ -1,9 +1,11 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ShowClassSchedule;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ShowApprovedController;
@@ -145,5 +147,20 @@ Route::get('/class_scheduling', [ShowClassSchedule::class, 'showClassSchedule'])
 //staff-confirm payment route
 Route::post('/confirm-payment/{student_id}', [ApproveEnrollmentController::class, 'confirmPayment'])->name('confirm_payment');
 Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+Route::delete('/enrollments/{id}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+
+
+//schedule routes
+Route::get('/students/{id}/schedules', [ShowApprovedController::class, 'fetchSchedule'])->name('students.schedules');
+Route::get('/students/{student}', [ShowApprovedController::class, 'show'])->name('students.show');
+Route::put('/schedules/{id}', [ScheduleController::class, 'update'])->name('schedules.update');
+// Fetch student schedules
+Route::get('/students/{studentId}/schedules', [StudentController::class, 'getStudentSchedules'])
+    ->name('students.schedules');
+
+// Update schedule status
+Route::put('/schedules/{scheduleId}/update', [ScheduleController::class, 'updateScheduleStatus'])
+    ->name('schedules.update');
+
 
 

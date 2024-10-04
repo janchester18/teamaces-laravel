@@ -10,7 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <!-- SweetAlert CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
 </head>
 <body>
@@ -118,7 +119,7 @@
                             @endif
                         </td>
                         <td class="actions">
-                            <button class="btn btn-sm btn-warning">Edit</button>
+                            <a href="{{ route('students.show', ['student' => $student->id]) }}" class="btn btn-sm btn-primary">Edit Schedule</a>
                             <button class="btn btn-sm btn-warning">Update Progress</button>
                         </td>
                     </tr>
@@ -193,16 +194,44 @@
                             <button type="submit" class="btn btn-primary">Add Student</button>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal Structure -->
+<!-- Modal -->
+<div class="modal fade" id="updateProgressModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Update Student Progress</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalStudentInfo"></div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Scheduled Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalScheduleBody"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> --}}
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Bootstrap JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Include Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.getElementById('addStudentForm').addEventListener('submit', function (e) {
@@ -283,6 +312,98 @@ document.getElementById('package').addEventListener('change', function() {
             packageSelect.selectedIndex = 0; // Reset to the default "Select a package" option
         }
     });
+
+
+    $(document).ready(function () {
+    $('.btn-warning').on('click', function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        // Get the student ID (you can store it as a data attribute on the button)
+        const studentId = $(this).closest('tr').find('td:nth-child(2)').text();
+
+        // Optionally, you can retrieve student data from the table if needed
+        const studentName = $(this).closest('tr').find('td:nth-child(3)').text();
+
+        // Make an AJAX request to fetch the schedules for this student
+        $.ajax({
+            url: `/students/${studentId}/schedules`, // Define your route here
+            method: 'GET',
+            success: function (data) {
+                // Check if data is valid
+                if (!data || !Array.isArray(data) || data.length === 0) {
+                    alert('No schedules found for this student.');
+                    return; // Exit if data is not in expected format
+                }
+
+                // Populate the modal with student info (Assuming you have studentName available)
+                $('#modalStudentInfo').html(`
+                    <strong>Student ID:</strong> ${studentId} <br>
+                    <strong>Name:</strong> ${studentName} <br>
+                `);
+
+                // Clear the schedule body
+                $('#modalScheduleBody').empty();
+
+                // Populate the schedule table
+                data.forEach(schedule => {
+                    $('#modalScheduleBody').append(`
+                        <tr>
+                            <td>${schedule.scheduled_date}</td>
+                            <td>
+                                <select class="form-control" onchange="updateScheduleStatus(${schedule.id}, this.value)">
+                                    <option value="pending" ${schedule.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="done" ${schedule.status === 'done' ? 'selected' : ''}>Done</option>
+                                    <option value="missed" ${schedule.status === 'missed' ? 'selected' : ''}>Missed</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                // Show the modal
+                $('#updateProgressModal').modal('show');
+            },
+            error: function () {
+                alert('Error retrieving student schedules.');
+            }
+        });
+    });
+});
+
+// Function to update schedule status
+function updateScheduleStatus(scheduleId, status) {
+    // Make an AJAX request to update the schedule status
+    $.ajax({
+        url: `/schedules/${scheduleId}/update`, // Define your route for updating schedule
+        method: 'PUT',
+        data: {
+            status: status,
+            _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token here
+        },
+        success: function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'Status Updated',
+                text: 'Schedule status has been updated successfully!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        },
+        error: function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: 'There was an error updating the schedule status.',
+                showConfirmButton: true
+            });
+        }
+    });
+}
+
+
 
     </script>
 

@@ -326,18 +326,30 @@
                 <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
             </div>
 
-            <!-- Course Selection Field -->
-            <div class="mb-3">
-                <label for="course" class="form-label">Course</label>
-                <select class="form-select" id="course" name="course_id" required> <!-- Change name to course_id -->
-                    <option selected disabled value="">Select a course</option>
-                    @foreach($courses as $course)
-                        <option value="{{ $course->id }}">
-                            {{ $course->name }} - ₱{{ number_format($course->price, 2) }} <!-- Display name and price -->
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                        <!-- Course Selection Field -->
+                        <div class="mb-3">
+                            <label for="course" class="form-label">Course</label>
+                            <select class="form-select" id="course" name="course_id">
+                                <option value="" selected>Select a course</option>
+                                @foreach($courses as $course)
+                                    <option value="{{ $course->id }}">
+                                        {{ $course->name }} - ₱{{ number_format($course->price, 2) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <!-- Package Selection Field -->
+                        <div class="mb-3">
+                            <label for="package" class="form-label">Package</label>
+                            <select class="form-select" id="package" name="package_id">
+                                <option value="" selected>Select a package</option>
+                                @foreach($packages as $package)
+                                    <option value="{{ $package->id }}">
+                                        {{ $package->name }} - ₱{{ number_format($package->price, 2) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
             <!-- Submit Button -->
             <div class="button-container">
@@ -413,6 +425,23 @@
                 }
             });
         });
+        document.getElementById('package').addEventListener('change', function() {
+        var courseSelect = document.getElementById('course');
+
+        // If a package is selected, clear the course selection
+        if (this.value !== "") {
+            courseSelect.selectedIndex = 0; // Reset to the default "Select a course" option
+        }
+    });
+
+    document.getElementById('course').addEventListener('change', function() {
+        var packageSelect = document.getElementById('package');
+
+        // If a course is selected, clear the package selection
+        if (this.value !== "") {
+            packageSelect.selectedIndex = 0; // Reset to the default "Select a package" option
+        }
+    });
     </script>
 
 </body>

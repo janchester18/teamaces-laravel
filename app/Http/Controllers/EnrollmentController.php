@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Course;
+use App\Models\Package;
+use App\Models\Student;
 use App\Models\Enrollment;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Models\StudentCourse;
 
 class EnrollmentController extends Controller
 {
@@ -17,14 +20,23 @@ class EnrollmentController extends Controller
      */
     public function showForm()
     {
-        // Fetch branches from the database
-        $branches = Branch::all(); // Fetch all branches
+        // Fetch students along with their courses
+        $students = Student::with('courses')->get();
+
+        // Fetch students along with their courses
+        $branches = Branch::all();
 
         // Fetch courses from the database
         $courses = Course::all(); // Fetch all courses from the database
 
-        // Pass branches and courses to the view
-        return view('user.enrollment', compact('branches', 'courses'));
+        // Fetch packages from the database
+        $packages = Package::where('is_active', 1)->get(); // Fetch active packages
+
+        // Fetch the student courses (if necessary, depending on your use case)
+        $studentCourses = StudentCourse::all();
+
+        // Return the view with the fetched data
+        return view('user.enrollment', compact('students', 'branches', 'courses', 'packages', 'studentCourses')); // Include packages in the compact
     }
 
     /**
@@ -46,7 +58,9 @@ class EnrollmentController extends Controller
                 'unique:enrollments,email',
                 'unique:students,email', // Check against the students table as well
             ],
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'nullable|exists:courses,id', // Dropdown for courses
+            'package_id' => 'nullable|exists:packages,id', // Dropdown for packages
+
         ], [
             'email.unique' => 'This email address is already taken. Please use a different email address.', // Custom error message
         ]);
@@ -110,5 +124,20 @@ class EnrollmentController extends Controller
         DB::table('email_verification_tokens')->where('token', $code)->delete();
 
         return redirect()->route('enrollment.form')->with('success', 'Email verified successfully!');
+    }
+    public function destroy($id)
+    {
+        // Find the enrollment by ID
+        $enrollment = Enrollment::find($id);
+
+        // Check if enrollment exists
+        if (!$enrollment) {
+            return response()->json(['message' => 'Enrollment not found.'], 404);
+        }
+
+        // Delete the enrollment
+        $enrollment->delete();
+
+        return response()->json(['message' => 'Enrollment deleted successfully.']);
     }
 }

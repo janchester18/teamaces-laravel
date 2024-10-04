@@ -85,31 +85,49 @@
                                 </div>
                             </div>
                         @else
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Student ID</th>
-                                        <th>Student Name</th>
-                                        <th>Course</th>
-                                        <th>Enrolled on</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($pendingEnrollments as $enrollment)
-                                    <tr>
-                                        <td>{{ $enrollment->id }}</td>
-                                        <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
-                                        <td>{{ $enrollment->course ? $enrollment->course->name : 'N/A' }}</td> <!-- Display course name -->
-                                        <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-success" onclick="confirmPayment('{{ $enrollment->id }}')">Confirm Payment</button>
-                                        </td>
-                                    </tr>
-
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Course/Package</th> <!-- Combined column -->
+                                    <th>Price</th> <!-- Price column -->
+                                    <th>Enrolled on</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingEnrollments as $enrollment)
+                                <tr>
+                                    <td>{{ $enrollment->id }}</td>
+                                    <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
+                                    <td>
+                                        @if($enrollment->course)
+                                            {{ $enrollment->course->name }} (Course)
+                                        @elseif($enrollment->package)
+                                            {{ $enrollment->package->name }} (Package)
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($enrollment->course)
+                                            {{ number_format($enrollment->course->price, 2) }} <!-- Display course price -->
+                                        @elseif($enrollment->package)
+                                            {{ number_format($enrollment->package->price, 2) }} <!-- Display package price -->
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
+                                    <td class="actions">
+                                        <button class="btn btn-sm btn-success" onclick="confirmPayment('{{ $enrollment->id }}')">Confirm Payment</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete Enrollment</button> <!-- Delete button -->
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                         @endif
                     </div>
                 </section>
@@ -168,6 +186,52 @@
             }
         });
     }
+
+    function deleteEnrollment(enrollmentId) {
+    Swal.fire({
+        title: 'Delete Enrollment',
+        text: "Are you sure you want to delete this enrollment?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Make AJAX request to delete the enrollment
+            $.ajax({
+                url: '/enrollments/' + enrollmentId,
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}' // Include CSRF token for security
+                },
+                success: function(response) {
+                    Swal.fire(
+                        'Deleted!',
+                        response.message,
+                        'success'
+                    );
+                    // Optionally reload the page or remove the row from the table
+                    location.reload(); // Reload the page to refresh the table
+                },
+                error: function(xhr) {
+                    Swal.fire(
+                        'Error!',
+                        xhr.responseJSON.message || 'Something went wrong.',
+                        'error'
+                    );
+                }
+            });
+        } else {
+            Swal.fire(
+                'Cancelled',
+                'Enrollment deletion cancelled.',
+                'error'
+            );
+        }
+    });
+}
 </script>
 
 </body>

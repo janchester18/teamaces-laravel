@@ -77,13 +77,13 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card p-3 text-center">
-                                <h3><i class="fas fa-user-graduate"></i> Students</h3>
+                                <h3><i class="fas fa-user-graduate"></i> Total Students</h3>
                                 <p>500</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card p-3 text-center">
-                                <h3><i class="fas fa-chalkboard-teacher"></i> Instructors</h3>
+                                <h3><i class="fas fa-chalkboard-teacher"></i> Scheduled Sessions Today</h3>
                                 <p>25</p>
                             </div>
                         </div>
@@ -105,57 +105,7 @@
                     </div>
                 </section>
 
-                <!-- Branch Performance Table Section -->
-                <section class="branch-performance my-4">
-                    <h3>Branch Performance</h3>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Branch Name</th>
-                                    <th>Students</th>
-                                    <th>Instructors</th>
-                                    <th>Revenue</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Main Branch</td>
-                                    <td>300</td>
-                                    <td>15</td>
-                                    <td>$80,000</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning">View</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>North Branch</td>
-                                    <td>150</td>
-                                    <td>7</td>
-                                    <td>$30,000</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning">View</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>East Branch</td>
-                                    <td>50</td>
-                                    <td>3</td>
-                                    <td>$10,000</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning">View</button>
-                                    </td>
-                                </tr>
-                                <!-- Repeat rows as necessary -->
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+
             </main>
         </div>
     </div>

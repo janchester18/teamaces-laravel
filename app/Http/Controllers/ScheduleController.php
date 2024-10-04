@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Student;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -55,4 +57,40 @@ class ScheduleController extends Controller
             }
         }
     }
+
+    public function update(Request $request, $id) {
+        $request->validate([
+            'scheduled_date' => 'required|date',
+            'schedule_finish' => 'required|date',
+        ]);
+
+        // Find the schedule
+        $schedule = Schedule::findOrFail($id);
+
+        // Update the schedule fields
+        $schedule->scheduled_date = $request->input('scheduled_date');
+        $schedule->schedule_finish = $request->input('schedule_finish');
+        $schedule->status = 'pending'; // Or whatever logic you need for status
+
+        // Save the changes
+        $schedule->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function updateScheduleStatus(Request $request, $scheduleId)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'status' => 'required|in:pending,done,missed',
+        ]);
+
+        // Find the schedule by ID and update the status
+        $schedule = Schedule::findOrFail($scheduleId);
+        $schedule->status = $request->status;
+        $schedule->save();
+
+        return response()->json(['message' => 'Schedule status updated successfully.']);
+    }
+
 }

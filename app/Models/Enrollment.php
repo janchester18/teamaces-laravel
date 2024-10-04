@@ -9,9 +9,8 @@ class Enrollment extends Model
 {
     use HasFactory;
 
-    // Primary key as student ID
     protected $primaryKey = 'id';
-    public $incrementing = false; // Non-incrementing ID
+    public $incrementing = false;
 
     protected $fillable = [
         'first_name',
@@ -21,11 +20,11 @@ class Enrollment extends Model
         'phone_number',
         'email',
         'course_id',
-        'branch_id',  // Add this line
+        'branch_id',
+        'package_id',  // Add this line
         'is_email_verified',
         'is_approved',
     ];
-
 
     protected $casts = [
         'is_email_verified' => 'boolean',
@@ -37,27 +36,24 @@ class Enrollment extends Model
         return $this->belongsTo(Course::class, 'course_id');
     }
 
-    // Automatically generate the student_id based on the current year and dob
+    public function package()
+    {
+        return $this->belongsTo(Package::class, 'package_id');  // Define relationship with Package
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         self::creating(function ($model) {
-            // Get the last two digits of the current year
             $currentYear = date('y');
-
-            // Generate a 5-digit random number
-            $randomNumber = sprintf('%05d', mt_rand(0, 99999)); // Ensures the number is always 5 digits long
-
-            // Generate the student ID: last two digits of the year + '-' + 5-digit random number
+            $randomNumber = sprintf('%05d', mt_rand(0, 99999));
             $model->id = $currentYear . '-' . $randomNumber;
 
-            // Ensure the student ID is unique
             while (self::where('id', $model->id)->exists()) {
-                $randomNumber = sprintf('%05d', mt_rand(0, 99999)); // Generate a new random number
+                $randomNumber = sprintf('%05d', mt_rand(0, 99999));
                 $model->id = $currentYear . '-' . $randomNumber;
             }
         });
     }
-
 }

@@ -44,6 +44,7 @@ class ShowApprovedController extends Controller
     {
         $schedules = Schedule::where('student_id', $studentId)
             ->with(['course']) // Assuming 'course' is the relationship defined in the Schedule model
+            ->orderBy('scheduled_date', 'asc') // Sort by scheduled_date in ascending order
             ->get();
 
         if ($schedules->isEmpty()) {

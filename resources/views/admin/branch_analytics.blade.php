@@ -59,7 +59,7 @@
             <!-- Main Content -->
             <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <header class="d-flex justify-content-between align-items-center py-3">
-                    <h2>Branch Analytics</h2>
+                    <h2>Dashboard</h2>
                     <div class="profile d-flex align-items-center">
                         <!-- Notification Icon -->
                         <a href="#" class="text-dark me-3">
@@ -78,19 +78,44 @@
                         <div class="col-md-4">
                             <div class="card p-3 text-center">
                                 <h3><i class="fas fa-user-graduate"></i> Total Students</h3>
-                                <p>500</p>
+                                <p>{{ $totalStudents }}</p> <!-- Display the count of total students -->
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card p-3 text-center">
                                 <h3><i class="fas fa-chalkboard-teacher"></i> Scheduled Sessions Today</h3>
-                                <p>25</p>
+                                <p>{{ $scheduledSessionsToday }}</p> <!-- Display the count of scheduled sessions for today -->
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card p-3 text-center">
                                 <h3><i class="fas fa-dollar-sign"></i> Revenue</h3>
-                                <p>$120,000</p>
+                                <p>₱{{ number_format($totalRevenue, 2) }}</p> <!-- Display the total revenue formatted as currency -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pending Requests Section -->
+                <section class="pending-requests my-4">
+                    <h3>Pending Requests</h3>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card p-3 text-center">
+                                <h4><i class="fas fa-user-plus"></i> Enrollment</h4>
+                                <p>10</p> <!-- Example value for pending enrollments -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card p-3 text-center">
+                                <h4><i class="fas fa-box-open"></i> Package</h4>
+                                <p>5</p> <!-- Example value for pending packages -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card p-3 text-center">
+                                <h4><i class="fas fa-calendar-alt"></i> Schedule Adjustment</h4>
+                                <p>3</p> <!-- Example value for pending schedule adjustments -->
                             </div>
                         </div>
                     </div>
@@ -98,10 +123,17 @@
 
                 <!-- Revenue Chart Section -->
                 <section class="revenue-chart my-4">
-                    <h3>Revenue by Branch</h3>
+                    <h3>Revenue per Month</h3>
                     <div class="card p-3">
-                        <p>Revenue Chart Placeholder</p>
-                        <!-- Insert your chart library here (e.g., Chart.js, Google Charts) -->
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Insights Section -->
+                <section class="insights my-4">
+                    <h3>AI Generated Insights</h3>
+                    <div class="card p-3">
+                        <p id="insights-placeholder">Loading insights...</p>
                     </div>
                 </section>
 
@@ -112,5 +144,58 @@
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+        fetch('{{ route('revenue_insights') }}')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('insights-placeholder').innerText = data.insights;
+            })
+            .catch(error => {
+                console.error('Error fetching insights:', error);
+                document.getElementById('insights-placeholder').innerText = 'Error fetching insights.';
+            });
+    });
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const revenueData = @json($revenueData); // Pass the revenue data from PHP to JavaScript
+
+            const labels = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: Object.values(revenueData), // Use the revenue data for the line chart
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+
+            const revenueChart = new Chart(ctx, config);
+        });
+    </script>
 </body>
 </html>

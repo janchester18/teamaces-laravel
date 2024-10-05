@@ -303,8 +303,10 @@ private function createTDCSchedules(Student $student, $courseId, $startDate, $ho
     }
     public function getStudentSchedules($studentId)
     {
-        // Fetch schedules for the specified student ID
-        $schedules = Schedule::where('student_id', $studentId)->get();
+        // Fetch schedules for the specified student ID and order by scheduled_date in ascending order
+        $schedules = Schedule::where('student_id', $studentId)
+                             ->orderBy('scheduled_date', 'asc')
+                             ->get();
 
         return response()->json($schedules); // Return the schedules as JSON
     }

@@ -70,6 +70,13 @@
                     </div>
                 </header>
 
+                <!-- "Back to Student Management" Button -->
+                <div class="mb-3">
+                    <a href="{{ route('student_management') }}" class="text-primary" style="text-decoration: underline;">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Student Management
+                    </a>
+                </div>
+
                 <div class="container">
                     <h2>Schedule for <strong>{{ $student->first_name }} {{ $student->last_name }}</strong></h2>
 
@@ -95,20 +102,22 @@
                             <tbody>
                                 @foreach($schedules as $schedule)
                                 <tr>
-                                    <td>{{ $schedule->course->name }}</td> <!-- Assuming there is a relationship to get course name -->
-                                    <td>{{ $schedule->scheduled_date }}</td> <!-- Formatting date -->
+                                    <td>{{ $schedule->course->name }}</td>
+                                    <td>{{ $schedule->scheduled_date }}</td>
                                     <td>{{ $schedule->schedule_finish }}</td>
-                                    <td>{{ ucfirst($schedule->status) }}</td> <!-- Capitalizing status -->
+                                    <td>{{ ucfirst($schedule->status) }}</td>
                                     <td class="actions">
-                                        <button class="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editScheduleModal"
-                                            data-schedule-id="{{ $schedule->id }}"
-                                            data-course-hours="{{ $schedule->course->hours_per_session }}"
-                                            data-date="{{ $schedule->scheduled_date }}"
-                                            data-finish="{{ $schedule->schedule_finish }}">
-                                            Edit
-                                        </button>
+                                        @if(strtolower($schedule->status) !== 'done') <!-- Check if status is not "done" -->
+                                            <button class="btn btn-warning btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editScheduleModal"
+                                                data-schedule-id="{{ $schedule->id }}"
+                                                data-course-hours="{{ $schedule->course->hours_per_session }}"
+                                                data-date="{{ $schedule->scheduled_date }}"
+                                                data-finish="{{ $schedule->schedule_finish }}">
+                                                Edit
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -219,7 +228,7 @@
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token for security
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({
                             scheduled_date: newStartDate,
@@ -229,21 +238,19 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Show a success alert using SweetAlert
                             Swal.fire({
                                 title: 'Updated!',
                                 text: 'Schedule updated successfully!',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then(() => {
-                                // Reload the page only after clicking 'OK'
                                 location.reload();
                             });
                         } else {
-                            // Show an error alert using SweetAlert
+                            // Display the error message returned from the backend
                             Swal.fire({
                                 title: 'Error!',
-                                text: 'Failed to update schedule. Please try again.',
+                                text: data.message || 'Failed to update schedule. Please try again.',
                                 icon: 'error',
                                 confirmButtonText: 'OK'
                             });
@@ -251,7 +258,6 @@
                     })
                     .catch(error => {
                         console.error('Error updating schedule:', error);
-                        // Show a network error alert using SweetAlert
                         Swal.fire({
                             title: 'Network Error!',
                             text: 'There was an issue connecting to the server. Please try again later.',
@@ -259,6 +265,7 @@
                             confirmButtonText: 'OK'
                         });
                     });
+
                 }
             });
         });

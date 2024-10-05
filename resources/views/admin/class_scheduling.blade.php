@@ -86,16 +86,29 @@
 
                 <!-- Modal to display schedule events -->
                 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="eventModalLabel">Scheduled Classes</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <ul id="eventDetails" class="list-group">
-                                    <!-- Event details will be injected here by JS -->
-                                </ul>
+                                <!-- Modal table structure -->
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Student</th>
+                                                <th>Phone Number</th>
+                                                <th>Time</th>
+                                                <th>Course</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="eventDetailsTableBody">
+                                            <!-- Event details will be injected here by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -103,6 +116,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Class Scheduling -->
                 <section class="class-overview my-4">
@@ -144,83 +158,98 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
 "></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Group events by date
-        var eventsByDate = {};
+   document.addEventListener('DOMContentLoaded', function () {
+    // Group events by date
+    var eventsByDate = {};
 
-        @foreach ($schedules as $schedule)
-            @if ($schedule->course_id != 1) <!-- Check if course_id is not equal to 1 -->
-                <?php
-                    // Extracting the date without the time part
-                    $date = \Carbon\Carbon::parse($schedule->scheduled_date)->toDateString();
-                ?>
-                // Add event to the respective date
-                eventsByDate['{{ $date }}'] = eventsByDate['{{ $date }}'] || [];
-                eventsByDate['{{ $date }}'].push({
-                    title: '{{ $schedule->student ? $schedule->student->first_name : "N/A" }} {{ $schedule->student ? $schedule->student->last_name : "N/A" }} - {{ $schedule->course ? $schedule->course->acronym : "N/A" }}',
-                    start: '{{ $schedule->scheduled_date }}',
-                    end: '{{ $schedule->schedule_finish }}',
-                    extendedProps: { // Ensure extendedProps is defined
-                        student: '{{ $schedule->student ? $schedule->student->first_name : "N/A" }} {{ $schedule->student ? $schedule->student->last_name : "N/A" }}',
-                        course: '{{ $schedule->course ? $schedule->course->acronym : "N/A" }}',
-                        time: '{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format("h:i A") }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format("h:i A") }}'
-                    }
-                });
-            @endif
-        @endforeach
-
-        // Flatten the events for FullCalendar, limiting to 3 events per date and adding "more+" if necessary
-        var events = [];
-        for (const [date, dayEvents] of Object.entries(eventsByDate)) {
-            const displayedEvents = dayEvents.slice(0, 3); // Get the first 3 events
-            events.push(...displayedEvents); // Add the first 3 events
-
-            if (dayEvents.length > 3) {
-                // Add a "more+" event if there are more than 3
-                events.push({
-                    title: `+${dayEvents.length - 3} more`,
-                    start: date,
-                    allDay: true // This makes it a full-day event
-                });
-            }
-        }
-
-        // Initialize FullCalendar
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            height: 'auto',
-            events: events,
-            dateClick: function (info) {
-                // Log the clicked date
-                console.log('Clicked date:', info.dateStr);
-
-                // Show all events for the clicked date
-                var eventDetails = $('#eventDetails');
-                eventDetails.empty();
-
-                // Retrieve all events for the clicked date
-                const allEventsForTheDay = eventsByDate[info.dateStr] || [];
-
-                if (allEventsForTheDay.length) {
-                    allEventsForTheDay.forEach(event => {
-                        // Ensure extendedProps is defined before accessing its properties
-                        const student = event.extendedProps?.student || "N/A";
-                        const course = event.extendedProps?.course || "N/A";
-                        const time = event.extendedProps?.time || "N/A";
-                        eventDetails.append(`<li class="list-group-item">${student} (${time}) - ${course}</li>`);
-                    });
-                } else {
-                    eventDetails.append('<li class="list-group-item">No scheduled classes for this day.</li>');
+    @foreach ($schedules as $schedule)
+        @if ($schedule->course_id != 1) <!-- Check if course_id is not equal to 1 -->
+            <?php
+                // Extracting the date without the time part
+                $date = \Carbon\Carbon::parse($schedule->scheduled_date)->toDateString();
+            ?>
+            // Add event to the respective date
+            eventsByDate['{{ $date }}'] = eventsByDate['{{ $date }}'] || [];
+            eventsByDate['{{ $date }}'].push({
+                title: '{{ $schedule->student ? $schedule->student->first_name : "N/A" }} {{ $schedule->student ? $schedule->student->last_name : "N/A" }} - {{ $schedule->course ? $schedule->course->acronym : "N/A" }}',
+                start: '{{ $schedule->scheduled_date }}',
+                end: '{{ $schedule->schedule_finish }}',
+                extendedProps: { // Ensure extendedProps is defined
+                    student: '{{ $schedule->student ? $schedule->student->first_name : "N/A" }} {{ $schedule->student ? $schedule->student->last_name : "N/A" }}',
+                    phone: '{{ $schedule->student ? $schedule->student->phone_number : "N/A" }}',
+                    course: '{{ $schedule->course ? $schedule->course->acronym : "N/A" }}',
+                    time: '{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format("h:i A") }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format("h:i A") }}'
                 }
+            });
+        @endif
+    @endforeach
 
-                var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-                eventModal.show();
+    // Flatten the events for FullCalendar, limiting to 3 events per date and adding "more+" if necessary
+    var events = [];
+    for (const [date, dayEvents] of Object.entries(eventsByDate)) {
+        const displayedEvents = dayEvents.slice(0, 3); // Get the first 3 events
+        events.push(...displayedEvents); // Add the first 3 events
+
+        if (dayEvents.length > 3) {
+            // Add a "more+" event if there are more than 3
+            events.push({
+                title: `+${dayEvents.length - 3} more`,
+                start: date,
+                allDay: true // This makes it a full-day event
+            });
+        }
+    }
+
+    // Initialize FullCalendar
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        events: events,
+        dateClick: function (info) {
+            // Show all events for the clicked date
+            var eventDetailsTableBody = $('#eventDetailsTableBody');
+            eventDetailsTableBody.empty();
+
+            // Retrieve all events for the clicked date
+            const allEventsForTheDay = eventsByDate[info.dateStr] || [];
+
+            if (allEventsForTheDay.length) {
+                allEventsForTheDay.forEach(event => {
+                    // Ensure extendedProps is defined before accessing its properties
+                    const student = event.extendedProps?.student || "N/A";
+                    const phone = event.extendedProps?.phone || "N/A";
+                    const course = event.extendedProps?.course || "N/A";
+                    const time = event.extendedProps?.time || "N/A";
+
+                    // Append a new row for each event in the table, adding the phone number
+                    eventDetailsTableBody.append(`
+                        <tr>
+                            <td>${student}</td>
+                            <td>${phone}</td>
+                            <td>${time}</td>
+                            <td>${course}</td>
+                        </tr>
+                    `);
+                });
+            } else {
+                // If no events are found, add a single row indicating no events
+                eventDetailsTableBody.append(`
+                    <tr>
+                        <td colspan="4" class="text-center">No scheduled classes for this day.</td>
+                    </tr>
+                `);
             }
-        });
 
-        calendar.render();
+            // Display the modal
+            var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+            eventModal.show();
+        }
     });
+
+    calendar.render();
+});
+
 </script>
 
 

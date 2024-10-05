@@ -58,18 +58,56 @@ class ScheduleController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'scheduled_date' => 'required|date',
             'schedule_finish' => 'required|date',
         ]);
 
-        // Find the schedule
+        // Retrieve the schedule being updated
         $schedule = Schedule::findOrFail($id);
 
-        // Update the schedule fields
-        $schedule->scheduled_date = $request->input('scheduled_date');
-        $schedule->schedule_finish = $request->input('schedule_finish');
+        // Extract necessary fields for checking conflicts
+        $newStartDate = $request->input('scheduled_date');
+        $newFinishDate = $request->input('schedule_finish');
+        $courseId = $schedule->course_id;
+        $branchId = $schedule->branch_id;
+
+        // Check if the course is "TDC" (course_id = 1)
+        if ($courseId != 1) {
+            // Check if the same time slot has 2 or more schedules with the same course and branch
+            $conflictingSchedules = Schedule::where('branch_id', $branchId)
+                ->where('course_id', $courseId)
+                ->where(function ($query) use ($newStartDate, $newFinishDate) {
+                    // Check if the new start or finish time overlaps with existing schedules
+                    $query->where(function ($q) use ($newStartDate, $newFinishDate) {
+                        $q->where('scheduled_date', '<=', $newStartDate)
+                          ->where('schedule_finish', '>=', $newStartDate);
+                    })
+                    ->orWhere(function ($q) use ($newStartDate, $newFinishDate) {
+                        $q->where('scheduled_date', '<=', $newFinishDate)
+                          ->where('schedule_finish', '>=', $newFinishDate);
+                    })
+                    ->orWhere(function ($q) use ($newStartDate, $newFinishDate) {
+                        $q->where('scheduled_date', '>=', $newStartDate)
+                          ->where('schedule_finish', '<=', $newFinishDate);
+                    });
+                })
+                ->count();
+
+            // If the number of conflicting schedules is 2 or more, return an error
+            if ($conflictingSchedules >= 2) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This schedule time slot is already fully booked for this course and branch. Only 2 students can have the same schedule per slot.'
+                ]);
+            }
+        }
+
+        // Update the schedule fields if no conflict
+        $schedule->scheduled_date = $newStartDate;
+        $schedule->schedule_finish = $newFinishDate;
         $schedule->status = 'pending'; // Or whatever logic you need for status
 
         // Save the changes
@@ -77,6 +115,8 @@ class ScheduleController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+
 
     public function updateScheduleStatus(Request $request, $scheduleId)
     {

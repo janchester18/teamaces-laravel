@@ -6,6 +6,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ShowClassSchedule;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ShowApprovedController;
@@ -161,6 +162,10 @@ Route::get('/students/{studentId}/schedules', [StudentController::class, 'getStu
 // Update schedule status
 Route::put('/schedules/{scheduleId}/update', [ScheduleController::class, 'updateScheduleStatus'])
     ->name('schedules.update');
+
+//dashboard routes
+Route::get('/admin/branch_analytics', [DashboardController::class, 'index'])->name('branch_analytics');
+Route::get('/branch_analytics/revenue-insights', [DashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
 
 
 

@@ -28,7 +28,7 @@
 
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link text-light" href="{{ route('branch_analytics') }}"><i class="fas fa-home"></i> Dashboard</a>
+                  <a class="nav-link text-light" href="{{ route('admin.branch_analytics_view') }}"><i class="fas fa-home"></i> Dashboard</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link text-light" href="{{ route('class_scheduling') }}"><i class="fas fa-calendar-check"></i> Class Scheduling</a>

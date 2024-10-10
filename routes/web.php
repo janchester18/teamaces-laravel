@@ -129,9 +129,10 @@ Route::get('/owner/branch_analytics', function () {
     return view('owner.branch_analytics');
 })->name('owner.branch_analytics')->middleware('auth');
 
-Route::get('/admin/branch_analytics', function () {
+Route::get('/admin/branch_analytics?view=summary', function () {
     return view('admin.branch_analytics');
-})->name('admin.branch_analytics')->middleware('auth');
+})->name('admin.branch_analytics_view')->middleware('auth');
+
 
 //LOGOUT LOGIC////////////////////////////////////////////////////////////////////////////////////////////////////////
 Route::post('/logout', function () {
@@ -164,7 +165,10 @@ Route::put('/schedules/{scheduleId}/update', [ScheduleController::class, 'update
     ->name('schedules.update');
 
 //dashboard routes
-Route::get('/admin/branch_analytics', [DashboardController::class, 'index'])->name('branch_analytics');
+// Controller-based route for more complex logic
+Route::get('/admin/branch_analytics', [DashboardController::class, 'index'])
+    ->name('admin.branch_analytics');
+
 Route::get('/branch_analytics/revenue-insights', [DashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
 
 

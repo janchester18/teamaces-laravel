@@ -68,7 +68,7 @@ class DashboardController extends Controller
         // Call the API to generate insights
         $client = new Client();
         $url = 'https://api.arliai.com/v1/chat/completions';
-        $apiKey = 'd8605424-91ec-4842-83e3-21cfd7b0e418'; // Replace with your actual API key
+        $apiKey = env('API_KEY_ARLI'); // Replace with your actual API key
 
         $formattedData = array_map(function ($label, $value) {
             return "$label - $value";

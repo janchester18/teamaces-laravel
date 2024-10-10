@@ -16,6 +16,7 @@ class ShowClassSchedule extends Controller
         // Fetch schedules that belong to the same branch as the logged-in admin
         $schedules = Schedule::with(['student', 'course']) // Eager load student and course
             ->where('branch_id', $adminBranchId)
+            ->where('status', '!=', 'done') // Exclude schedules with 'done' status
             ->get();
 
         // Define the time slots (adjust as necessary)

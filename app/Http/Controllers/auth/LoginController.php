@@ -30,7 +30,7 @@ class LoginController extends Controller
             if ($user->role == 'owner') {
                 return redirect()->route('owner.branch_analytics');
             } elseif ($user->role == 'staff') {
-                return redirect()->route('admin.branch_analytics');
+                return redirect()->route('admin.branch_analytics_view');
             } else {
                 Auth::logout(); // Logout if the role is not allowed
                 return redirect()->route('login')->withErrors('Unauthorized role.');

@@ -106,24 +106,22 @@
         <div class="login-container">
             <div class="login-form">
                 <h2 class="text-center mb-4">Login</h2>
-                <form>
+                <form method="POST" action="{{ route('student.login.submit') }}">
+                    @csrf <!-- Add this for Laravel's CSRF protection -->
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" required>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" required>
+                        <label for="student_id" class="form-label">Student ID</label>
+                        <input type="text" class="form-control" id="student_id" name="student_id" required>
                     </div>
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
                         <label class="form-check-label" for="rememberMe">Remember me</label>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Sign In</button>
                 </form>
-                <div class="text-center mt-3">
-                    <a href="#" class="text-decoration-none">Forgot password?</a>
-                </div>
             </div>
         </div>
         <div class="hero-container">
@@ -139,41 +137,6 @@
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('content').style.display = 'block';
         };
-
-        document.addEventListener('DOMContentLoaded', function () {
-            let currentIndex = 0;
-            const images = document.querySelectorAll('.gallery-img');
-            const modalImage = document.getElementById('modal-image');
-            const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-
-            // Open modal and display clicked image
-            images.forEach((img, index) => {
-                img.addEventListener('click', () => {
-                    currentIndex = index;
-                    showImage();
-                    imageModal.show();
-                });
-            });
-
-            // Show the image in the modal
-            function showImage() {
-                const img = images[currentIndex];
-                modalImage.src = img.src;
-                modalImage.alt = img.alt;
-            }
-
-            // Next image
-            document.getElementById('nextBtn').addEventListener('click', () => {
-                currentIndex = (currentIndex + 1) % images.length;
-                showImage();
-            });
-
-            // Previous image
-            document.getElementById('prevBtn').addEventListener('click', () => {
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
-                showImage();
-            });
-        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

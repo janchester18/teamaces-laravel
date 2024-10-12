@@ -1,16 +1,21 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ShowClassSchedule;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ShowApprovedController;
 use App\Http\Controllers\ShowEnrollmentController;
+use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\ApproveEnrollmentController;
 
 Route::get('/', function () {
@@ -134,10 +139,19 @@ Route::get('/admin/branch_analytics?view=summary', function () {
 })->name('admin.branch_analytics_view')->middleware('auth');
 
 
-//LOGOUT LOGIC////////////////////////////////////////////////////////////////////////////////////////////////////////
-Route::post('/logout', function () {
+// LOGOUT LOGIC
+Route::post('/logout', function (Request $request) {
+    // Check the authentication status
+    $userId = Auth::id();
+    \Log::info("Logging out user ID: $userId");
+
     Auth::logout(); // Logs the user out
-    return redirect('/login'); // Redirect to login page after logout
+
+    // Access the session from the request instance
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/login');
 })->name('logout');
 
 //admin show routes
@@ -170,6 +184,23 @@ Route::get('/admin/branch_analytics', [DashboardController::class, 'index'])
     ->name('admin.branch_analytics');
 
 Route::get('/branch_analytics/revenue-insights', [DashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
+Route::get('/enrollment-insights', [AnalyticsController::class, 'getEnrollmentInsights'])->name('enrollment_insights');
+
+Route::prefix('student')->group(function () {
+    // Show the login form
+    Route::get('login', [AuthController::class, 'showLoginForm'])->name('student.login');
+
+    // Handle the login form submission
+    Route::post('login', [AuthController::class, 'login'])->name('student.login.submit');
+
+    // Handle logout
+    Route::post('logout', [AuthController::class, 'logout'])->name('student.logout');
+});
+
+// Protect student routes using the custom guard
+Route::middleware('auth:student')->group(function () {
+    Route::get('student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+});
 
 
 

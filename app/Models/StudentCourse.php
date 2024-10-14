@@ -36,4 +36,10 @@ class StudentCourse extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    // Define a relationship to the Schedule model
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'course_id', 'course_id');
+    }
 }

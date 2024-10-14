@@ -198,9 +198,10 @@ Route::prefix('student')->group(function () {
 });
 
 // Protect student routes using the custom guard
-Route::middleware('auth:student')->group(function () {
+Route::middleware(['auth:student'])->group(function () {
     Route::get('student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 });
+Route::get('/course/{id}/details', [StudentDashboardController::class, 'courseDetails'])->name('course.details');
 
 
 

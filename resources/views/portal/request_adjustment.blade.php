@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamAces Student Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        /* Custom navbar color */
+        .navbar-custom {
+            background-color: #141820;
+        }
+
+        /* Add padding to main content */
+        .content-wrapper {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        /* Adjust dynamic margins for larger screens */
+        @media (min-width: 576px) {
+            .content-wrapper {
+                margin-left: 0px;
+                margin-right: 0px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .content-wrapper {
+                margin-left: 30px;
+                margin-right: 30px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .content-wrapper {
+                margin-left: 50px;
+                margin-right: 50px;
+            }
+        }
+
+        /* Set a specific width for the Actions column */
+        .actions-column {
+            width: 200px;
+        }
+
+        /* Hover effect for the logout button */
+        .logout-btn {
+            padding: 10px;
+            transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background-color: #2D3749FF;
+            transform: scale(1.05);
+        }
+
+        /* FullCalendar style adjustments */
+        #calendar {
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+        /* Custom styles for FullCalendar */
+        .fc {
+            font-family: 'Arial', sans-serif; /* Modern font */
+        }
+
+        /* Change the background color and text color of the header */
+        .fc-toolbar {
+            background-color: #343a40; /* Dark background */
+            color: #ffffff; /* White text */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Style the title of the calendar */
+        .fc-toolbar h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        /* Style for the calendar day cells */
+        .fc-daygrid-day {
+            border: 1px solid #dee2e6; /* Light border */
+        }
+
+        /* Change hover effect for days */
+        .fc-daygrid-day:hover {
+            background-color: #f8f9fa; /* Light background on hover */
+        }
+
+        /* Style the events */
+        /* Remove hover effects from FullCalendar events */
+        .fc-event {
+            color: #000000;
+            transition: none !important; /* Disable transitions */
+            cursor: default; /* Change cursor to default */
+        }
+
+
+
+        /* Style for selected days in the month view */
+        .fc-daygrid-day.fc-day-today {
+            background-color: #e9ecef; /* Highlight today */
+        }
+
+        .fc-toolbar-chunk button {
+            background-color: #e9ecef !important;
+            color: #343a40 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{{ asset('images/aces.png') }}" alt="Logo" width="50" height="50" class="me-2">
+                <strong class="d-none d-sm-inline">TeamAces Student Portal</strong>
+            </a>
+            <div class="d-flex ms-auto">
+                <a class="nav-link text-white logout-btn" href="{{ route('logout') }}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content-wrapper mt-4">
+        <!-- Back Button -->
+        <a href="{{ route('student.dashboard') }}" class="btn btn-primary mb-3">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <!-- Full Calendar -->
+        <div id="calendar"></div>
+
+        <!-- Modal to display schedule events -->
+        <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="eventModalLabel">Scheduled Classes</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Modal table structure -->
+                        <!-- Modal table structure -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Phone Number</th>
+                                        <th>Time</th>
+                                        <th>Course</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eventDetailsTableBody">
+                                    <!-- Event details will be injected here by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Global variables
+        var eventMap = new Map();
+        var calendar; // Declare calendar in the global scope
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Group events by date
+            var eventsByDate = {};
+
+            @foreach ($schedules as $schedule)
+                @if ($schedule->course_id != 1) // Check if course_id is not equal to 1
+                    <?php
+                    // Extracting the date without the time part
+                    $date = \Carbon\Carbon::parse($schedule->scheduled_date)->toDateString();
+                    ?>
+                    // Add event to the respective date
+                    eventsByDate['{{ $date }}'] = eventsByDate['{{ $date }}'] || [];
+                    var eventObj = {
+                        title: '{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }} - {{ $schedule->course ? $schedule->course->acronym : 'N/A' }}',
+                        start: '{{ $schedule->scheduled_date }}',
+                        end: '{{ $schedule->schedule_finish }}',
+                        id: '{{ $schedule->id }}', // Add schedule ID for updates
+                        extendedProps: {
+                            student: '{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }}',
+                            phone: '{{ $schedule->student ? $schedule->student->phone_number : 'N/A' }}',
+                            course: '{{ $schedule->course ? $schedule->course->acronym : 'N/A' }}',
+                            time: '{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format('h:i A') }}',
+                            status: '{{ $schedule->status }}' // Include current status
+                        }
+                    };
+                    eventsByDate['{{ $date }}'].push(eventObj);
+                    eventMap.set('{{ $schedule->id }}', eventObj); // Store event in the map
+                @endif
+            @endforeach
+
+            // Flatten the events for FullCalendar
+            var events = [];
+            for (const [date, dayEvents] of Object.entries(eventsByDate)) {
+                const displayedEvents = dayEvents.slice(0, 3); // Get the first 3 events
+                events.push(...displayedEvents);
+
+                if (dayEvents.length > 3) {
+                    // Add a "more+" event if there are more than 3
+                    events.push({
+                        title: `+${dayEvents.length - 3} more`,
+                        start: date,
+                        allDay: true
+                    });
+                }
+            }
+
+            // Initialize FullCalendar
+            var calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+                events: events,
+                dateClick: function(info) {
+                    // Show all events for the clicked date
+                    var eventDetailsTableBody = $('#eventDetailsTableBody');
+                    eventDetailsTableBody.empty();
+
+                    // Retrieve all events for the clicked date
+                    const allEventsForTheDay = eventsByDate[info.dateStr] || [];
+
+                    if (allEventsForTheDay.length) {
+                        allEventsForTheDay.forEach(event => {
+                            const student = event.extendedProps?.student || "N/A";
+                            const phone = event.extendedProps?.phone || "N/A";
+                            const course = event.extendedProps?.course || "N/A";
+                            const time = event.extendedProps?.time || "N/A";
+
+                            eventDetailsTableBody.append(`
+                                <tr>
+                                    <td>${student}</td>
+                                    <td>${phone}</td>
+                                    <td>${time}</td>
+                                    <td>${course}</td>
+                                </tr>
+                            `);
+                        });
+
+                    } else {
+                        eventDetailsTableBody.append(`
+                    <tr>
+                        <td colspan="5" class="text-center">No scheduled classes for this day.</td>
+                    </tr>
+                `);
+                    }
+
+                    var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                    eventModal.show();
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+
+</body>
+
+</html>

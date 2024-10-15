@@ -46,10 +46,6 @@ class StudentDashboardController extends Controller
         return view('portal.student_dashboard', compact('student', 'courses'));
     }
 
-
-
-
-
     public function courseDetails($id)
     {
         // Get the authenticated student
@@ -58,12 +54,14 @@ class StudentDashboardController extends Controller
         // Get the course by ID
         $course = Course::findOrFail($id);
 
-        // Fetch the student's schedule for this course
+        // Fetch the student's schedule for this course, ordered by scheduled_date
         $schedules = Schedule::where('student_id', $student->id)
                     ->where('course_id', $id)
+                    ->orderBy('scheduled_date', 'asc') // Sort by scheduled_date in ascending order
                     ->get();
 
         // Return the course details view with the course and schedule data
         return view('portal.course_details', compact('course', 'schedules'));
     }
+
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\ShowApprovedController;
 use App\Http\Controllers\ShowEnrollmentController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\ApproveEnrollmentController;
+use App\Http\Controllers\StudentRequestAdjustmentController;
 
 Route::get('/', function () {
     return view('user.home'); // Make sure the view is located in resources/views/user/home.blade.php
@@ -202,6 +203,6 @@ Route::middleware(['auth:student'])->group(function () {
     Route::get('student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 });
 Route::get('/course/{id}/details', [StudentDashboardController::class, 'courseDetails'])->name('course.details');
-
-
+Route::get('/request-adjustment', [StudentRequestAdjustmentController::class, 'showView'])->name('request.adjustment');
+Route::get('/request-adjustment', [StudentRequestAdjustmentController::class, 'showClassSchedule'])->name('request.adjustment');
 

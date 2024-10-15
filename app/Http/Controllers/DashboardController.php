@@ -49,7 +49,14 @@ class DashboardController extends Controller
             $revenueData[$month] = $monthlyRevenue->get($month, 0);
         }
 
-        return view('admin.branch_analytics', compact('totalStudents', 'scheduledSessionsToday', 'totalRevenue', 'revenueData')); // Pass revenue data to the view
+        $revenueMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        // Map revenue data for each month
+        $revenueData = array_map(function ($month) use ($monthlyRevenue) {
+            return $monthlyRevenue->get($month, 0);
+        }, range(1, 12));
+
+        return view('admin.branch_analytics', compact('totalStudents', 'scheduledSessionsToday', 'totalRevenue', 'revenueData', 'revenueMonths')); // Pass revenue data to the view
     }
 
     public function getRevenueInsights()

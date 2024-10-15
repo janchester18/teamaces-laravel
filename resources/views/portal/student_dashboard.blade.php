@@ -93,7 +93,7 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">Sessions: {{ $studentCourse->number_of_sessions }}</li>
                             <li class="list-group-item">Hours per session: {{ $studentCourse->hours_per_session }}</li>
-                            <li class="list-group-item">Price: ${{ number_format($studentCourse->price, 2) }}</li>
+                            <li class="list-group-item">Price: ₱{{ number_format($studentCourse->price, 2) }}</li>
                             <li class="list-group-item">Status: {{ $studentCourse->status }}</li>
                         </ul>
                         <!-- Progress Bar -->

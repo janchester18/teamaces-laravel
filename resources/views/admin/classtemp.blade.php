@@ -93,13 +93,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('student_management') }}" class="nav-link active">
+                            <a href="{{ route('student_management') }}" class="nav-link">
                                 <i class="nav-icon fas fa-user-graduate"></i>
                                 <p>Student Management</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('pending_enrollments') }}" class="nav-link">
+                            <a href="{{ route('pending_enrollments') }}" class="nav-link active">
                                 <i class="nav-icon fas fa-user-plus"></i>
                                 <p>Pending Enrollments</p>
                             </a>
@@ -139,7 +139,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Edit Schedule</h1>
+                            <h1 class="m-0">Pending Enrollments</h1>
                         </div>
                     </div>
                 </div>
@@ -148,7 +148,7 @@
 
             <!-- Main content -->
             <!-- "Back to Student Management" Button -->
-            <div class="mx-3 mb-3">
+            <div class="mb-3">
                 <a href="{{ route('student_management') }}" class="text-primary" style="text-decoration: underline;">
                     <i class="fas fa-arrow-left me-2"></i>Back to Student Management
                 </a>
@@ -166,7 +166,6 @@
                         </div>
                     </div>
                 @else
-                <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -201,8 +200,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-
                 @endif
             </div>
             </main>

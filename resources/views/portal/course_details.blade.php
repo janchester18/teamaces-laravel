@@ -113,7 +113,7 @@
                             <td>{{ $schedule->status }}</td>
                             <td>
                                 @if($schedule->status !== 'done')
-                                    <form action="#" method="POST">
+                                    <form action="{{ route('request.adjustment') }}" method="GET">
                                         @csrf
                                         <button type="submit" class="btn btn-warning btn-sm action-button">
                                             <i class="bi bi-pencil-fill"></i> <!-- Use the pencil icon -->

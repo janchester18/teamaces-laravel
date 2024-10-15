@@ -5,204 +5,257 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Branch Analytics</title>
-    <!-- Font Awesome 6.4.0 CDN link -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Bootstrap 5.3.0 CDN link -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AdminLTE -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
 
-<body>
-    <div class="container-fluid">
-        <div class="row">
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Preloader (optional) -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="{{ asset('images/admin/aceslogo.png') }}" alt="AdminLTE Logo"
+                height="60" width="60">
+        </div>
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+                            class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <!-- Notifications -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-bell"></i>
+                    </a>
+                </li>
+                <!-- User Profile -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-user-circle"></i> Profile
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="{{ route('admin.branch_analytics_view') }}" class="brand-link">
+                <img src="{{ asset('images/admin/aceslogo.png') }}" alt="Logo"
+                    class="brand-image img-circle elevation-3">
+                <span class="brand-text font-weight-light">TeamAces</span>
+            </a>
+
             <!-- Sidebar -->
-            <nav class="col-md-2 d-md-block bg-dark sidebar">
-                <div class="logo-container text-center pt-4">
-                    <img src="{{ asset('images/admin/aceslogo.png') }}" alt="Logo" class="sidebar-logo">
+            <div class="sidebar">
+                <!-- User Panel -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="info">
+                        <a href="#" class="d-block">{{ Auth::user()->name }}</a>
+                        <small>{{ ucfirst(strtolower(Auth::user()->role)) }} -
+                            {{ Auth::user()->branch ? Auth::user()->branch->name : 'No Branch Assigned' }}</small>
+                    </div>
                 </div>
 
-                <!-- User Info -->
-                <div class="user-info text-center text-light">
-                    <h5>{{ Auth::user()->name }}</h5> <!-- Display User's Name -->
-                    <p class="mb-2">{{ Auth::user()->branch ? Auth::user()->branch->name : 'No Branch Assigned' }}</p>
-                    <!-- Display Branch Name -->
-                    <p>{{ ucfirst(strtolower(Auth::user()->role)) }}</p> <!-- Display Role in Sentence Case -->
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="false">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.branch_analytics_view') }}" class="nav-link active">
+                                <i class="nav-icon fas fa-home"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('class_scheduling') }}" class="nav-link">
+                                <i class="nav-icon fas fa-calendar-check"></i>
+                                <p>Class Scheduling</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('student_management') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-graduate"></i>
+                                <p>Student Management</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('pending_enrollments') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-plus"></i>
+                                <p>Pending Enrollments</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('reports') }}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p>Reports & Analytics</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('settings') }}" class="nav-link">
+                                <i class="nav-icon fas fa-cogs"></i>
+                                <p>Settings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="nav-link btn btn-link logout-btn">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                                    <p>Logout</p>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Dashboard</h1>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <!-- /.content-header -->
 
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ route('admin.branch_analytics_view') }}"><i
-                                class="fas fa-home"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ route('class_scheduling') }}"><i
-                                class="fas fa-calendar-check"></i> Class Scheduling</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ route('student_management') }}"><i
-                                class="fas fa-user-graduate"></i> Student Management</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ route('pending_enrollments') }}"><i
-                                class="fas fa-user-plus"></i> Pending Enrollments</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active text-light" href="{{ route('reports') }}"><i
-                                class="fas fa-chart-line"></i> Reports & Analytics</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ route('settings') }}"><i class="fas fa-cogs"></i>
-                            Settings</a>
-                    </li>
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf <!-- CSRF token for security -->
-                            <button type="submit" class="nav-link text-light btn btn-link logout-btn"
-                                style="border: none;">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Main Content -->
-            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 main-content">
-                <header class="d-flex justify-content-between align-items-center py-3">
-                    <h2>Dashboard</h2>
-                    <div class="profile d-flex align-items-center">
-                        <!-- Notification Icon -->
-                        <a href="#" class="text-dark me-3">
-                            <i class="fas fa-bell"></i>
-                        </a>
-                        <!-- Profile Icon -->
-                        <a href="#" class="text-dark">
-                            <i class="fas fa-user-circle"></i> Profile
-                        </a>
-                    </div>
-                </header>
-
-                <!-- Analytics Overview Section -->
-                <section class="analytics-overview my-4">
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Analytics Overview Section -->
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="card p-3 text-center">
-                                <h3><i class="fas fa-user-graduate"></i> Total Students</h3>
-                                <p>{{ $totalStudents }}</p> <!-- Display the count of total students -->
+                        <div class="col-lg-4 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ $totalStudents }}</h3>
+                                    <p>Total Students</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card p-3 text-center">
-                                <h3><i class="fas fa-chalkboard-teacher"></i> Scheduled Sessions Today</h3>
-                                <p>{{ $scheduledSessionsToday }}</p>
-                                <!-- Display the count of scheduled sessions for today -->
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card p-3 text-center">
-                                <h3><i class="fas fa-dollar-sign"></i> Revenue</h3>
-                                <p>₱{{ number_format($totalRevenue, 2) }}</p>
-                                <!-- Display the total revenue formatted as currency -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
-                <!-- Pending Requests Section -->
-                <section class="pending-requests my-4">
-                    <h3>Pending Requests</h3>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card p-3 text-center">
-                                <h4><i class="fas fa-user-plus"></i> Enrollment</h4>
-                                <p>10</p> <!-- Example value for pending enrollments -->
+                        <div class="col-lg-4 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ $scheduledSessionsToday }}</h3>
+                                    <p>Scheduled Sessions Today</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card p-3 text-center">
-                                <h4><i class="fas fa-box-open"></i> Package</h4>
-                                <p>5</p> <!-- Example value for pending packages -->
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card p-3 text-center">
-                                <h4><i class="fas fa-calendar-alt"></i> Schedule Adjustment</h4>
-                                <p>3</p> <!-- Example value for pending schedule adjustments -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
-                <!-- Revenue Chart Section -->
-                <section class="revenue-chart my-4">
-                    <h3>Revenue per Month</h3>
-                    <div class="card p-3">
-                        <div class="row">
-                            <!-- Left Column: Chart -->
-                            <div class="col-md-6">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                            <!-- Right Column: Insights -->
-                            <div class="col-md-6 d-flex align-items-center">
-                                <div class="insights-container">
-                                    <h4>AI Generated Insights</h4>
-                                    <p id="insights-placeholder">Loading insights...</p>
+                        <div class="col-lg-4 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>₱{{ number_format($totalRevenue, 2) }}</h3>
+                                    <p>Revenue</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-dollar-sign"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
 
-                <!-- Enrollment Chart Section -->
-                <section class="enrollment-chart my-4">
-                    <h3>Enrollment Status Distribution</h3>
-                    <div class="card p-3">
-                        <div class="row">
-                            <!-- Left Column: Chart -->
-                            <div class="col-md-6">
-                                <canvas id="enrollmentChart"></canvas>
-                            </div>
-                            <!-- Right Column: Insights -->
-                            <div class="col-md-6 d-flex align-items-center">
-                                <div class="insights-container">
-                                    <h4>AI Generated Insights</h4>
-                                    <p id="enrollment-insights-placeholder">Loading insights...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
+                    <!-- Revenue Chart Section -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Revenue per Month</h3>
+            </div>
+            <div class="card-body d-flex flex-column flex-md-row">
+                <!-- Chart -->
+                <div class="flex-grow-1 mb-3 mb-md-0"> <!-- Margin bottom for mobile view -->
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <!-- Insights for Revenue -->
+                <div class="insights-container ms-md-3" style="min-width: 300px;"> <!-- Set a min-width for insights -->
+                    <h4>LLM Generated Insights</h4>
+                    <button id="fetch-insights-button" class="btn btn-primary">Fetch Revenue Insights</button>
+                    <p id="insights-placeholder"></p>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+                </div>
+        </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <footer class="main-footer">
+        <div class="float-right d-none d-sm-inline">
+        </div>
+        <strong>Copyright &copy; 2024 TeamAces Driving Academy.</strong> All rights reserved.
+    </footer>
+    </div>
+
+    <!-- REQUIRED SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/branch_analytics.js') }}"></script>
+    <script>
+        src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" >
+    </script>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Fetch insights
-            fetch('{{ route('revenue_insights') }}')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('insights-placeholder').innerText = data.insights;
-                })
-                .catch(error => {
-                    console.error('Error fetching insights:', error);
-                    document.getElementById('insights-placeholder').innerText = 'Error fetching insights.';
-                });
+            const controller = new AbortController(); // Create an instance of AbortController
+            const signal = controller.signal; // Get the signal from the controller
 
-            fetch('{{ route('enrollment_insights') }}')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('enrollment-insights-placeholder').innerText = data.insights;
-                })
-                .catch(error => {
-                    console.error('Error fetching insights:', error);
-                    document.getElementById('enrollment-insights-placeholder').innerText =
-                        'Error fetching insights.';
-                });
+            // Fetch insights function
+            const fetchInsights = async () => {
+                // Show loading text when the button is clicked
+                document.getElementById('insights-placeholder').innerText = 'Loading insights...'; // Set loading text
+
+                // Hide the button once clicked
+                document.getElementById('fetch-insights-button').style.display = 'none'; // Hide the button
+
+                try {
+                    const response = await fetch('{{ route('revenue_insights') }}', { signal }); // Pass the signal to fetch
+                    const data = await response.json();
+                    document.getElementById('insights-placeholder').innerText = data.insights; // Show insights
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.log('Fetch aborted'); // Log if the fetch was aborted
+                    } else {
+                        console.error('Error fetching insights:', error);
+                        document.getElementById('insights-placeholder').innerText = 'Error fetching insights.'; // Show error message
+                    }
+                }
+            };
 
             // Line chart (Revenue)
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');
@@ -236,35 +289,19 @@
                 }
             };
 
-            new Chart(revenueCtx, revenueChartConfig);
+            new Chart(revenueCtx, revenueChartConfig); // Create the revenue chart
 
-            // Pie chart (Enrollment Status)
-            const enrollmentCtx = document.getElementById('enrollmentChart').getContext('2d');
-            const enrollmentData = [50, 30, 20]; // Fake data: [Enrolled, Pending, Dropped]
-            const enrollmentLabels = ['Enrolled', 'Pending', 'Dropped'];
+            // Start fetching insights when the button is clicked
+            document.getElementById('fetch-insights-button').addEventListener('click', fetchInsights);
 
-            const enrollmentChartConfig = {
-                type: 'pie',
-                data: {
-                    labels: enrollmentLabels,
-                    datasets: [{
-                        label: 'Enrollment Status',
-                        data: enrollmentData,
-                        backgroundColor: [
-                            'rgba(75, 192, 192, 0.6)',
-                            'rgba(255, 205, 86, 0.6)',
-                            'rgba(255, 99, 132, 0.6)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            };
-
-            new Chart(enrollmentCtx, enrollmentChartConfig);
+            // Stop fetching insights when navigating away
+            window.addEventListener('beforeunload', function() {
+                controller.abort(); // Abort the fetch request when leaving the page
+            });
         });
     </script>
+
+
 </body>
 
 </html>

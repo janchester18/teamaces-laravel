@@ -112,4 +112,6 @@ class DashboardController extends Controller
             return response()->json(['insights' => 'Error generating insights.'], 500);
         }
     }
+
+
 }

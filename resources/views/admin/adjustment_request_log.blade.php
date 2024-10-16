@@ -99,13 +99,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('pending_enrollments') }}" class="nav-link active">
+                            <a href="{{ route('pending_enrollments') }}" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
                                 <p>Pending Enrollments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
+                            <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link active">
                                 <i class="nav-icon fas fa-edit"></i>
                                 <p>Schedule Adjustment Requests</p>
                             </a>
@@ -145,72 +145,49 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Pending Enrollments</h1>
+                            <h1 class="m-0">Schedule Adjustment Request Logs</h1>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="mx-3 mb-3">
+                <a href="{{ route('schedule_adjustment_requests') }}" class="text-primary" style="text-decoration: underline;">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Adjustment Requests
+                </a>
+            </div>
             <!-- /.content-header -->
-
-            <!-- Main content -->
-            <section class="pending-enrollments m-4">
-                <div class="table-responsive">
-                    @if($pendingEnrollments->isEmpty())
-                    <div class="card text-center w-100">
-                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                            <i class="fas fa-frown fa-5x text-muted"></i>
-                            <h5 class="card-title mt-3">Nothing to See Here!</h5>
-                            <p class="card-text">There are currently no pending enrollments.</p>
-                        </div>
-                    </div>
-
-                    @else
-                    <table class="table">
-                        <thead>
+            <div class="container table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Schedule ID</th>
+                            <th>Old Scheduled Date</th>
+                            <th>New Scheduled Date</th>
+                            <th>Status</th>
+                            <th>Reason</th> <!-- Add the new Reason column -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($requests as $index => $request)
                             <tr>
-                                <th>Student ID</th>
-                                <th>Student Name</th>
-                                <th>Course/Package</th> <!-- Combined column -->
-                                <th>Price</th> <!-- Price column -->
-                                <th>Enrolled on</th>
-                                <th>Actions</th>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $request->schedule->student->first_name }} {{ $request->schedule->student->last_name }}</td>
+                                <td>{{ $request->schedule_id }}</td>
+                                <td>{{ $request->schedule->scheduled_date }}</td>
+                                <td>{{ $request->new_scheduled_date }}</td>
+                                <td>{{ $request->status }}</td>
+                                <td>{{ $request->reason ?: 'N/A' }}</td> <!-- Show 'N/A' if reason is empty -->
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pendingEnrollments as $enrollment)
-                            <tr>
-                                <td>{{ $enrollment->id }}</td>
-                                <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
-                                <td>
-                                    @if($enrollment->course)
-                                        {{ $enrollment->course->name }} (Course)
-                                    @elseif($enrollment->package)
-                                        {{ $enrollment->package->name }} (Package)
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($enrollment->course)
-                                        {{ number_format($enrollment->course->price, 2) }} <!-- Display course price -->
-                                    @elseif($enrollment->package)
-                                        {{ number_format($enrollment->package->price, 2) }} <!-- Display package price -->
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
-                                <td class="actions">
-                                    <button class="btn btn-sm btn-success" onclick="confirmPayment('{{ $enrollment->id }}')">Confirm Payment</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete Enrollment</button> <!-- Delete button -->
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    @endif
-                </div>
-            </section>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -237,99 +214,8 @@
     </script>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    function confirmPayment(studentId) {
-        Swal.fire({
-            title: 'Confirm Payment',
-            text: "Are you sure you want to confirm this payment and add the student to the database?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, confirm!',
-            cancelButtonText: 'No, cancel!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Make AJAX request to confirm payment
-                $.ajax({
-                    url: '/confirm-payment/' + studentId,
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}' // Include CSRF token for security
-                    },
-                    success: function(response) {
-                        Swal.fire(
-                            'Confirmed!',
-                            response.message,
-                            'success'
-                        );
-                        // Optionally, reload the page or remove the row from the table
-                        location.reload(); // Reload the page to refresh the table
-                    },
-                    error: function(xhr) {
-                        Swal.fire(
-                            'Error!',
-                            xhr.responseJSON.message || 'Something went wrong.',
-                            'error'
-                        );
-                    }
-                });
-            } else {
-                Swal.fire(
-                    'Cancelled',
-                    'Payment confirmation cancelled.',
-                    'error'
-                );
-            }
-        });
-    }
 
-    function deleteEnrollment(enrollmentId) {
-    Swal.fire({
-        title: 'Delete Enrollment',
-        text: "Are you sure you want to delete this enrollment?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Make AJAX request to delete the enrollment
-            $.ajax({
-                url: '/enrollments/' + enrollmentId,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}' // Include CSRF token for security
-                },
-                success: function(response) {
-                    Swal.fire(
-                        'Deleted!',
-                        response.message,
-                        'success'
-                    );
-                    // Optionally reload the page or remove the row from the table
-                    location.reload(); // Reload the page to refresh the table
-                },
-                error: function(xhr) {
-                    Swal.fire(
-                        'Error!',
-                        xhr.responseJSON.message || 'Something went wrong.',
-                        'error'
-                    );
-                }
-            });
-        } else {
-            Swal.fire(
-                'Cancelled',
-                'Enrollment deletion cancelled.',
-                'error'
-            );
-        }
-    });
-}
-    </script>
+
 </body>
 
 </html>

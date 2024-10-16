@@ -98,6 +98,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
+                                <i class="nav-icon fas fa-edit"></i>
+                                <p>Schedule Adjustment Requests</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('reports') }}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>
@@ -167,11 +173,23 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-lg-4 col-6">
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3>₱{{ number_format($totalRevenue, 2) }}</h3>
+                                    <h3>
+                                        <span class="d-none d-md-inline">
+                                            ₱{{ number_format($totalRevenue, 2) }} <!-- For wider screens -->
+                                        </span>
+                                        <span class="d-md-none">
+                                            @if ($totalRevenue < 1000)
+                                                ₱{{ number_format($totalRevenue, 2) }} <!-- For values less than 1k -->
+                                            @elseif ($totalRevenue < 1000000)
+                                                ₱{{ round($totalRevenue / 1000) }}k <!-- For thousands -->
+                                            @else
+                                                ₱{{ round($totalRevenue / 1000000, 1) }}M <!-- For millions -->
+                                            @endif
+                                        </span>
+                                    </h3>
                                     <p>Revenue</p>
                                 </div>
                                 <div class="icon">
@@ -179,6 +197,8 @@
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
 
                     <!-- Revenue Chart Section -->
@@ -196,7 +216,15 @@
                 <!-- Insights for Revenue -->
                 <div class="insights-container ms-md-3" style="min-width: 300px;"> <!-- Set a min-width for insights -->
                     <h4>LLM Generated Insights</h4>
-                    <button id="fetch-insights-button" class="btn btn-primary">Fetch Revenue Insights</button>
+                    <div class="text-center">
+                        <button id="fetch-insights-button" class="btn btn-primary rounded">Get Insights</button>
+                    </div>
+                    <div id="loader" class="text-center" style="display: none;">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
                     <p id="insights-placeholder"></p>
                 </div>
             </div>
@@ -237,25 +265,29 @@
 
             // Fetch insights function
             const fetchInsights = async () => {
-                // Show loading text when the button is clicked
-                document.getElementById('insights-placeholder').innerText = 'Loading insights...'; // Set loading text
+    // Show the loader and hide the button
+    document.getElementById('loader').style.display = 'block'; // Show loader
+    document.getElementById('fetch-insights-button').style.display = 'none'; // Hide the button
+    document.getElementById('insights-placeholder').innerText = ''; // Clear insights placeholder
 
-                // Hide the button once clicked
-                document.getElementById('fetch-insights-button').style.display = 'none'; // Hide the button
+    try {
+        const response = await fetch('{{ route('revenue_insights') }}', { signal });
+        const data = await response.json();
+        document.getElementById('insights-placeholder').innerText = data.insights; // Show insights
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.log('Fetch aborted');
+        } else {
+            console.error('Error fetching insights:', error);
+            document.getElementById('insights-placeholder').innerText = 'Error fetching insights.';
+        }
+    } finally {
+        // Hide the loader and show the button again
+        document.getElementById('loader').style.display = 'none'; // Hide loader
+        document.getElementById('fetch-insights-button').style.display = 'none'; // Show the button again
+    }
+};
 
-                try {
-                    const response = await fetch('{{ route('revenue_insights') }}', { signal }); // Pass the signal to fetch
-                    const data = await response.json();
-                    document.getElementById('insights-placeholder').innerText = data.insights; // Show insights
-                } catch (error) {
-                    if (error.name === 'AbortError') {
-                        console.log('Fetch aborted'); // Log if the fetch was aborted
-                    } else {
-                        console.error('Error fetching insights:', error);
-                        document.getElementById('insights-placeholder').innerText = 'Error fetching insights.'; // Show error message
-                    }
-                }
-            };
 
             // Line chart (Revenue)
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');

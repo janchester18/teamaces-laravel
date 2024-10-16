@@ -105,6 +105,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
+                                <i class="nav-icon fas fa-edit"></i>
+                                <p>Schedule Adjustment Requests</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('reports') }}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>

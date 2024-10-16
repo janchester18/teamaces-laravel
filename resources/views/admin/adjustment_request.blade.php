@@ -99,13 +99,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('pending_enrollments') }}" class="nav-link active">
+                            <a href="{{ route('pending_enrollments') }}" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
                                 <p>Pending Enrollments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
+                            <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link active">
                                 <i class="nav-icon fas fa-edit"></i>
                                 <p>Schedule Adjustment Requests</p>
                             </a>
@@ -140,77 +140,136 @@
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- Content Header -->
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">Pending Enrollments</h1>
-                        </div>
-                    </div>
-                </div>
+<!-- Content Header -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Schedule Adjustment Requests</h1>
             </div>
+            <div class="col-sm-6 d-flex justify-content-end"> <!-- Use justify-content-end to align the button right -->
+                <a href="{{ route('requests.log.data') }}" class="btn btn-primary rounded">
+                    <i class="fas fa-list mr-1"></i>
+                    Requests Log</a> <!-- Use rounded-pill for rounded corners -->
+            </div>
+        </div>
+    </div>
+</div>
+
             <!-- /.content-header -->
 
-            <!-- Main content -->
-            <section class="pending-enrollments m-4">
+<!-- Main Content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
                 <div class="table-responsive">
-                    @if($pendingEnrollments->isEmpty())
+                    @if($requests->isEmpty())
                     <div class="card text-center w-100">
                         <div class="card-body d-flex flex-column align-items-center justify-content-center">
                             <i class="fas fa-frown fa-5x text-muted"></i>
                             <h5 class="card-title mt-3">Nothing to See Here!</h5>
-                            <p class="card-text">There are currently no pending enrollments.</p>
+                            <p class="card-text">There are currently no pending requests.</p>
                         </div>
                     </div>
-
                     @else
-                    <table class="table">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Student ID</th>
+                                <th>#</th>
                                 <th>Student Name</th>
-                                <th>Course/Package</th> <!-- Combined column -->
-                                <th>Price</th> <!-- Price column -->
-                                <th>Enrolled on</th>
-                                <th>Actions</th>
+                                <th>Schedule ID</th>
+                                <th>Current Scheduled Date</th>
+                                <th>New Scheduled Date</th>
+                                <th>Status</th>
+                                <th>Action</th> <!-- New Action Column -->
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($pendingEnrollments as $enrollment)
-                            <tr>
-                                <td>{{ $enrollment->id }}</td>
-                                <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
-                                <td>
-                                    @if($enrollment->course)
-                                        {{ $enrollment->course->name }} (Course)
-                                    @elseif($enrollment->package)
-                                        {{ $enrollment->package->name }} (Package)
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($enrollment->course)
-                                        {{ number_format($enrollment->course->price, 2) }} <!-- Display course price -->
-                                    @elseif($enrollment->package)
-                                        {{ number_format($enrollment->package->price, 2) }} <!-- Display package price -->
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
-                                <td class="actions">
-                                    <button class="btn btn-sm btn-success" onclick="confirmPayment('{{ $enrollment->id }}')">Confirm Payment</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete Enrollment</button> <!-- Delete button -->
-                                </td>
-                            </tr>
-                            @endforeach
+                            @forelse($requests as $request)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ optional($request->schedule->student)->first_name ?? 'N/A' }} {{ optional($request->schedule->student)->last_name ?? 'N/A' }}</td>
+                                    <td>{{ $request->schedule_id }}</td>
+                                    <td>{{ optional($request->schedule)->scheduled_date }}</td>
+                                    <td>{{ $request->new_scheduled_date }}</td>
+                                    <td>{{ $request->status ?: 'Not processed yet' }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-sm" title="Process Request"
+                                                data-bs-toggle="modal" data-bs-target="#processModal"
+                                                onclick="populateModal({{ json_encode($request) }})">
+                                            <i class="fas fa-cog"></i> Process
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center">No requests made.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                     @endif
                 </div>
-            </section>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="processModal" tabindex="-1" aria-labelledby="processModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="processModalLabel">Process Adjustment Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="processForm" action="{{ route('process.adjustment') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="request_id" id="request_id">
+                    <div class="mb-3">
+                        <label for="student_name" class="form-label">Student Name</label>
+                        <input type="text" class="form-control" id="student_name" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="schedule_id" class="form-label">Schedule ID</label>
+                        <input type="text" class="form-control" id="schedule_id" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="current_scheduled_date" class="form-label">Current Scheduled Date</label>
+                        <input type="text" class="form-control" id="current_scheduled_date" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_scheduled_date" class="form-label">New Scheduled Date</label>
+                        <input type="text" class="form-control" id="new_scheduled_date" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <input type="text" class="form-control" id="status" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="decision" class="form-label">Decision</label>
+                        <select class="form-select" id="decision" name="decision">
+                            <option value="" disabled selected>Select Decision</option>
+                            <option value="approve">Approve</option>
+                            <option value="deny">Deny</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="reasonContainer" style="display: none;">
+                        <label for="reason" class="form-label">Reason for Denial</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -238,98 +297,34 @@
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    function confirmPayment(studentId) {
-        Swal.fire({
-            title: 'Confirm Payment',
-            text: "Are you sure you want to confirm this payment and add the student to the database?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, confirm!',
-            cancelButtonText: 'No, cancel!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Make AJAX request to confirm payment
-                $.ajax({
-                    url: '/confirm-payment/' + studentId,
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}' // Include CSRF token for security
-                    },
-                    success: function(response) {
-                        Swal.fire(
-                            'Confirmed!',
-                            response.message,
-                            'success'
-                        );
-                        // Optionally, reload the page or remove the row from the table
-                        location.reload(); // Reload the page to refresh the table
-                    },
-                    error: function(xhr) {
-                        Swal.fire(
-                            'Error!',
-                            xhr.responseJSON.message || 'Something went wrong.',
-                            'error'
-                        );
-                    }
-                });
-            } else {
-                Swal.fire(
-                    'Cancelled',
-                    'Payment confirmation cancelled.',
-                    'error'
-                );
-            }
-        });
-    }
+        function populateModal(request) {
+    document.getElementById('request_id').value = request.id;
+    document.getElementById('student_name').value = request.schedule.student.first_name + ' ' + request.schedule.student.last_name;
+    document.getElementById('schedule_id').value = request.schedule_id;
+    document.getElementById('current_scheduled_date').value = request.schedule.scheduled_date;
+    document.getElementById('new_scheduled_date').value = request.new_scheduled_date;
+    document.getElementById('status').value = request.status;
 
-    function deleteEnrollment(enrollmentId) {
-    Swal.fire({
-        title: 'Delete Enrollment',
-        text: "Are you sure you want to delete this enrollment?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Make AJAX request to delete the enrollment
-            $.ajax({
-                url: '/enrollments/' + enrollmentId,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}' // Include CSRF token for security
-                },
-                success: function(response) {
-                    Swal.fire(
-                        'Deleted!',
-                        response.message,
-                        'success'
-                    );
-                    // Optionally reload the page or remove the row from the table
-                    location.reload(); // Reload the page to refresh the table
-                },
-                error: function(xhr) {
-                    Swal.fire(
-                        'Error!',
-                        xhr.responseJSON.message || 'Something went wrong.',
-                        'error'
-                    );
-                }
-            });
+    // Set the form action dynamically
+    document.getElementById('processForm').action = "{{ route('process.adjustment') }}";
+
+    // Reset the decision and reason fields
+    document.getElementById('decision').selectedIndex = 0;
+    document.getElementById('reasonContainer').style.display = 'none';
+    document.getElementById('reason').value = '';
+
+    // Show/hide the reason input based on decision selection
+    document.getElementById('decision').onchange = function () {
+        if (this.value === 'deny') {
+            document.getElementById('reasonContainer').style.display = 'block';
         } else {
-            Swal.fire(
-                'Cancelled',
-                'Enrollment deletion cancelled.',
-                'error'
-            );
+            document.getElementById('reasonContainer').style.display = 'none';
         }
-    });
+    };
 }
+
     </script>
+
 </body>
 
 </html>

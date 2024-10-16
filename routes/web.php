@@ -17,6 +17,8 @@ use App\Http\Controllers\ShowApprovedController;
 use App\Http\Controllers\ShowEnrollmentController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\ApproveEnrollmentController;
+use App\Http\Controllers\AdminAdjustRequestController;
+use App\Http\Controllers\DisplayStudentRequestController;
 use App\Http\Controllers\StudentRequestAdjustmentController;
 
 Route::get('/', function () {
@@ -99,6 +101,16 @@ Route::get('/branch_management', function () {
 Route::get('/pending_enrollments', function () {
     return view('admin.pending_enrollments');
 })->name('pending_enrollments');
+
+//adjustment_requests
+Route::get('/adjustment-requests', function () {
+    return view('admin.adjustment_request'); // Ensure this matches your Blade view file
+})->name('schedule_adjustment_requests');
+
+//adjustment_requests
+Route::get('/requests_log', function () {
+    return view('admin.adjustment_request_log'); // Ensure this matches your Blade view file
+})->name('requests.log');
 
 // staff_management
 Route::get('/staff_management', function () {
@@ -185,7 +197,6 @@ Route::get('/admin/branch_analytics', [DashboardController::class, 'index'])
     ->name('admin.branch_analytics');
 
 Route::get('/branch_analytics/revenue-insights', [DashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
-Route::get('/enrollment-insights', [AnalyticsController::class, 'getEnrollmentInsights'])->name('enrollment_insights');
 
 Route::prefix('student')->group(function () {
     // Show the login form
@@ -202,7 +213,17 @@ Route::prefix('student')->group(function () {
 Route::middleware(['auth:student'])->group(function () {
     Route::get('student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 });
-Route::get('/course/{id}/details', [StudentDashboardController::class, 'courseDetails'])->name('course.details');
-Route::get('/request-adjustment', [StudentRequestAdjustmentController::class, 'showView'])->name('request.adjustment');
-Route::get('/request-adjustment', [StudentRequestAdjustmentController::class, 'showClassSchedule'])->name('request.adjustment');
+Route::post('/student_logout', [AuthController::class, 'logout'])->name('student.logout');
 
+
+Route::get('/course/{id}/details', [StudentDashboardController::class, 'courseDetails'])->name('course.details');
+Route::get('/request-adjustment/form', [StudentRequestAdjustmentController::class, 'showAdjustmentPage'])->name('request.adjustment');
+
+Route::post('/submit-adjustment', [StudentRequestAdjustmentController::class, 'submitAdjustment'])->name('submit.adjustment');
+Route::get('/requests-made', [DisplayStudentRequestController::class, 'viewRequests'])->name('requests.made');
+
+Route::get('/adjustment-requests', [AdminAdjustRequestController::class, 'index'])->name('schedule_adjustment_requests');
+Route::post('/adjustment-request/process', [AdminAdjustRequestController::class, 'processRequest'])->name('process.adjustment');
+
+// In your routes file (web.php)
+Route::get('/requests_log', [AdminAdjustRequestController::class, 'showRequestLogs'])->name('requests.log.data');

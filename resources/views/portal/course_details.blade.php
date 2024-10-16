@@ -78,9 +78,12 @@
                 <strong class="d-none d-sm-inline">TeamAces Student Portal</strong> <!-- Hide text on small screens -->
             </a>
             <div class="d-flex ms-auto"> <!-- Use d-flex to align logout button to the right -->
-                <a class="nav-link text-white logout-btn" href="{{ route('logout') }}">
-                    <i class="bi bi-box-arrow-right"></i> Logout <!-- Keep this text visible on all screens -->
-                </a>
+                <form action="{{ route('student.logout') }}" method="POST" id="logout-form" class="d-inline">
+                    @csrf
+                    <button type="submit" class="nav-link text-white logout-btn" style="border: none; background: none; cursor: pointer;">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
             </div>
         </div>
     </nav>
@@ -115,9 +118,12 @@
                                 @if($schedule->status !== 'done')
                                     <form action="{{ route('request.adjustment') }}" method="GET">
                                         @csrf
+                                        <input type="hidden" name="schedule_id" value="{{ $schedule->id }}">
+                                        <input type="hidden" name="scheduled_date" value="{{ $schedule->scheduled_date }}">
+                                        <input type="hidden" name="schedule_finish" value="{{ $schedule->schedule_finish }}">
+                                        <input type="hidden" name="status" value="{{ $schedule->status }}">
                                         <button type="submit" class="btn btn-warning btn-sm action-button">
-                                            <i class="bi bi-pencil-fill"></i> <!-- Use the pencil icon -->
-                                            Request Adjustment
+                                            <i class="bi bi-pencil-fill"></i> Request Adjustment
                                         </button>
                                     </form>
                                 @endif

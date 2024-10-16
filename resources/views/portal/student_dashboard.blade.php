@@ -72,16 +72,28 @@
                 <strong class="d-none d-sm-inline">TeamAces Student Portal</strong> <!-- Hide text on small screens -->
             </a>
             <div class="d-flex ms-auto"> <!-- Use d-flex to align logout button to the right -->
-                <a class="nav-link text-white logout-btn" href="{{ route('logout') }}">
-                    <i class="bi bi-box-arrow-right"></i> Logout <!-- Keep this text visible on all screens -->
-                </a>
+                <form action="{{ route('student.logout') }}" method="POST" id="logout-form" class="d-inline">
+                    @csrf
+                    <button type="submit" class="nav-link text-white logout-btn" style="border: none; background: none; cursor: pointer;">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
+
             </div>
         </div>
     </nav>
 
   <!-- Main Content -->
   <div class="mt-4 content-wrapper">
-    <h2><strong>My Courses</strong></h2>
+    <div class="mb-3">
+        <h3>Welcome, <strong>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</strong>!</h3> <!-- Welcome message -->
+    </div>
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <h2><strong>My Courses</strong></h2>
+        <a href="{{ route('requests.made') }}" class="btn btn-primary">
+            <i class="bi bi-file-earmark-text"></i>
+            View Requests</a> <!-- Button to view requests -->
+    </div>
     <div class="row">
         @foreach($courses as $studentCourse) <!-- Change $course to $studentCourse -->
         <div class="col-md-4">

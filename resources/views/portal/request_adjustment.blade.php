@@ -12,6 +12,9 @@
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
@@ -69,7 +72,6 @@
 
         /* FullCalendar style adjustments */
         #calendar {
-            max-width: 1100px;
             margin: 40px auto;
         }
         /* Custom styles for FullCalendar */
@@ -133,9 +135,12 @@
                 <strong class="d-none d-sm-inline">TeamAces Student Portal</strong>
             </a>
             <div class="d-flex ms-auto">
-                <a class="nav-link text-white logout-btn" href="{{ route('logout') }}">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
+                <form action="{{ route('student.logout') }}" method="POST" id="logout-form" class="d-inline">
+                    @csrf
+                    <button type="submit" class="nav-link text-white logout-btn" style="border: none; background: none; cursor: pointer;">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
             </div>
         </div>
     </nav>
@@ -148,6 +153,39 @@
 
         <!-- Full Calendar -->
         <div id="calendar"></div>
+
+        <div class="mb-5">
+            <h3>Request Schedule Adjustment</h3>
+
+            <!-- Display current schedule details -->
+            <div class="mb-3">
+                <strong>Current Scheduled Date:</strong> {{ $scheduledDate }}<br>
+                <strong>Finish Time:</strong> {{ $scheduleFinish }}<br>
+                <strong>Status:</strong> {{ ucfirst($status) }}<br>
+            </div>
+
+            <!-- Form to select new schedule -->
+            <form id="adjustmentForm" action="{{ route('submit.adjustment') }}" method="POST">
+                @csrf
+                <input type="hidden" name="schedule_id" value="{{ $scheduleId }}">
+                <!-- Date and Time Picker for new schedule -->
+                <div class="mb-3">
+                    <label for="new_schedule" class="form-label">Select New Start Date and Time</label>
+                    <input type="datetime-local" name="new_schedule" class="form-control" id="newSchedule" required>
+                </div>
+                <!-- Calculated Finish Time -->
+                <div class="mb-3">
+                    <label for="new_schedule_finish" class="form-label">Calculated Finish Time</label>
+                    <input type="datetime-local" name="new_schedule_finish" class="form-control" id="newScheduleFinish" readonly>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Submit Adjustment Request</button>
+                </div>
+            </form>
+
+
+        </div>
+
 
         <!-- Modal to display schedule events -->
         <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
@@ -187,6 +225,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         // Global variables
         var eventMap = new Map();
@@ -284,6 +325,68 @@
 
             calendar.render();
         });
+
+
+        document.getElementById('newSchedule').addEventListener('change', function() {
+    const startDateTime = new Date(this.value); // Get the selected start date and time
+    const hoursPerSession = {{ $hoursPerSession }}; // Get hours per session from PHP
+
+    // Calculate the finish time
+    startDateTime.setHours(startDateTime.getHours() + hoursPerSession + 8);
+
+    // Format the finish time to datetime-local format
+    const finishDateTime = startDateTime.toISOString().slice(0, 16);
+
+    // Set the calculated finish time in the readonly input
+    document.getElementById('newScheduleFinish').value = finishDateTime;
+});
+
+
+
+$(document).ready(function() {
+        $('#adjustmentForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // SweetAlert confirmation
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to submit the schedule adjustment request?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, submit it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Perform AJAX request
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            // Show success message
+                            Swal.fire(
+                                'Submitted!',
+                                'Your schedule adjustment request has been submitted.',
+                                'success'
+                            ).then(() => {
+                                // Redirect to the previous view after confirmation
+                                window.location.href = '{{ route('student.dashboard') }}';
+                            });
+                        },
+                        error: function(xhr) {
+                            // Show error message
+                            Swal.fire(
+                                'Error!',
+                                'There was a problem submitting your request.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    });
     </script>
 
 </body>

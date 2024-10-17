@@ -86,7 +86,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('staff_management') }}" class="nav-link active">
+                            <a href="{{ route('staff_management') }}" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>Staff Management</p>
                             </a>
@@ -104,13 +104,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('inquiries_requests') }}" class="nav-link">
+                            <a href="{{ route('inquiries_requests') }}" class="nav-link active">
                                 <i class="nav-icon fas fa-envelope"></i>
                                 <p>Inquiries & Requests</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{-- {{ route('reports') }} --}}" class="nav-link">
+                            <a href="{{-- {{ route('owner.reports') }} --}}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>
                             </a>
@@ -145,7 +145,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Staff Management</h1>
+                            <h1 class="m-0">Inquiries & Requests</h1>
                         </div>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
             <!-- /.content-header -->
 
             <!-- Main content -->
-                <h1>this is staff management</h1>
+                <h1>this is Inquiries & Requests</h1>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->

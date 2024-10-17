@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ShowApprovedController;
+use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\ShowEnrollmentController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\ApproveEnrollmentController;
@@ -143,9 +144,9 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 
 // Owner and staff redirection routes
-Route::get('/owner/branch_analytics', function () {
+Route::get('/owner/branch_analytics?view=summary', function () {
     return view('owner.branch_analytics');
-})->name('owner.branch_analytics')->middleware('auth');
+})->name('owner.branch_analytics_view')->middleware('auth');
 
 Route::get('/admin/branch_analytics?view=summary', function () {
     return view('admin.branch_analytics');
@@ -198,6 +199,12 @@ Route::get('/admin/branch_analytics', [DashboardController::class, 'index'])
 
 Route::get('/branch_analytics/revenue-insights', [DashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
 
+// Controller-based route for more complex logic owner
+Route::get('/owner/branch_analytics', [OwnerDashboardController::class, 'index'])
+    ->name('owner.branch_analytics');
+
+Route::get('/branch_analytics/revenue-insights', [OwnerDashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
+
 Route::prefix('student')->group(function () {
     // Show the login form
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('student.login');
@@ -227,3 +234,34 @@ Route::post('/adjustment-request/process', [AdminAdjustRequestController::class,
 
 // In your routes file (web.php)
 Route::get('/requests_log', [AdminAdjustRequestController::class, 'showRequestLogs'])->name('requests.log.data');
+
+
+//owner nav routes
+// branch_management
+Route::get('/branch_management', function () {
+    return view('owner.branch_management');
+})->name('branch_management');
+// add branch
+Route::get('/add_map', function () {
+    return view('owner.add_map');
+})->name('branch.create.form');
+// staff_management
+Route::get('/staff_management', function () {
+    return view('owner.staff_management');
+})->name('staff_management');
+// course_management
+Route::get('/course_management', function () {
+    return view('owner.course_management');
+})->name('course_management');
+// package_management
+Route::get('/package_management', function () {
+    return view('owner.package_management');
+})->name('package_management');
+// inquiries_requests
+Route::get('/inquiries_requests', function () {
+    return view('owner.inquiries_requests');
+})->name('inquiries_requests');
+
+//owner branch routes
+Route::get('/branch_management', [BranchController::class, 'showOwnerBranches'])->name('branch_management');
+Route::post('/branch/store', [BranchController::class, 'store'])->name('branch.store');

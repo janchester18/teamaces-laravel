@@ -28,7 +28,7 @@ class LoginController extends Controller
 
             // Check the user's role and redirect accordingly
             if ($user->role == 'owner') {
-                return redirect()->route('owner.branch_analytics');
+                return redirect()->route('owner.branch_analytics_view');
             } elseif ($user->role == 'staff') {
                 return redirect()->route('admin.branch_analytics_view');
             } else {

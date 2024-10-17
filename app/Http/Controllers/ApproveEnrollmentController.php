@@ -125,74 +125,74 @@ class ApproveEnrollmentController extends Controller
 
     // Function to create schedules
     private function createSchedules(Student $student, $courseId)
-    {
-        $course = Course::find($courseId);
+{
+    $course = Course::find($courseId);
 
-        if (!$student || !Student::find($student->id)) {
-            \Log::error("Student not found with ID: {$student->id}");
-            return;
-        }
-
-        if (!$course) {
-            \Log::error("Course not found with ID: {$courseId}");
-            return;
-        }
-
-        $numberOfSessions = $course->number_of_sessions;
-        $hoursPerSession = $course->hours_per_session;
-        $startDate = Carbon::now()->addDay()->startOfDay(); // Start from tomorrow
-        $createdSchedules = 0;
-
-        $nextAvailableTDCDate = function ($date) {
-            $date=Carbon::now();
-            $dayOfWeek = $date->dayOfWeek; // Get the current day of the week (0 = Sunday, 6 = Saturday)
-
-            \Log::info('Current day of week: ' . $dayOfWeek);
-
-            if ($dayOfWeek >= Carbon::TUESDAY && $dayOfWeek <= Carbon::FRIDAY) {
-                // If today is between Tuesday and Friday, schedule the first session on the coming Saturday
-                return $date->next(Carbon::SATURDAY);
-            } else {
-                // If today is Saturday, Sunday, or Monday, schedule the first session on the coming Tuesday
-                return $date->next(Carbon::TUESDAY);
-            }
-        };
-
-        while ($createdSchedules < $numberOfSessions) {
-            $currentDate = $startDate->copy();
-
-            // Check if a schedule already exists for the student on this day
-            $existingSchedule = Schedule::where('student_id', $student->id)
-                ->whereDate('scheduled_date', $currentDate->format('Y-m-d'))
-                ->exists();
-
-            if (!$existingSchedule) {
-                // Check for TDC-specific scheduling (assuming courseId == 1 is TDC)
-                if ($courseId == 1) {
-                    // Move to the next valid TDC start date
-                    $currentDate = $nextAvailableTDCDate($startDate->copy());
-
-                    // Create two TDC sessions starting from the calculated current date
-                    $this->createTDCSchedules($student, $courseId, $currentDate, $hoursPerSession);
-                    $createdSchedules += 2; // Two sessions created for TDC
-
-                    // Move startDate to the next valid day after both sessions (next Tuesday)
-                    $startDate = $currentDate->next(Carbon::TUESDAY)->next(Carbon::SATURDAY);
-                } else {
-                    // For non-TDC courses, limit to one session per day with a set start time (e.g., 8 AM)
-                    if ($this->scheduleWithLimit($student, $courseId, $currentDate->setTime(8, 0), $hoursPerSession)) {
-                        $createdSchedules++;
-                    }
-                }
-            }
-
-            $startDate->addDay(); // Move to the next day
-        }
-
-        \Log::info("Created {$createdSchedules} schedules for student ID: {$student->id}");
+    if (!$student || !Student::find($student->id)) {
+        \Log::error("Student not found with ID: {$student->id}");
+        return;
     }
 
-    private function createTDCSchedules(Student $student, $courseId, $startDate, $hoursPerSession)
+    if (!$course) {
+        \Log::error("Course not found with ID: {$courseId}");
+        return;
+    }
+
+    $numberOfSessions = $course->number_of_sessions;
+    $hoursPerSession = $course->hours_per_session;
+    $startDate = Carbon::now()->addDay()->startOfDay(); // Start from tomorrow
+    $createdSchedules = 0;
+
+    $nextAvailableTDCDate = function ($date) {
+        $date=Carbon::now();
+        $dayOfWeek = $date->dayOfWeek; // Get the current day of the week (0 = Sunday, 6 = Saturday)
+
+        \Log::info('Current day of week: ' . $dayOfWeek);
+
+        if ($dayOfWeek >= Carbon::TUESDAY && $dayOfWeek <= Carbon::FRIDAY) {
+            // If today is between Tuesday and Friday, schedule the first session on the coming Saturday
+            return $date->next(Carbon::SATURDAY);
+        } else {
+            // If today is Saturday, Sunday, or Monday, schedule the first session on the coming Tuesday
+            return $date->next(Carbon::TUESDAY);
+        }
+    };
+
+    while ($createdSchedules < $numberOfSessions) {
+        $currentDate = $startDate->copy();
+
+        // Check if a schedule already exists for the student on this day
+        $existingSchedule = Schedule::where('student_id', $student->id)
+            ->whereDate('scheduled_date', $currentDate->format('Y-m-d'))
+            ->exists();
+
+        if (!$existingSchedule) {
+            // Check for TDC-specific scheduling (assuming courseId == 1 is TDC)
+            if ($courseId == 1) {
+                // Move to the next valid TDC start date
+                $currentDate = $nextAvailableTDCDate($startDate->copy());
+
+                // Create two TDC sessions starting from the calculated current date
+                $this->createTDCSchedules($student, $courseId, $currentDate, $hoursPerSession);
+                $createdSchedules += 2; // Two sessions created for TDC
+
+                // Move startDate to the next valid day after both sessions (next Tuesday)
+                $startDate = $currentDate->next(Carbon::TUESDAY)->next(Carbon::SATURDAY);
+            } else {
+                // For non-TDC courses, limit to one session per day with a set start time (e.g., 8 AM)
+                if ($this->scheduleWithLimit($student, $courseId, $currentDate->setTime(8, 0), $hoursPerSession)) {
+                    $createdSchedules++;
+                }
+            }
+        }
+
+        $startDate->addDay(); // Move to the next day
+    }
+
+    \Log::info("Created {$createdSchedules} schedules for student ID: {$student->id}");
+}
+
+private function createTDCSchedules(Student $student, $courseId, $startDate, $hoursPerSession)
 {
     // Set the first session start time to 8:00 AM on the correct date
     $firstSessionTime = $startDate->copy()->setTime(8, 0);
@@ -229,43 +229,48 @@ class ApproveEnrollmentController extends Controller
 }
 
     private function scheduleWithLimit(Student $student, $courseId, $date, $hoursPerSession)
-    {
-        $startTimes = [
-            8 => '08:00:00',
-            9 => '09:00:00',
-            10 => '10:00:00',
-            11 => '11:00:00',
-            13 => '13:00:00',
-            14 => '14:00:00',
-            15 => '15:00:00',
-            16 => '16:00:00',
-            17 => '17:00:00'
-        ];
+{
+    $startTimes = [
+        8 => '08:00:00',
+        9 => '09:00:00',
+        10 => '10:00:00',
+        11 => '11:00:00',
+        13 => '13:00:00',
+        14 => '14:00:00',
+        15 => '15:00:00',
+        16 => '16:00:00',
+    ];
 
-        foreach ($startTimes as $hour => $time) {
-            // Check if a schedule already exists for this time
-            if (!Schedule::where('student_id', $student->id)
-                ->whereDate('scheduled_date', $date->format('Y-m-d'))
-                ->whereTime('scheduled_date', $time)
-                ->exists()) {
-                // Create a new schedule if it doesn't exist
-                Schedule::create([
-                    'student_id' => $student->id,
-                    'branch_id' => $student->branch_id,
-                    'course_id' => $courseId,
-                    'scheduled_date' => $date->setTime($hour, 0),
-                    'schedule_finish' => $date->setTime($hour, 0)->addHours($hoursPerSession),
-                    'status' => 'pending',
-                ]);
+    $maxStudentsPerSlot = 2; // Set the limit of students per time slot
 
-                return true; // Successfully scheduled
-            }
+    foreach ($startTimes as $hour => $time) {
+        // Count how many students are already scheduled for this course, branch, and time slot
+        $studentCount = Schedule::where('course_id', $courseId)
+            ->where('branch_id', $student->branch_id)
+            ->whereDate('scheduled_date', $date->format('Y-m-d'))
+            ->whereTime('scheduled_date', $time)
+            ->count();
+
+        // If the current time slot has not reached the limit, schedule the student
+        if ($studentCount < $maxStudentsPerSlot) {
+            Schedule::create([
+                'student_id' => $student->id,
+                'branch_id' => $student->branch_id,
+                'course_id' => $courseId,
+                'scheduled_date' => $date->setTime($hour, 0),
+                'schedule_finish' => $date->copy()->addHours($hoursPerSession), // Ensure finish time is set correctly
+                'status' => 'pending',
+            ]);
+
+            return true; // Successfully scheduled
         }
-
-        return false; // No available slots
     }
 
-    // New function to create a transaction entry
+    return false; // No available slots found
+}
+
+
+
     private function createTransaction(Student $student, $courseId, $packageId = null)
     {
         Transaction::create([
@@ -279,6 +284,15 @@ class ApproveEnrollmentController extends Controller
         ]);
 
         \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}");
+    }
+    public function getStudentSchedules($studentId)
+    {
+        // Fetch schedules for the specified student ID and order by scheduled_date in ascending order
+        $schedules = Schedule::where('student_id', $studentId)
+                             ->orderBy('scheduled_date', 'asc')
+                             ->get();
+
+        return response()->json($schedules); // Return the schedules as JSON
     }
 
 

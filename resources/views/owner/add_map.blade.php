@@ -9,9 +9,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <!-- SweetAlert CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <style>
+        #map { height: 400px; } /* Set the height of the map */
+    </style>
 </head>
+
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -80,13 +90,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('branch_management') }}" class="nav-link">
+                            <a href="{{ route('branch_management') }}" class="nav-link active">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Branch Management</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('staff_management') }}" class="nav-link active">
+                            <a href="{{ route('staff_management') }}" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>Staff Management</p>
                             </a>
@@ -145,18 +155,49 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Staff Management</h1>
+                            <h1 class="m-0">Add New Branch</h1>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- /.content-header -->
 
-            <!-- Main content -->
-                <h1>this is staff management</h1>
-        <!-- /.content -->
+    <!-- Main content -->
+    <div class="container-fluid">
+        <div class="row mx-4">
+            <div class="col-md-6">
+                <form id="branchForm" action="{{ route('branch.store') }}" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label for="branch_name">Branch Name:</label>
+                        <input type="text" id="branch_name" name="branch_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input type="text" id="address" name="address" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="latitude">Latitude:</label>
+                        <input type="text" id="latitude" name="latitude" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">Longitude:</label>
+                        <input type="text" id="longitude" name="longitude" class="form-control" readonly>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+            </div>
+            <div class="col-md-6">
+                <h5><strong>Select New Location</strong></h5>
+                <div id="map" style="height: 400px;"></div>
+            </div>
+        </div>
     </div>
-    <!-- /.content-wrapper -->
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
 
     <!-- Main Footer -->
     <footer class="main-footer">
@@ -176,6 +217,90 @@
     </script>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([13.41, 122.56], 6); // Set the view to the Philippines
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add a click event to the map
+    map.on('click', function(e) {
+        // Get the latitude and longitude from the click event
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        // Populate the form fields
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+    });
+
+ // Handle form submission with confirmation and SweetAlert
+document.getElementById('branchForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    // Ask for confirmation before submitting the form
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to add this branch?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, add it!',
+        cancelButtonText: 'No, keep it'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // If confirmed, proceed with the AJAX submission
+            var formData = new FormData(this);
+
+            // Use Fetch API to submit the form data
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Include CSRF token
+                }
+            })
+            .then(response => {
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+})
+.then(data => {
+    console.log(data); // Log the data for debugging
+    if (data.success) {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Branch added successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            window.location.href = "{{ route('branch_management') }}"; // Adjust the route name if needed
+        });
+    } else {
+        Swal.fire({
+            title: 'Error!',
+            text: data.message || 'Failed to add branch. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+})
+
+        }
+    });
+});
+
+
+</script>
+
 
 
 </body>

@@ -86,13 +86,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('staff_management') }}" class="nav-link active">
+                            <a href="{{ route('staff_management') }}" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>Staff Management</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('course_management') }}" class="nav-link">
+                            <a href="{{ route('course_management') }}" class="nav-link active">
                                 <i class="nav-icon fas fa-book"></i>
                                 <p>Course Management</p>
                             </a>
@@ -145,7 +145,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Staff Management</h1>
+                            <h1 class="m-0">Course Management</h1>
                         </div>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
             <!-- /.content-header -->
 
             <!-- Main content -->
-                <h1>this is staff management</h1>
+                <h1>this is course management</h1>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->

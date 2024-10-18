@@ -21,6 +21,8 @@ class User extends Authenticatable
         'password',
         'role',          // Add the 'role' field
         'branch_id',     // Foreign key for the branch
+        'phone_number',
+        'status',
     ];
 
     /**

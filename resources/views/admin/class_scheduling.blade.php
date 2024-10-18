@@ -6,19 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Branch Analytics</title>
+
+    <!-- Load jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Load jQuery UI after jQuery -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-        <!-- Bootstrap 5.3.0 CDN link -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- SweetAlert CDN -->
+
+    <!-- Bootstrap 5.3.0 CDN link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
+    <!-- Bootstrap Datepicker CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
+<!-- Bootstrap Datepicker JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
+
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -145,7 +164,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Dashboard</h1>
+                            <h1 class="m-0">Class Scheduling</h1>
                         </div>
                     </div>
                 </div>
@@ -153,7 +172,7 @@
             <!-- /.content-header -->
 
             <!-- Main content -->
-            <section class="content">
+            <section class="content mx-3">
                 <!-- Full Calendar -->
                 <div id="calendar"></div>
 
@@ -166,7 +185,6 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <!-- Modal table structure -->
                                 <!-- Modal table structure -->
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered">
@@ -196,6 +214,20 @@
                 <!-- Class Scheduling -->
                 <section class="class-overview my-4">
                     <h4>Overview of Scheduled TDC Classes</h4>
+                    <div class="filter-section">
+                        <label for="scheduleDatePicker" class="form-label">Filter by Date:</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="scheduleDatePicker" class="form-control" placeholder="Select a date" autocomplete="off">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                            <div class="input-group-append">
+                                <button id="resetSchedules" class="btn btn-primary rounded" type="button">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
@@ -204,20 +236,13 @@
                                     <th>Student Name</th>
                                     <th>Course Acronym</th>
                                     <th>Time</th>
+                                    <th>Status</th> <!-- New Status Column -->
                                 </tr>
                             </thead>
                             <tbody id="classOverviewBody">
-                                @foreach ($schedules as $schedule)
-                                    @if ($schedule->course && $schedule->course->acronym === 'TDC' && $schedule->status !== 'done')
-                                        <tr>
-                                            <td>{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('Y-m-d') }}</td>
-                                            <td>{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }}</td>
-                                            <td>{{ $schedule->course->acronym }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format('h:i A') }}</td>
-                                        </tr>
-                                    @endif
-                                @endforeach
+                                <!-- TDC schedules will be injected here by the fetchTDCSchedules function -->
                             </tbody>
+
                         </table>
                     </div>
                 </section>
@@ -235,19 +260,51 @@
     </div>
 
     <!-- REQUIRED SCRIPTS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Include Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-       <!-- FullCalendar JS -->
-   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <!-- Initialize your scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/branch_analytics.js') }}"></script>
     <script>
-        src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" >
-    </script>
-    <!-- Include Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        // Function to update schedule status
+        function updateScheduleStatus(scheduleId, status) {
+            // Make an AJAX request to update the schedule status
+            $.ajax({
+                url: `/schedules/${scheduleId}/update`, // Define your route for updating schedule
+                method: 'PUT',
+                data: {
+                    status: status,
+                    _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token here
+                },
+                success: function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: 'Schedule status has been updated successfully!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Failed',
+                        text: 'There was an error updating the schedule status.',
+                        showConfirmButton: true
+                    });
+                }
+            });
+        }
+
+        // Event listener for status dropdown change
+        $(document).on('change', '.status-dropdown', function() {
+            var scheduleId = $(this).data('schedule-id');
+            var status = $(this).val();
+
+            // Call the update function when status is changed
+            updateScheduleStatus(scheduleId, status);
+        });
+        </script>
     <script>
 // Global variables
 var eventMap = new Map();
@@ -399,6 +456,72 @@ function updateScheduleStatus(scheduleId, status) {
 }
 
     </script>
+
+    <script>
+$(document).ready(function() {
+    // Initialize the Bootstrap date picker
+    $("#scheduleDatePicker").datepicker({
+        format: 'yyyy-mm-dd', // Format to match the database date format
+        autoclose: true, // Automatically close the datepicker after selection
+        todayHighlight: true // Highlight today's date
+    }).on('changeDate', function(e) {
+        // When a date is selected, fetch filtered TDC schedules
+        fetchTDCSchedules(e.format());
+    });
+
+    // Reset button functionality
+    $("#resetSchedules").click(function() {
+        $("#scheduleDatePicker").datepicker('clearDates'); // Clear the selected date
+        fetchTDCSchedules(); // Fetch all schedules
+    });
+
+    // Fetch all schedules initially when the page loads
+    fetchTDCSchedules();
+
+    function fetchTDCSchedules(selectedDate = null) {
+        $.ajax({
+            url: "{{ route('tdc_schedules') }}",
+            method: 'GET',
+            data: {
+                date: selectedDate // Pass the selected date as a parameter
+            },
+            success: function(data) {
+                var tdcTableBody = $('#classOverviewBody');
+                tdcTableBody.empty(); // Clear the existing rows
+
+                if (data.length === 0) {
+                    tdcTableBody.append('<tr><td colspan="5" class="text-center">No schedules found for this date</td></tr>');
+                    return; // Exit the function if no data is found
+                }
+
+                // Populate the table with the retrieved schedules
+                data.forEach(function(schedule) {
+                    tdcTableBody.append(`
+                        <tr>
+                            <td>${schedule.scheduled_date}</td>
+                            <td>${schedule.student.first_name} ${schedule.student.last_name}</td>
+                            <td>${schedule.course.acronym}</td>
+                            <td>${schedule.scheduled_date} - ${schedule.schedule_finish}</td>
+                            <td>
+                                <select class="form-select status-dropdown" data-schedule-id="${schedule.id}">
+                                    <option value="pending" ${schedule.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="done" ${schedule.status === 'done' ? 'selected' : ''}>Done</option>
+                                    <option value="missing" ${schedule.status === 'missing' ? 'selected' : ''}>Missing</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `);
+                });
+            },
+            error: function() {
+                alert('Failed to fetch TDC schedules.');
+            }
+        });
+    }
+});
+</script>
+
+
 </body>
 
 </html>

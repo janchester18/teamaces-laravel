@@ -14,30 +14,28 @@ class LoginController extends Controller
     }
 
     public function login(Request $request)
-    {
-        // Validate the request inputs
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    // Validate the request inputs
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        // Attempt to authenticate the user
-        if (Auth::attempt($request->only('email', 'password'))) {
-            // Retrieve authenticated user
-            $user = Auth::user();
-
-            // Check the user's role and redirect accordingly
-            if ($user->role == 'owner') {
-                return redirect()->route('owner.branch_analytics_view');
-            } elseif ($user->role == 'staff') {
-                return redirect()->route('admin.branch_analytics_view');
-            } else {
-                Auth::logout(); // Logout if the role is not allowed
-                return redirect()->route('login')->withErrors('Unauthorized role.');
-            }
+    // Attempt to authenticate the user
+    if (Auth::attempt($request->only('email', 'password'))) {
+        // Check if the user is inactive
+        if (Auth::user()->status !== 'active') {
+            Auth::logout(); // Logout if inactive
+            return response()->json(['message' => 'Your account is inactive.'], 403);
         }
 
-        // If login attempt fails, redirect back with error message
-        return redirect()->route('login')->withErrors('Login failed. Please check your credentials.');
+        // Login successful
+        return response()->json(['redirect' => route('owner.branch_analytics_view')]);
     }
+
+    // If login attempt fails, return error
+    return response()->json(['message' => ['Login failed. Please check your credentials.']], 422);
+}
+
+
 }

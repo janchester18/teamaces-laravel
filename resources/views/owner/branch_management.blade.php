@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Branch Analytics</title>
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+        <!-- SweetAlert CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+        <!-- SweetAlert CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
@@ -169,7 +175,8 @@
                                 <th>Address</th>
                                 <th>Latitude</th>
                                 <th>Longitude</th>
-                                <th>Action</th> <!-- New Action column -->
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,17 +187,59 @@
                                     <td>{{ $branch->address }}</td>
                                     <td>{{ $branch->latitude }}</td>
                                     <td>{{ $branch->longitude }}</td>
+                                    <td>{{ $branch->status }}</td>
                                     <td>
-                                        <a href="{{-- {{ route('branch.edit', $branch->id) }} --}}" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-pencil-alt"></i> <!-- Pencil icon --> Edit
-                                        </a>
-                                    </td> <!-- Action cell with the edit button -->
+                                        <button class="btn btn-sm btn-warning edit-btn"
+                                                data-id="{{ $branch->id }}"
+                                                data-name="{{ $branch->name }}"
+                                                data-address="{{ $branch->address }}"
+                                                data-status="{{ $branch->status }}"> <!-- Add this line -->
+                                            <i class="fas fa-pencil-alt"></i> Edit
+                                        </button>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </section>
+
+            <!-- Edit Branch Modal -->
+<div class="modal fade" id="editBranchModal" tabindex="-1" role="dialog" aria-labelledby="editBranchModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBranchModalLabel">Edit Branch</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editBranchForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="branch_id" name="branch_id">
+                    <div class="form-group">
+                        <label for="branch_name">Name</label>
+                        <input type="text" class="form-control" id="branch_name" name="branch_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="branch_address">Address</label>
+                        <input type="text" class="form-control" id="branch_address" name="branch_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="branch_status">Status</label>
+                        <select class="form-control" id="branch_status" name="branch_status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
         <!-- /.content -->
@@ -207,14 +256,83 @@
 
     <!-- REQUIRED SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/branch_analytics.js') }}"></script>
+
+    <!-- JavaScript to handle the edit button click -->
     <script>
-        src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" >
+        document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const name = this.getAttribute('data-name');
+            const address = this.getAttribute('data-address');
+            const status = this.getAttribute('data-status'); // Get the status from the button's data attribute
+
+            // Set the values in the modal
+            document.getElementById('branch_id').value = id;
+            document.getElementById('branch_name').value = name;
+            document.getElementById('branch_address').value = address;
+            document.getElementById('branch_status').value = status; // Set the status dropdown
+
+            // Update the form action to include the branch ID
+            document.getElementById('editBranchForm').action = "{{ route('branch.update', '') }}" + '/' + id;
+
+            // Show the modal
+            $('#editBranchModal').modal('show');
+        });
+    });
+
+        // Handle form submission with AJAX
+        document.getElementById('editBranchForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(this); // Create FormData object
+
+            // Make AJAX request
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest', // Set this header to identify the request as AJAX
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token
+                }
+            })
+            .then(response => response.json()) // Parse the JSON response
+            .then(data => {
+                if (data.success) {
+                    // Show success alert
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Branch updated successfully.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Optionally refresh the page or reload the table data here
+                        location.reload(); // Reload the page (or you can update the table dynamically)
+                    });
+                } else {
+                    // Show error alert
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'There was an issue updating the branch.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'There was an issue processing your request.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
     </script>
-    <!-- Include Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
 </body>

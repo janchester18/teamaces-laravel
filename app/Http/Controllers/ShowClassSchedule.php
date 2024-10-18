@@ -40,4 +40,28 @@ class ShowClassSchedule extends Controller
         return view('admin.class_scheduling', compact('schedules', 'timeSlots', 'daysOfWeek'));
     }
 
+    public function fetchTDCSchedules(Request $request)
+    {
+        $adminBranchId = auth()->user()->branch_id;
+
+        // Get the date from the request (if provided)
+        $selectedDate = $request->input('date');
+
+        // Query the schedules
+        $tdcSchedules = Schedule::with(['student', 'course'])
+            ->where('branch_id', $adminBranchId)
+            ->whereHas('course', function ($query) {
+                $query->where('acronym', 'TDC'); // Filter for TDC course
+            })
+            ->where('status', '!=', 'done'); // Exclude 'done' schedules
+
+        // If a date is selected, filter schedules for that date
+        if ($selectedDate) {
+            $tdcSchedules->whereDate('scheduled_date', $selectedDate);
+        }
+
+        return response()->json($tdcSchedules->get()); // Return filtered schedules
+    }
+
+
 }

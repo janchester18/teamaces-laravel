@@ -13,10 +13,5 @@ class Branch extends Model
      protected $table = 'branches';
 
         // Specify the fields that can be mass-assigned
-    protected $fillable = [
-        'name',
-        'address',
-        'latitude',
-        'longitude',
-    ];
+        protected $fillable = ['name', 'address', 'latitude', 'longitude', 'status'];
 }

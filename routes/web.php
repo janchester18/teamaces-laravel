@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ShowClassSchedule;
 use App\Http\Controllers\StudentController;
@@ -172,6 +173,7 @@ Route::post('/logout', function (Request $request) {
 Route::get('/pending_enrollments', [ShowEnrollmentController::class, 'showPendingEnrollments'])->name('pending_enrollments');
 Route::get('/student_management', [ShowApprovedController::class, 'index'])->name('student_management');
 Route::get('/class_scheduling', [ShowClassSchedule::class, 'showClassSchedule'])->name('class_scheduling');
+Route::get('/tdc_schedules', [ShowClassSchedule::class, 'fetchTDCSchedules'])->name('tdc_schedules');
 
 
 //staff-confirm payment route
@@ -265,3 +267,10 @@ Route::get('/inquiries_requests', function () {
 //owner branch routes
 Route::get('/branch_management', [BranchController::class, 'showOwnerBranches'])->name('branch_management');
 Route::post('/branch/store', [BranchController::class, 'store'])->name('branch.store');
+Route::put('/branch/update/{id}', [BranchController::class, 'update'])->name('branch.update');
+
+//owner staff routes
+Route::get('/staff_management', [UserController::class, 'showStaffManagement'])
+    ->name('staff_management'); // This is the route name you'll use in your Blade views
+Route::post('/staff/store', [UserController::class, 'store'])->name('staff.store');
+Route::put('/staff/{id}', [UserController::class, 'update'])->name('staff.update');

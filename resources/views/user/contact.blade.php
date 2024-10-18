@@ -194,10 +194,77 @@
             margin-bottom: 30px;
             margin-top: 30px;
         }
+                            /* Button styling */
+    #backToTopBtn {
+        opacity: 0; /* Start invisible */
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+        z-index: 99;
+        width: 50px;
+        height: 50px;
+        border: none;
+        outline: none;
+        background-color: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 10px;
+        opacity: 0; /* Start with the button being fully transparent */
+        transition: opacity 0.3s ease-in-out; /* Smooth transition for opacity */
+    }
+
+    #backToTopBtn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: brightness(0) invert(1); /* Make image white */
+    }
+
+    #backToTopBtn:hover {
+        background-color: #0056b3; /* Darker color on hover */
+    }
+
+    /* Entry animation (fade in) */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); } /* Starts hidden and moves up */
+        to { opacity: 1; transform: translateY(0); } /* Ends visible */
+    }
+
+    /* Exit animation (fade out) */
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(30px); } /* Moves down when hidden */
+    }
+
+    /* When the button is visible */
+    #backToTopBtn.show {
+        display: block;
+        animation: fadeIn 0.5s ease-in-out forwards; /* Trigger the fade-in animation */
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* When the button is hidden */
+    #backToTopBtn.hide {
+        opacity: 0;
+        animation: fadeOut 0.2s ease-in-out forwards; /* Trigger the fade-out animation */
+    }
+    .navbar-hidden {
+            position: fixed;
+            top: -110px;
+            /* Adjust this value based on your navbar height */
+            transition: top 0.3s;
+            /* Smooth transition for the hide/show effect */
+        }
     </style>
 </head>
 
 <body>
+
+    <!-- Back to Top Button -->
+    <button onclick="scrollToTop()" id="backToTopBtn" title="Go to top">
+        <img src="{{ asset('images/arrow-up.svg') }}" alt="Back to Top">
+    </button>
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
@@ -376,6 +443,46 @@
 });
 
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var navbar = document.querySelector('.navbar');
+        var lastScrollTop = 0;
+
+        window.addEventListener('scroll', function() {
+            var currentScrollTop = window.scrollY;
+
+            if (currentScrollTop > lastScrollTop) {
+                // Scrolling down
+                navbar.classList.add('navbar-hidden');
+            } else {
+                // Scrolling up
+                navbar.classList.remove('navbar-hidden');
+            }
+
+            lastScrollTop = currentScrollTop;
+        });
+    });
+
+
+            window.onscroll = function() { scrollFunction() };
+
+    function scrollFunction() {
+        const btn = document.getElementById("backToTopBtn");
+        // Show the button when scrolled more than 100px from the top
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            btn.classList.add('show');
+            btn.classList.remove('hide');
+        } else {
+            btn.classList.add('hide');
+            btn.classList.remove('show');
+        }
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>

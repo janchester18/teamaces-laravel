@@ -156,9 +156,8 @@
 <!-- Student List Section -->
 <section class="student-list m-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <!-- Sort Button on the left -->
-        <button class="btn btn-secondary me-2">Sort</button>
 
+        <!-- Search Bar in the middle -->
         <!-- Search Bar in the middle -->
         <div class="flex-grow-1 mx-3">
             <input type="text" class="form-control" placeholder="Search by name" aria-label="Search" id="searchStudent">
@@ -502,6 +501,18 @@ function updateScheduleStatus(scheduleId, status) {
 }
 
     </script>
+
+<script>
+    $(document).ready(function() {
+        $('#searchStudent').on('keyup', function() {
+            var value = $(this).val().toLowerCase(); // Get the search input value and convert to lowercase
+            $('#studentTableBody tr').filter(function() {
+                // Check if any of the columns contain the search term
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    });
+</script>
 </body>
 
 </html>

@@ -44,6 +44,9 @@ class BranchController extends Controller
         $branch->latitude = $request->latitude;
         $branch->longitude = $request->longitude;
 
+        // Set the status to active by default
+        $branch->status = 'active';
+
         // Attempt to save the branch
         if ($branch->save()) {
             return response()->json(['success' => true]);
@@ -51,5 +54,27 @@ class BranchController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to add branch.']);
         }
     }
+
+
+    public function update(Request $request, $id)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'branch_name' => 'required|string|max:255',
+            'branch_address' => 'required|string|max:255',
+            'branch_status' => 'required|in:active,inactive', // Validate status
+        ]);
+
+        // Find the branch and update it
+        $branch = Branch::findOrFail($id);
+        $branch->name = $validated['branch_name'];
+        $branch->address = $validated['branch_address'];
+        $branch->status = $validated['branch_status']; // Update status
+        $branch->save();
+
+        // Return a JSON response
+        return response()->json(['success' => true, 'message' => 'Branch updated successfully.']);
+    }
+
 
 }

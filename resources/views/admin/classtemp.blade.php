@@ -72,7 +72,7 @@
                     <div class="info">
                         <a href="#" class="d-block">{{ Auth::user()->name }}</a>
                         <small>{{ ucfirst(strtolower(Auth::user()->role)) }} -
-                            {{ Auth::user()->branch ? Auth::user()->branch->name : 'No Branch Assigned' }}</small>
+                            {{ Auth::user()->branch ? str_replace('TeamAces Driving Academy ', '', Auth::user()->branch->name) : 'No Branch Assigned' }}</small>
                     </div>
                 </div>
 

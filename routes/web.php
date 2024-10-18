@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ShowClassSchedule;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ScheduleController;
@@ -274,3 +276,13 @@ Route::get('/staff_management', [UserController::class, 'showStaffManagement'])
     ->name('staff_management'); // This is the route name you'll use in your Blade views
 Route::post('/staff/store', [UserController::class, 'store'])->name('staff.store');
 Route::put('/staff/{id}', [UserController::class, 'update'])->name('staff.update');
+
+//owner courses routes
+Route::get('/course_management', [CourseController::class, 'index'])->name('course_management');
+Route::post('/course/store', [CourseController::class, 'store'])->name('course.store');
+Route::put('/course/update/{id}', [CourseController::class, 'update'])->name('course.update');
+
+//owner packages routes
+Route::get('/package_management', [PackageController::class, 'index'])->name('package_management');
+Route::post('/package/store', [PackageController::class, 'store'])->name('package.store');
+Route::put('/packages/{id}', [PackageController::class, 'update'])->name('packages.update');

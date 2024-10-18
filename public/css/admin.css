@@ -243,3 +243,9 @@
     background-color: #e9ecef !important;
     color: #343a40 !important;
 }
+
+
+.info small {
+    display: block; /* Makes the small element take up the full width */
+    word-wrap: break-word; /* Allows the text to break into the next line if needed */
+}

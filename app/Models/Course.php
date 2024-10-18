@@ -33,4 +33,10 @@ class Course extends Model
         return $this->belongsToMany(Package::class, 'course_package')
             ->withTimestamps();
     }
+
+        // Define the relationship with CoursePackage
+        public function coursePackages()
+        {
+            return $this->hasMany(CoursePackage::class, 'course_id');
+        }
 }

@@ -10,8 +10,8 @@ class BranchController extends Controller
     // Method to display the branches and map
     public function showBranches()
     {
-        // Fetch all branches from the database
-        $branches = Branch::all();
+        // Fetch only active branches from the database
+        $branches = Branch::where('status', 'active')->get();
 
         // Pass the branches data to the view
         return view('user.branches', compact('branches'));

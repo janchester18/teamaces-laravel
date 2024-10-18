@@ -10,6 +10,9 @@
     <link rel="icon" href="{{ asset('images/aces.png') }}">
 </head>
 <style>
+    html {
+        scroll-behavior: smooth;
+        }
    body {
             font-family: 'Open Sans', sans-serif;
             padding-top: 0px;
@@ -305,41 +308,321 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="container text-center">
-            <h1 class="mb-4 fade-in">Contact TeamAces Driving Academy</h1>
-            <p class="mb-5 fade-in fade-in-delay-1">Get in touch with us for any inquiries or to start your journey towards becoming a confident driver.</p>
-            <div class="fade-in fade-in-delay-2">
-                <a href="#" class="btn btn-custom btn-franchise">Be our Partner</a>
+<section class="hero">
+    <div class="container text-center">
+        <h1 class="mb-4 fade-in">Contact TeamAces Driving Academy</h1>
+        <p class="mb-5 fade-in fade-in-delay-1">Get in touch with us for any inquiries or to start your journey towards becoming a confident driver.</p>
+        <div class="fade-in fade-in-delay-2">
+            <a href="#" class="btn btn-custom btn-franchise" data-bs-toggle="modal" data-bs-target="#contactModal">Get in Touch</a>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">Get in Touch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="contactForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+</div>
 
-    <!-- Contact Form Section -->
-    <section id="contact-container" class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="contact-form fade-in fade-in-delay-2">
-                    <h2 class="text-center mb-4">Get in Touch</h2>
-                    <form id="contactForm">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Message</label>
-                            <textarea class="form-control" id="message" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
-                    </form>
+<div class="franchise-info m-5 py-4 bg-white">
+    <h2 class="text-center font-weight-bold mb-4">Secure a Driving School Franchise in Your Area</h2>
+    <p class="text-center">
+        TeamAces Driving Academy Inc. is excited to offer franchise opportunities. We currently have over 10 franchise branches nationwide, with our latest addition in Naic, Cavite, and more branches opening soon!
+    </p>
+
+    <div class="text-center mb-4">
+        <img src="images/franchise_header.jpg" alt="Franchise Header" class="img-fluid">
+    </div>
+
+    <h3 class="font-weight-bold text-primary text-center mb-3">Our Branch Locations</h3>
+    <ul class="list-unstyled text-center mb-4">
+        <li>Bauan, Lemery, Tanauan, Lipa, Rosario, Batangas City</li>
+        <li>Calamba, Paranaque City, Danao, Mandaue Cebu City</li>
+        <li>Pila Laguna, Famy Laguna, Naic Cavite</li>
+        <li>San Jose Del Monte Bulacan, Rosales Pangasinan</li>
+    </ul>
+
+    <div class="alert alert-info text-center">
+        <strong>Note:</strong> We only accept 1 franchise branch in one city/town or within a 10Km radius on a first-come, first-served basis. Franchise locations are subject to approval.
+        Inquire and reserve your prospected franchise location to secure the zoning area!
+    </div>
+
+    <h3 class="font-weight-bold text-primary text-center mb-3">Franchise Package Inclusions</h3>
+
+    <!-- Franchise Package Inclusions -->
+    <div class="franchise-package">
+        <div class="row text-center">
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/accreditation-lto-team-aces.png" alt="LTO Accreditation Assistance" class="img-fluid">
+                <h5 class="font-weight-bold">LTO Accreditation Assistance</h5>
+                <p>We will process the LTO accreditation at your location's Regional Office. You only need to handle other legal documents.</p>
+            </div>
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/instructor-training-team-aces-removebg-preview.png" alt="Intensive Instructor Training" class="img-fluid">
+                <h5 class="font-weight-bold">Intensive Instructor Training</h5>
+                <p>Your driving instructors will receive comprehensive training at our head office to ensure consistent service across all branches.</p>
+            </div>
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/admin-staff-training-team-aces_orig.png" alt="Admin Staff Training" class="img-fluid">
+                <h5 class="font-weight-bold">Admin Staff Training</h5>
+                <p>We conduct training for your admin staff to instill a "Service Over Profit" mentality, ensuring quality service.</p>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/it-system-team-aces-stradcom.png" alt="ACES IT System Training" class="img-fluid">
+                <h5 class="font-weight-bold">ACES IT System Training</h5>
+                <p>Our staff will train on the automated processing of LTO licenses using the ACES IT System based on new regulations.</p>
+            </div>
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/screen-shot-2020-03-02-at-17-removebg-preview_orig.png" alt="Manual Vehicle Downpayment" class="img-fluid">
+                <h5 class="font-weight-bold">Manual Vehicle Downpayment</h5>
+                <p>Your franchise package includes a downpayment for a fully equipped manually operated vehicle with safety features.</p>
+            </div>
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/screen-shot-2020-03-02-at-17-removebg-preview-1_orig.png" alt="Automatic Vehicle Downpayment" class="img-fluid">
+                <h5 class="font-weight-bold">Automatic Vehicle Downpayment</h5>
+                <p>Your package also includes a downpayment for a fully equipped automatic vehicle, ensuring safety for both student and instructor.</p>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/icon-prep-cahier_orig.png" alt="Business Operations Documents" class="img-fluid">
+                <h5 class="font-weight-bold">Business Operations Documents</h5>
+                <p>We provide all necessary documents for smooth daily operations, from student enrollment to obtaining driver's licenses.</p>
+            </div>
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/fig-dm01_orig.png" alt="Online Presence & Marketing Support" class="img-fluid">
+                <h5 class="font-weight-bold">Online Presence & Marketing Support</h5>
+                <p>Your franchise will have an online presence on our website, helping you attract clients through effective marketing.</p>
+            </div>
+            <div class="col-md-4 col-12 mb-4">
+                <img src="images/team-aces-pos-system.jpeg" alt="Messenger App & POS System" class="img-fluid">
+                <h5 class="font-weight-bold">Messenger App & POS System Included</h5>
+                <p>Our app allows 24/7 online enrollment, and our POS system helps track sales and employee hours efficiently.</p>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="font-weight-bold text-primary text-center mb-3">Franchise Package for Only Php 1,200,000.00</h3>
+    <p class="text-center">
+        <strong>Package Breakdown:</strong>
+        <ul class="list-unstyled text-center package-breakdown">
+            <li>Php 850,000.00 for the TeamAces Driving Academy system</li>
+            <li>Php 120,000.00 for the downpayment of a manual vehicle</li>
+            <li>Php 120,000.00 for the downpayment of an automatic vehicle</li>
+            <li>Php 110,000.00 as the franchise bond (3-year contract)</li>
+        </ul>
+        <p class="text-center text-primary font-italic bg-light border border-primary p-2 my-3">
+            Monthly amortization will be shouldered by the franchisee.
+        </p>
+    </p>
+
+
+    <div class="alert alert-info text-center mb-4">
+        <strong>Franchise Obligations:</strong> A monthly 8% royalty fee is based on sales recorded in the ACES IT system.
+    </div>
+
+    <h3 class="font-weight-bold text-primary text-center mb-3">Franchise Bonuses</h3>
+    <ul class="list-unstyled text-center">
+        <li>Location Assistance</li>
+        <li>Pre-Opening Assistance</li>
+        <li>Franchise Seminar</li>
+    </ul>
+
+    <h3 class="font-weight-bold text-center mb-4">Join Us Today!</h3>
+    <p class="text-center">
+        Be one of our top franchisees! We're here to help you grow your franchise business with us.
+    </p>
+</div>
+
+<style>
+
+
+    .franchise-package .img-fluid {
+        max-height: 200px; /* Limit image height for uniformity */
+    }
+
+    @media (max-width: 767.98px) {
+        .franchise-package .img-fluid {
+            max-width: 100%; /* Ensure images fit within mobile screens */
+            height: auto;
+        }
+    }
+
+    .step-image {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
+<!-- Add a horizontal line -->
+<hr class="my-4"> <!-- You can adjust the margin as needed -->
+
+<!-- Franchise Steps -->
+<div class="franchise-steps m-5 py-4 bg-white">
+    <h2 class="text-center font-weight-bold mb-5">How to Franchise with Us</h2>
+
+    <!-- Step 1 -->
+    <div class="step mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-6 col-12 text-center mb-3 mb-md-0">
+                <img src="images/team-aces-form_orig.jpg" alt="Step 1" class="img-fluid" style="max-width: 100%; max-height: 200px; height: auto;">
+            </div>
+            <div class="col-md-6 col-12">
+                <h3 class="font-weight-bold text-primary">Step 1: Franchise Application</h3>
+                <p>
+                    Download and fill out the Franchise Application Form:
+                    <a href="images/teamaces_application_form.pdf" download target="_blank" class="btn btn-outline-primary btn-sm">Download Form</a>.
+                    After filling it out, send it via email to our Franchise Manager at
+                    <a href="mailto:bodegasjohnny@gmail.com">bodegasjohnny@gmail.com</a> for approval.
+                </p>
+                <div class="alert alert-info mt-3">
+                    <strong>After Sending:</strong> Send us a text message with your details:
+                    <ul class="mt-2 list-unstyled">
+                        <li><strong>Name:</strong> Your Full Name</li>
+                        <li><strong>Address:</strong> Your Complete Address</li>
+                        <li><strong>Email Address:</strong> Your Email</li>
+                        <li><strong>Available Time for Phone Call:</strong> Your Available Hours</li>
+                        <li><strong>Send To:</strong> SMART - 0908-187-5826 | GLOBE - 0945-7147-536</li>
+                    </ul>
+                </div>
+                <p>
+                    We will arrange a phone or Zoom meeting to discuss the details and answer your questions.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step mb-5">
+        <div class="row align-items-center flex-md-row-reverse">
+            <div class="col-md-6 col-12 text-center mb-3 mb-md-0">
+                <img src="images/contact-mail.png" alt="Step 2" class="img-fluid" style="max-width: 100%; max-height: 200px; height: auto;">
+            </div>
+            <div class="col-md-6 col-12">
+                <h3 class="font-weight-bold text-primary">Step 2: Phone Interview & Decision</h3>
+                <p>
+                    After the phone interview with our Marketing Representative, if you decide to proceed with franchising, we will schedule a personal meeting.
+                    Be sure to prepare the following documents:
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check-circle text-success"></i> 1 valid ID</li>
+                    <li><i class="fas fa-check-circle text-success"></i> 2 pieces 2x2 photos</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Filled-out application form</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Signed franchise contract</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Php 600,000.00 or 50% franchise fee (dated check)</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Post-dated check for the remaining balance</li>
+                </ul>
+                <p class="mt-3">
+                    These documents will be required during the orientation and personal meeting.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-6 col-12 text-center mb-3 mb-md-0">
+                <img src="images/screen-shot-2020-03-02-at-22-39-40.png" alt="Step 3" class="img-fluid" style="max-width: 100%; max-height: 200px; height: auto;">
+            </div>
+            <div class="col-md-6 col-12">
+                <h3 class="font-weight-bold text-primary">Step 3: Location Assistance</h3>
+                <p>
+                    We will help with location approval for clients who already have a site. If you don’t have a location, we will provide assistance in finding one.
+                </p>
+                <p><strong>Tip:</strong> Choose a spot with foot traffic, near city centers or LTO offices to increase franchise sales.</p>
+                <div class="alert alert-warning">
+                    <strong>Note:</strong> Location assistance is provided only after signing the contract and settling 50% of the Php 600,000.00 franchise fee.
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step mb-5">
+        <div class="row align-items-center flex-md-row-reverse">
+            <div class="col-md-6 col-12 text-center mb-3 mb-md-0">
+                <img src="images/processing-reno.png" alt="Step 4" class="img-fluid" style="max-width: 100%; max-height: 200px; height: auto;">
+            </div>
+            <div class="col-md-6 col-12">
+                <h3 class="font-weight-bold text-primary">Step 4: Processing & Renovation</h3>
+                <p>
+                    The office renovation process typically lasts 1-2 months, depending on the location. While waiting, we will arrange franchise seminars, and staff training sessions for driving instructors.
+                </p>
+                <p>
+                    During this period, you can also begin applying for business permits and other legal documents required by your local government.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-6 col-12 text-center mb-3 mb-md-0">
+                <img src="images/openning.png" alt="Step 5" class="img-fluid" style="max-width: 100%; max-height: 200px; height: auto;">
+            </div>
+            <div class="col-md-6 col-12">
+                <h3 class="font-weight-bold text-primary">Step 5: Branch Opening & Pre-Opening Assistance</h3>
+                <p>
+                    The branch will be handed over to you after the completion of renovations. We will also provide pre-opening assistance to ensure smooth operations on your first day.
+                </p>
+                <p>
+                    Get ready to begin your exciting journey with us!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 767.98px) {
+        .step-image {
+            max-width: 80%;
+            height: auto;
+        }
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    }
+</style>
+
+
+        <!-- Franchise CTA -->
+        <div class="text-center">
+            <a href="images/teamaces_application_form.pdf" download target="_blank" class="btn btn-custom btn-franchise">Download Franchise Application Form</a>
+            <p class="mt-3">Have questions? Contact us at <a href="tel:+639081875826">0908-187-5826</a> or <a href="mailto:bodegasjohnny@gmail.com">bodegasjohnny@gmail.com</a></p>
+        </div>
+    </div>
+</section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -482,6 +765,13 @@
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    document.querySelector('.btn-franchise').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent default anchor behavior
+  document.querySelector('#franchise-section').scrollIntoView({
+    behavior: 'smooth'
+  });
+});
 </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

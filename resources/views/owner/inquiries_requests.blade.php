@@ -7,8 +7,10 @@
     <title>Inquiries & Requests</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
@@ -110,15 +112,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{-- {{ route('owner.reports') }} --}}" class="nav-link">
+                            <a href="{{ route('owner-reports') }}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{-- {{ route('settings') }} --}}" class="nav-link">
-                                <i class="nav-icon fas fa-cogs"></i>
-                                <p>Settings</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -153,7 +149,45 @@
             <!-- /.content-header -->
 
             <!-- Main content -->
-                <h1>this is Inquiries & Requests</h1>
+            <section class="package-overview m-4">
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($inquiries as $inquiry)
+                            <tr>
+                                <td>{{ $inquiry->name }}</td>
+                                <td>{{ $inquiry->email }}</td>
+                                <td>{{ $inquiry->message }}</td>
+                                <td>{{ ucfirst($inquiry->status) }}</td>
+                                <td>{{ $inquiry->created_at->format('Y-m-d') }}</td>
+                                <td>
+                                    @if($inquiry->status !== 'resolved')
+                                    <button class="btn btn-sm btn-success mark-resolved-btn" data-id="{{ $inquiry->id }}">
+                                        <i class="fas fa-check"></i> Mark as Resolved
+                                    </button>
+                                    @else
+                                    <button class="btn btn-sm btn-secondary" disabled>
+                                        <i class="fas fa-check"></i> Resolved
+                                    </button>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -176,6 +210,42 @@
     </script>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        $(document).on('click', '.mark-resolved-btn', function() {
+            var inquiryId = $(this).data('id');
+
+            $.ajax({
+                url: '{{ route("inquiries.markResolved") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: inquiryId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Success',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(function(result) {
+                            // Reload only if "OK" is clicked
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'An error occurred while updating the status.', 'error');
+                }
+            });
+        });
+    </script>
+
 
 
 </body>

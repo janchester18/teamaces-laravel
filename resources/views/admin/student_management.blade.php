@@ -98,11 +98,28 @@
                                 <p>Student Management</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('pending_enrollments') }}" class="nav-link">
+                        <li class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
-                                <p>Pending Enrollments</p>
+                                <p>
+                                    Pending Enrollments
+                                    <i class="right fas fa-angle-left"></i> <!-- Indicates that it's collapsible -->
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview mt-0">
+                                <li class="nav-item pl-3">
+                                    <a href="{{ route('pending_enrollments') }}" class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-user-plus"></i>
+                                        <p>New Students</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item pl-3">
+                                    <a href="{{ route('existing_students') }}" class="nav-link {{-- {{ request()->routeIs('existing_students') ? 'active' : '' }} --}}">
+                                        <i class="nav-icon fas fa-user"></i>
+                                        <p>Existing Students</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
@@ -114,12 +131,6 @@
                             <a href="{{ route('reports') }}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('settings') }}" class="nav-link">
-                                <i class="nav-icon fas fa-cogs"></i>
-                                <p>Settings</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -188,14 +199,23 @@
                         <td>{{ $student->email }}</td>
                         <td>{{ $student->phone_number }}</td>
                         <td>
-                            @if($student->courses->isNotEmpty())
-                                @foreach($student->courses as $course)
-                                    {{ $course->name }}<br>
-                                @endforeach
+                            @if($student->studentCourses->isNotEmpty())
+                                {{-- Get only ongoing courses --}}
+                                @php
+                                    $ongoingCourses = $student->studentCourses->where('status', 'ongoing')->pluck('course_id');
+                                    $courseNames = $student->courses->whereIn('id', $ongoingCourses)->pluck('name');
+                                @endphp
+                                @if($courseNames->isNotEmpty())
+                                    {{ $courseNames->first() }} <!-- Display the first ongoing course only -->
+                                @else
+                                    N/A
+                                @endif
                             @else
                                 N/A
                             @endif
                         </td>
+
+
                         <td class="actions">
                             <a href="{{ route('students.show', ['student' => $student->id]) }}" class="btn btn-sm btn-primary">Edit Schedule</a>
                             <button class="btn btn-sm btn-warning">Update Progress</button>
@@ -205,6 +225,7 @@
             </tbody>
         </table>
     </div>
+
 </section>
             </main>
         </div>

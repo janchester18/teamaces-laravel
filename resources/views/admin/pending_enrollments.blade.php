@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Pending Enrollments</title>
+    <title>New Student Enrollments</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- AdminLTE -->
@@ -98,12 +98,30 @@
                                 <p>Student Management</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('pending_enrollments') }}" class="nav-link active">
+                        <li class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
-                                <p>Pending Enrollments</p>
+                                <p>
+                                    Pending Enrollments
+                                    <i class="right fas fa-angle-left"></i> <!-- Indicates that it's collapsible -->
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview mt-0">
+                                <li class="nav-item pl-3">
+                                    <a href="{{ route('pending_enrollments') }}" class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-user-plus"></i>
+                                        <p>New Students</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item pl-3">
+                                    <a href="{{ route('existing_students') }}" class="nav-link {{-- {{ request()->routeIs('existing_students') ? 'active' : '' }} --}}">
+                                        <i class="nav-icon fas fa-user"></i>
+                                        <p>Existing Students</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
                                 <i class="nav-icon fas fa-edit"></i>
@@ -114,12 +132,6 @@
                             <a href="{{ route('reports') }}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('settings') }}" class="nav-link">
-                                <i class="nav-icon fas fa-cogs"></i>
-                                <p>Settings</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -145,7 +157,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Pending Enrollments</h1>
+                            <h1 class="m-0">New Student Enrollments</h1>
                         </div>
                     </div>
                 </div>

@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Student;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use App\Models\StudentCourse;
 
 class ScheduleController extends Controller
 {
@@ -129,6 +130,32 @@ class ScheduleController extends Controller
         $schedule = Schedule::findOrFail($scheduleId);
         $schedule->status = $request->status;
         $schedule->save();
+
+        // Check if the status is set to 'done'
+        if ($request->status === 'done') {
+            // Get the student ID and course ID from the schedule
+            $studentId = $schedule->student_id;
+            $courseId = $schedule->course_id;
+
+            // Check if all schedules for the student and course are marked as 'done'
+            $allDone = Schedule::where('student_id', $studentId)
+                ->where('course_id', $courseId)
+                ->where('status', '!=', 'done')
+                ->count() === 0;
+
+            // If all schedules are done, update the student_courses status
+            if ($allDone) {
+                // Update the corresponding entry in the student_courses table
+                $studentCourse = StudentCourse::where('student_id', $studentId)
+                    ->where('course_id', $courseId)
+                    ->first();
+
+                if ($studentCourse) {
+                    $studentCourse->status = 'done';
+                    $studentCourse->save();
+                }
+            }
+        }
 
         return response()->json(['message' => 'Schedule status updated successfully.']);
     }

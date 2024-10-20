@@ -44,5 +44,9 @@ class Student extends Authenticatable
     }
 
     // Optionally, you can add accessors or mutators if needed for your fields
+    public function studentCourses()
+    {
+        return $this->hasMany(StudentCourse::class);
+    }
 }
 

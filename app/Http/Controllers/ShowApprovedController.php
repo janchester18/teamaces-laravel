@@ -16,26 +16,27 @@ class ShowApprovedController extends Controller
         // Get the current logged-in admin's branch_id
         $adminBranchId = auth()->user()->branch_id;
 
-        // Fetch students along with their courses, filtered by the admin's branch_id
-        $students = Student::with('courses')
-                           ->where('branch_id', $adminBranchId)
-                           ->get();
+        // Fetch students along with their ongoing courses, filtered by the admin's branch_id
+        $students = Student::with(['studentCourses' => function ($query) {
+            // Filter for ongoing courses only
+            $query->where('status', 'ongoing');
+        }, 'courses'])
+        ->where('branch_id', $adminBranchId)
+        ->whereHas('studentCourses', function ($query) {
+            $query->where('status', '!=', 'done');
+        })
+        ->get();
 
-        // Fetch courses from the database
+        // Fetch other necessary data
         $courses = Course::all();
-
-        // Fetch active packages from the database
         $packages = Package::where('is_active', 1)->get();
-
-        // Fetch student courses if necessary, depending on your use case
-        $studentCourses = StudentCourse::all();
-
-        // Fetch schedules if necessary, depending on your use case
         $schedules = Schedule::all();
 
         // Return the view with the fetched data
-        return view('admin.student_management', compact('students', 'courses', 'packages', 'studentCourses', 'schedules'));
+        return view('admin.student_management', compact('students', 'courses', 'packages', 'schedules'));
     }
+
+
 
     /**
      * Fetch the student's schedule for editing.

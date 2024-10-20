@@ -8,7 +8,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ShowClassSchedule;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ScheduleController;
@@ -16,9 +18,12 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\OwnerReportsController;
 use App\Http\Controllers\ShowApprovedController;
+use App\Http\Controllers\ExistingEnrollController;
 use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\ShowEnrollmentController;
+use App\Http\Controllers\ExistingStudentController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\ApproveEnrollmentController;
 use App\Http\Controllers\AdminAdjustRequestController;
@@ -106,6 +111,11 @@ Route::get('/pending_enrollments', function () {
     return view('admin.pending_enrollments');
 })->name('pending_enrollments');
 
+// existing_students
+Route::get('/existing_students', function () {
+    return view('admin.existing_students');
+})->name('existing_students');
+
 //adjustment_requests
 Route::get('/adjustment-requests', function () {
     return view('admin.adjustment_request'); // Ensure this matches your Blade view file
@@ -128,7 +138,7 @@ Route::get('/student_management', function () {
 
 // reports
 Route::get('/reports', function () {
-    return view('admin.student_management');
+    return view('admin.reports');
 })->name('reports');
 
 // settings
@@ -232,12 +242,24 @@ Route::get('/request-adjustment/form', [StudentRequestAdjustmentController::clas
 
 Route::post('/submit-adjustment', [StudentRequestAdjustmentController::class, 'submitAdjustment'])->name('submit.adjustment');
 Route::get('/requests-made', [DisplayStudentRequestController::class, 'viewRequests'])->name('requests.made');
+Route::get('/add_course', function () {
+    return view('portal.add_course');
+})->name('add_course');
+
+
+
 
 Route::get('/adjustment-requests', [AdminAdjustRequestController::class, 'index'])->name('schedule_adjustment_requests');
 Route::post('/adjustment-request/process', [AdminAdjustRequestController::class, 'processRequest'])->name('process.adjustment');
-
 // In your routes file (web.php)
 Route::get('/requests_log', [AdminAdjustRequestController::class, 'showRequestLogs'])->name('requests.log.data');
+
+//existing student enrollment routes
+Route::get('/existing_students', [ExistingStudentController::class, 'existingStudents'])->name('existing_students');
+Route::post('/approve-enrollment/{enrollmentId}', [ExistingStudentController::class, 'approveEnrollment'])->name('enrollments.approve');
+Route::delete('/delete-enrollments/{enrollmentId}', [ExistingStudentController::class, 'destroy'])->name('enrollments.delete');
+Route::get('/add_course', [ExistingEnrollController::class, 'showForm'])->name('add_course');
+Route::post('/enrollment/store', [ExistingEnrollController::class, 'store'])->name('existing-enrollment.store');
 
 
 //owner nav routes
@@ -265,6 +287,10 @@ Route::get('/package_management', function () {
 Route::get('/inquiries_requests', function () {
     return view('owner.inquiries_requests');
 })->name('inquiries_requests');
+// owner_reports
+Route::get('/owner-reports', function () {
+    return view('owner.owner-reports');
+})->name('owner-reports');
 
 //owner branch routes
 Route::get('/branch_management', [BranchController::class, 'showOwnerBranches'])->name('branch_management');
@@ -286,3 +312,26 @@ Route::put('/course/update/{id}', [CourseController::class, 'update'])->name('co
 Route::get('/package_management', [PackageController::class, 'index'])->name('package_management');
 Route::post('/package/store', [PackageController::class, 'store'])->name('package.store');
 Route::put('/packages/{id}', [PackageController::class, 'update'])->name('packages.update');
+
+//inquiries routes
+Route::post('/inquiries', [InquiryController::class, 'store'])->name('inquiries.store');
+Route::post('/inquiries/mark-resolved', [InquiryController::class, 'markResolved'])->name('inquiries.markResolved');
+Route::get('/inquiries_requests', [InquiryController::class, 'index'])->name('inquiries_requests');
+
+//admin reports
+Route::post('/api/generate-insights', [ReportsController::class, 'generateInsights']);
+Route::get('/reports', [ReportsController::class, 'getStudentDemographics'])->name('reports');
+// Popular Courses routes
+Route::post('/api/generate-course-insights', [ReportsController::class, 'generateCourseInsights']);
+Route::get('/transactions', [ReportsController::class, 'getBranchTransactions'])
+    ->name('transactions.branch')
+    ->middleware('auth');
+
+
+//owner reports
+Route::post('/api/owner-generate-insights', [OwnerReportsController::class, 'owner-generateInsights']);
+Route::get('/owner-reports', [OwnerReportsController::class, 'getStudentDemographics'])->name('owner-reports');
+// Popular Courses routes
+Route::post('/api/owner-generate-course-insights', [OwnerReportsController::class, 'owner-generateCourseInsights']);
+Route::get('/owner-transactions', [OwnerReportsController::class, 'getBranchTransactions'])
+    ->name('owner-transactions.branch');

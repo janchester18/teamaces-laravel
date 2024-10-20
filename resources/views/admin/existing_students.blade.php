@@ -4,11 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Existing Student Enrollments</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+        <!-- Bootstrap 5.3.0 CDN link -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- SweetAlert CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
@@ -74,7 +81,7 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         <li class="nav-item">
-                            <a href="{{ route('admin.branch_analytics_view') }}" class="nav-link active">
+                            <a href="{{ route('admin.branch_analytics_view') }}" class="nav-link">
                                 <i class="nav-icon fas fa-home"></i>
                                 <p>Dashboard</p>
                             </a>
@@ -91,7 +98,7 @@
                                 <p>Student Management</p>
                             </a>
                         </li>
-                        <li class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
+                        <li class="nav-item has-treeview {{ /* request()->is('pending_enrollments*') || */ request()->is('existing_students*') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
                                 <p>
@@ -101,19 +108,20 @@
                             </a>
                             <ul class="nav nav-treeview mt-0">
                                 <li class="nav-item pl-3">
-                                    <a href="{{ route('pending_enrollments') }}" class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
+                                    <a href="{{ route('pending_enrollments') }}" class="nav-link {{-- {{ request()->routeIs('pending_enrollments') ? 'active' : '' }} --}}">
                                         <i class="nav-icon fas fa-user-plus"></i>
                                         <p>New Students</p>
                                     </a>
                                 </li>
                                 <li class="nav-item pl-3">
-                                    <a href="{{ route('existing_students') }}" class="nav-link {{-- {{ request()->routeIs('existing_students') ? 'active' : '' }} --}}">
+                                    <a href="{{ route('existing_students') }}" class="nav-link  {{ request()->routeIs('existing_students') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-user"></i>
                                         <p>Existing Students</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('schedule_adjustment_requests') }}" class="nav-link">
                                 <i class="nav-icon fas fa-edit"></i>
@@ -149,104 +157,58 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Dashboard</h1>
+                            <h1 class="m-0">Existing Student Enrollments</h1>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- /.content-header -->
 
-            <!-- Main content -->
-            <section class="content">
-                <div class="container-fluid">
-                    <!-- Analytics Overview Section -->
-                    <div class="row">
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box bg-info">
-                                <div class="inner">
-                                    <h3>{{ $totalStudents }}</h3>
-                                    <p>Total Students</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-user-graduate"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3>{{ $scheduledSessionsToday }}</h3>
-                                    <p>Scheduled Sessions Today</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box bg-warning">
-                                <div class="inner">
-                                    <h3>
-                                        <span class="d-none d-md-inline">
-                                            ₱{{ number_format($totalRevenue, 2) }} <!-- For wider screens -->
-                                        </span>
-                                        <span class="d-md-none">
-                                            @if ($totalRevenue < 1000)
-                                                ₱{{ number_format($totalRevenue, 2) }} <!-- For values less than 1k -->
-                                            @elseif ($totalRevenue < 1000000)
-                                                ₱{{ round($totalRevenue / 1000) }}k <!-- For thousands -->
-                                            @else
-                                                ₱{{ round($totalRevenue / 1000000, 1) }}M <!-- For millions -->
-                                            @endif
-                                        </span>
-                                    </h3>
-                                    <p>Revenue</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-dollar-sign"></i>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-
-                    <!-- Revenue Chart Section -->
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Revenue per Month</h3>
-            </div>
-            <div class="card-body d-flex flex-column flex-md-row">
-                <!-- Chart -->
-                <div class="flex-grow-1 mb-3 mb-md-0"> <!-- Margin bottom for mobile view -->
-                    <canvas id="revenueChart"></canvas>
-                </div>
-                <!-- Insights for Revenue -->
-                <div class="insights-container ms-md-3" style="min-width: 300px;"> <!-- Set a min-width for insights -->
-                    <h4>LLM Generated Insights</h4>
-                    <div class="text-center">
-                        <button id="fetch-insights-button" class="btn btn-primary rounded">Get Insights</button>
-                    </div>
-                    <div id="loader" class="text-center" style="display: none;">
-                        <div class="spinner-border" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-
-                    <p id="insights-placeholder"></p>
-                </div>
+<!-- Main content -->
+<!-- Main content -->
+<section class="existing-students m-4">
+    <div class="table-responsive">
+        @if($notApprovedCourses->isEmpty())
+        <div class="card text-center w-100">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <i class="fas fa-frown fa-5x text-muted"></i>
+                <h5 class="card-title mt-3">Nothing to See Here!</h5>
+                <p class="card-text">There are currently no existing students with pending approvals.</p>
             </div>
         </div>
+        @else
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Course/Package</th>
+                    <th>Is Package</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($notApprovedCourses as $enrollment)
+                <tr>
+                    <td>{{ $enrollment->student->id }}</td>
+                    <td>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</td>
+                    <td>{{ $enrollment->course->name ?? 'N/A' }}</td>
+                    <td>{{ $enrollment->is_package ? 'Yes' : 'No' }}</td>
+                    <td class="actions">
+                        <button class="btn btn-sm btn-success" onclick="approveEnrollment('{{ $enrollment->id }}')">Approve</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete</button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
     </div>
-</div>
+</section>
 
 
-                </div>
-        </div>
-        </section>
+<!-- /.content -->
+
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -261,6 +223,10 @@
 
     <!-- REQUIRED SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Include Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+       <!-- FullCalendar JS -->
+   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/branch_analytics.js') }}"></script>
@@ -270,81 +236,100 @@
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const controller = new AbortController(); // Create an instance of AbortController
-            const signal = controller.signal; // Get the signal from the controller
-
-            // Fetch insights function
-            const fetchInsights = async () => {
-    // Show the loader and hide the button
-    document.getElementById('loader').style.display = 'block'; // Show loader
-    document.getElementById('fetch-insights-button').style.display = 'none'; // Hide the button
-    document.getElementById('insights-placeholder').innerText = ''; // Clear insights placeholder
-
-    try {
-        const response = await fetch('{{ route('revenue_insights') }}', { signal });
-        const data = await response.json();
-        document.getElementById('insights-placeholder').innerText = data.insights; // Show insights
-    } catch (error) {
-        if (error.name === 'AbortError') {
-            console.log('Fetch aborted');
-        } else {
-            console.error('Error fetching insights:', error);
-            document.getElementById('insights-placeholder').innerText = 'Error fetching insights.';
-        }
-    } finally {
-        // Hide the loader and show the button again
-        document.getElementById('loader').style.display = 'none'; // Hide loader
-        document.getElementById('fetch-insights-button').style.display = 'none'; // Show the button again
-    }
-};
-
-
-            // Line chart (Revenue)
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            const revenueData = @json($revenueData); // Pass the revenue data from PHP to JavaScript
-
-            const labels = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-
-            const revenueChartConfig = {
-                type: 'line',
+function approveEnrollment(enrollmentId) {
+    Swal.fire({
+        title: 'Approve Enrollment',
+        text: "Are you sure you want to approve this enrollment?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, approve it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Make AJAX request to approve the enrollment
+            $.ajax({
+                url: '/approve-enrollment/' + enrollmentId,
+                type: 'POST',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Revenue',
-                        data: Object.values(revenueData),
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        fill: true,
-                        tension: 0.1
-                    }]
+                    _token: '{{ csrf_token() }}' // Include CSRF token for security
                 },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
+                success: function(response) {
+                    Swal.fire(
+                        'Approved!',
+                        response.message,
+                        'success'
+                    );
+                    // Optionally, reload the page or remove the row from the table
+                    location.reload(); // Reload the page to refresh the table
+                },
+                error: function(xhr) {
+                    Swal.fire(
+                        'Error!',
+                        xhr.responseJSON.message || 'Something went wrong.',
+                        'error'
+                    );
                 }
-            };
-
-            new Chart(revenueCtx, revenueChartConfig); // Create the revenue chart
-
-            // Start fetching insights when the button is clicked
-            document.getElementById('fetch-insights-button').addEventListener('click', fetchInsights);
-
-            // Stop fetching insights when navigating away
-            window.addEventListener('beforeunload', function() {
-                controller.abort(); // Abort the fetch request when leaving the page
             });
-        });
+        } else {
+            Swal.fire(
+                'Cancelled',
+                'Enrollment approval cancelled.',
+                'error'
+            );
+        }
+    });
+}
+
+function deleteEnrollment(enrollmentId) {
+    Swal.fire({
+        title: 'Delete Enrollment',
+        text: "Are you sure you want to delete this enrollment?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Make AJAX request to delete the enrollment
+            $.ajax({
+                url: '/delete-enrollments/' + enrollmentId, // Make sure the enrollmentId is correct here
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}' // Include CSRF token for security
+                },
+                success: function(response) {
+                    Swal.fire(
+                        'Deleted!',
+                        response.message,
+                        'success'
+                    );
+                    location.reload(); // Reload the page to refresh the table
+                },
+                error: function(xhr) {
+                    Swal.fire(
+                        'Error!',
+                        xhr.responseJSON.message || 'Something went wrong.',
+                        'error'
+                    );
+                }
+            });
+        } else {
+            Swal.fire(
+                'Cancelled',
+                'Enrollment deletion cancelled.',
+                'error'
+            );
+        }
+    });
+}
+
+
+
     </script>
-
-
 </body>
 
 </html>

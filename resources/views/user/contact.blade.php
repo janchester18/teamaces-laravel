@@ -7,6 +7,8 @@
     <title>TeamAces Driving Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="{{ asset('images/aces.png') }}">
 </head>
 <style>
@@ -626,16 +628,50 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('contactForm');
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // Here you would typically send the form data to a server
-                alert('Thank you for your message. We will get back to you soon!');
-                form.reset();
+        $(document).ready(function() {
+            $('#contactForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent the form from submitting the default way
+
+                // Grab the form data
+                let name = $('#name').val();
+                let email = $('#email').val();
+                let message = $('#message').val();
+
+                $.ajax({
+                    url: "{{ route('inquiries.store') }}", // Route to handle form submission
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}', // CSRF token for security
+                        name: name,
+                        email: email,
+                        message: message,
+                    },
+                    success: function(response) {
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        });
+
+                        // Reset form fields
+                        $('#contactForm')[0].reset();
+                    },
+                    error: function(xhr) {
+                        // Show error message
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong! Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
             });
         });
     </script>
+
 </body>
 
 

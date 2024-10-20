@@ -120,15 +120,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{-- {{ route('reports') }} --}}" class="nav-link">
+                            <a href="{{ route('owner-reports') }}" class="nav-link">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Reports & Analytics</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{-- {{ route('settings') }} --}}" class="nav-link">
-                                <i class="nav-icon fas fa-cogs"></i>
-                                <p>Settings</p>
                             </a>
                         </li>
                         <li class="nav-item">

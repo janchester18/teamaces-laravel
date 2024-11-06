@@ -122,6 +122,7 @@
                                         <input type="hidden" name="scheduled_date" value="{{ $schedule->scheduled_date }}">
                                         <input type="hidden" name="schedule_finish" value="{{ $schedule->schedule_finish }}">
                                         <input type="hidden" name="status" value="{{ $schedule->status }}">
+                                        <input type="hidden" name="branch_id" value="{{ $schedule->branch_id }}">
                                         <button type="submit" class="btn btn-warning btn-sm action-button">
                                             <i class="bi bi-pencil-fill"></i> Request Adjustment
                                         </button>

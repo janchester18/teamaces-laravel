@@ -35,12 +35,12 @@ class StudentRequestAdjustmentController extends Controller
             $hoursPerSession = $schedule->course->hours_per_session ?? null; // Accessing hours_per_session
         }
 
-        // Get the current logged-in admin's branch_id
-        $adminBranchId = auth()->user()->branch_id;
+        // Get the current logged-in student's branch_id
+        $studentBranchId = $request->input('branch_id');
 
-        // Fetch schedules that belong to the same branch as the logged-in admin
+        // Fetch schedules that belong to the same branch as the logged-in student
         $schedules = Schedule::with(['student', 'course']) // Eager load student and course
-            ->where('branch_id', $adminBranchId)
+            ->where('branch_id', $studentBranchId)
             ->where('status', '!=', 'done') // Exclude schedules with 'done' status
             ->get();
 
@@ -60,7 +60,6 @@ class StudentRequestAdjustmentController extends Controller
                 'date' => $date->format('Y-m-d') // Date (e.g., 2024-10-02)
             ];
         }
-
 
         // Return the view with the filtered schedules, time slots, days of the week, and schedule data
         return view('portal.request_adjustment', compact('schedules', 'timeSlots', 'daysOfWeek', 'scheduleId', 'scheduledDate', 'scheduleFinish', 'status', 'schedule', 'hoursPerSession'));

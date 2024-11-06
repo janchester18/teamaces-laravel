@@ -60,58 +60,59 @@ class DashboardController extends Controller
     }
 
     public function getRevenueInsights()
-    {
-        // Fetch the transactions and group by month
-        $transactions = Transaction::where('branch_id', Auth::user()->branch_id)
-            ->selectRaw('SUM(price) as total, MONTH(created_at) as month')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+{
+    // Fetch the transactions and group by month
+    $transactions = Transaction::where('branch_id', Auth::user()->branch_id)
+        ->selectRaw('SUM(price) as total, MONTH(created_at) as month')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
 
-        // Prepare data for insights
-        $labels = $transactions->pluck('month')->map(fn($month) => date('F', mktime(0, 0, 0, $month, 1)))->toArray();
-        $data = $transactions->pluck('total')->toArray();
+    // Prepare data for insights
+    $labels = $transactions->pluck('month')->map(fn($month) => date('F', mktime(0, 0, 0, $month, 1)))->toArray();
+    $data = $transactions->pluck('total')->toArray();
 
-        // Call the API to generate insights
-        $client = new Client();
-        $url = 'https://api.arliai.com/v1/chat/completions';
-        $apiKey = env('API_KEY_ARLI'); // Replace with your actual API key
+    // Format data for the prompt
+    $formattedData = array_map(function ($label, $value) {
+        return "$label - $value";
+    }, $labels, $data);
 
-        $formattedData = array_map(function ($label, $value) {
-            return "$label - $value";
-        }, $labels, $data);
+    $formattedDataString = implode(', ', $formattedData);
 
-        $formattedDataString = implode(', ', $formattedData);
+    // Craft the prompt
+    $prompt = "Here is the revenue data per month for the bar chart sales per month: $formattedDataString. Generate a 3-sentence business insights based on this graph. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Don't include holidays and seasons. And provide suggestions. Again, don't include an introductory sentence or colon. The currency is Philippine pesos or pesos.";
 
-        $prompt = "Here is the revenue data per month for the bar chart sales per month: $formattedDataString. Generate a 3-sentence business insights based on this graph. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Don't include holidays and seasons. And provide suggestions. Again, don't include an introductory sentence or colon. The currency is Philippine pesos or pesos.";
+    // Set up the Mistral API request
+    $client = new \GuzzleHttp\Client();
+    $url = 'https://api.mistralai.com/v1/chat/completions';
+    $apiKey = env('MISTRAL_API_KEY'); // Ensure your API key is set in the .env file
 
-        try {
-            $response = $client->post($url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => "Bearer $apiKey"
-                ],
-                'json' => [
-                    'model' => 'Meta-Llama-3.1-8B-Instruct',
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'You are a helpful business analyst.'],
-                        ['role' => 'user', 'content' => $prompt]
-                    ],
-                    'max_tokens' => 1024,
-                    'temperature' => 0.7
+    try {
+        $response = $client->post($url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => "Bearer $apiKey"
+            ],
+            'json' => [
+                'model' => 'mistral-large-latest', // Use the specified model
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a helpful and accurate business analyst.'],
+                    ['role' => 'staff', 'content' => $prompt]
                 ]
-            ]);
+            ]
+        ]);
 
-            $body = json_decode($response->getBody()->getContents(), true);
-            $insights = $body['choices'][0]['message']['content'] ?? 'No insights generated.';
+        $body = json_decode($response->getBody()->getContents(), true);
+        $insights = $body['choices'][0]['message']['content'] ?? 'No insights generated.';
 
-            return response()->json(['insights' => $insights]);
+        return response()->json(['insights' => $insights]);
 
-        } catch (\Exception $e) {
-            Log::error('API Request Failed: ' . $e->getMessage());
-            return response()->json(['insights' => 'Error generating insights.'], 500);
-        }
+    } catch (\Exception $e) {
+        Log::error('Mistral API Request Failed: ' . $e->getMessage());
+        return response()->json(['insights' => 'Error generating insights.'], 500);
     }
+}
+
 
 
 }

@@ -149,7 +149,7 @@ Route::get('/settings', function () {
 // admin_login
 Route::get('/admin_login', function () {
     return view('admin.admin_login');
-})->name('login');
+})->name('admin_login');
 
 
 //LOGIN LOGIC////////////////////////////////////////////////////////////////////////////////////////////////////////

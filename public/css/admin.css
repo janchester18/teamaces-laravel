@@ -245,7 +245,75 @@
 }
 
 
-.info small {
-    display: block; /* Makes the small element take up the full width */
-    word-wrap: break-word; /* Allows the text to break into the next line if needed */
+/* DataTable Buttons */
+.dt-buttons .btn,
+button.dt-button,
+.dt-buttons .dt-button {
+    background-color: #007bff; /* Primary blue color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    margin: 0 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dt-buttons .btn:hover,
+button.dt-button:hover,
+.dt-buttons .dt-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Active and Focus Styles */
+.dt-buttons .btn:active,
+button.dt-button:active,
+.dt-buttons .dt-button:active,
+.dt-buttons .btn:focus,
+button.dt-button:focus,
+.dt-buttons .dt-button:focus {
+    background-color: #00408b;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Rounded Button Corners */
+.dt-buttons .btn,
+button.dt-button,
+.dt-buttons .dt-button {
+    border-radius: 5px;
+}
+
+/* Adjust DataTables search bar */
+.dataTables_filter input[type="search"] {
+    width: 250px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.dataTables_filter input[type="search"]:focus {
+    border-color: #007bff; /* Match with button color */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Center search and buttons in toolbar */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dt-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Adjust search bar and buttons positioning */
+.dataTables_wrapper .dataTables_filter {
+    justify-content: flex-end;
+}
+
+.dataTables_wrapper .dt-buttons {
+    margin-bottom: 10px;
 }

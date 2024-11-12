@@ -16,6 +16,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
     <!-- Include Bootstrap Datepicker CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -234,7 +238,7 @@
     </div>
 
     <h3>Transactions</h3>
-    <div class="filter-section mb-3 d-flex flex-wrap align-items-center justify-content-between">
+{{--     <div class="filter-section mb-3 d-flex flex-wrap align-items-center justify-content-between">
         <!-- Date Range Picker -->
         <div class="me-3 mb-3 flex-grow-1">
             <label for="scheduleDateRangePicker" class="form-label">Filter by Date Range:</label>
@@ -271,9 +275,10 @@
         <i class="fas fa-print me-2"></i> <!-- Print Icon -->
         Print Transactions
     </button>
-</div>
+</div> --}}
 
-    <div class="table-responsive mt-0">
+    <div class="table-responsive mt-0" id="transactionsTableWrapper">
+        <p><strong>Table Actions:</strong></p>
         <table class="table table-striped table-bordered" id="transactionsTable">
             <thead>
                 <tr>
@@ -296,7 +301,7 @@
 </section>
 
 <!-- Print-Specific Styles -->
-<style>
+{{-- <style>
     @media print {
         body {
             margin: 0; /* Remove default margin */
@@ -339,7 +344,7 @@
             margin: 20mm; /* Set margins for A4 */
         }
     }
-</style>
+</style> --}}
             <!-- Main content -->
 
         <!-- /.content -->
@@ -371,9 +376,19 @@
     <!-- Include jQuery and Bootstrap Datepicker JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<!-- Additional Buttons Dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
 
 <!-- STUDENT AGE DEMOGRAPHIC AND COURSE DISTRIBUTION -->
 <script>
@@ -533,8 +548,6 @@
 <!-- Include this script at the bottom of your HTML file -->
 <script>
     $(document).ready(function() {
-        // Fetch the transactions when the page loads (without filtering by date initially)
-        fetchBranchTransactions();
 
         // Event listener for the date range picker
         $('#scheduleDateRangePicker').daterangepicker({
@@ -564,7 +577,7 @@
 
 
         // Function to fetch transactions
-        function fetchBranchTransactions(startDate = '', endDate = '') {
+/*         function fetchBranchTransactions(startDate = '', endDate = '') {
             const url = "{{ route('transactions.branch') }}"; // Laravel route
 
             $.ajax({
@@ -604,7 +617,7 @@
                     console.error('Error fetching transactions:', error);
                 }
             });
-        }
+        } */
 
 
         // Function to filter the table based on student name
@@ -696,6 +709,50 @@
         window.location.reload(); // Reloads the page to restore the original contents
     }
     </script>
+
+<script>
+$(document).ready(function() {
+    $('#transactionsTable').DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "buttons": ["copy", "csv", "excel", "pdf", "print"],
+        dom: 'Bfrtip', // 'B' here enables the Buttons to display at the top
+        "ajax": {
+            "url": "{{ route('transactions.branch') }}",
+            "data": function(d) {
+                // Pass date range filters as additional parameters
+                d.start_date = $('#startDate').val();
+                d.end_date = $('#endDate').val();
+            },
+            "dataSrc": "" // Specify data source for response array
+        },
+        "columns": [
+            { "data": "student_id" },
+            { "data": "student_name" },
+            { "data": "course_package" },
+            { "data": "price" },
+            { "data": "balance", "render": function(data) {
+                return `<span style="color: ${data == 0.00 ? 'green' : 'red'}">${data}</span>`;
+            }},
+            { "data": "payment_method" },
+            { "data": "processed_by" },
+            { "data": "created_at" },
+            { "data": "balance", "render": function(data, type, row) {
+                return data != 0.00
+                    ? `<button class="btn btn-warning btn-sm" data-student-id="${row.student_id}" data-price="${data}">Update Payment</button>`
+                    : '';
+            }}
+        ]
+    }).buttons().container().appendTo('#transactionsTable_wrapper .col-md-6:eq(0)');
+
+
+    // Reload data on date range change
+    $('#startDate, #endDate').change(function() {
+        $('#transactionsTable').DataTable().ajax.reload();
+    });
+});
+  </script>
 
 </body>
 

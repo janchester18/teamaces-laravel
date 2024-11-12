@@ -310,6 +310,7 @@ private function createTransaction(Student $student, $courseId, $packageId = nul
         'transaction_date' => Carbon::now(),
         'staff_id' => Auth::user()->id, // Assuming the current admin user is authenticated
         'branch_id' => Auth::user()->branch_id,
+        'payment_method' => 'walk_in',
     ]);
 
     \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}, amount paid: {$amountPaid}, balance: {$balance}");

@@ -4,12 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inquiries & Requests</title>
+    <title>Reports and Analytics</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
@@ -217,46 +221,9 @@
     </div>
 
     <h3>Transactions</h3>
-    <div class="filter-section mb-3 d-flex flex-wrap align-items-center justify-content-between">
-        <!-- Date Range Picker -->
-        <div class="me-3 mb-3 flex-grow-1">
-            <label for="scheduleDateRangePicker" class="form-label">Filter by Date Range:</label>
-            <div class="input-group">
-                <input type="text" id="scheduleDateRangePicker" class="form-control" placeholder="Select a date range" autocomplete="off" aria-label="Date range picker">
-                <div class="input-group-append">
-                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                </div>
-                <div class="input-group-append">
-                    <button id="resetSchedules" class="btn btn-outline-secondary rounded" type="button" title="Reset date range">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Search Bar for Student Name -->
-        <div class="flex-grow-1 mb-2">
-            <label for="searchStudent" class="form-label">Search by Student Name:</label>
-            <div class="input-group">
-                <input type="text" id="searchStudent" class="form-control" placeholder="Enter student name" autocomplete="off" aria-label="Search by student name">
-                <div class="input-group-append">
-                    <button id="searchButton" class="btn btn-outline-secondary rounded" type="button" title="Search">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<!-- Print Button -->
-<div class="mb-3">
-    <button id="printButton" class="btn btn-primary rounded" onclick="printTable()">
-        <i class="fas fa-print me-2"></i> <!-- Print Icon -->
-        Print Transactions
-    </button>
-</div>
 
     <div class="table-responsive mt-0">
+        <p><strong>Table Actions:</strong></p>
         <table class="table table-striped table-bordered" id="transactionsTable">
             <thead>
                 <tr>
@@ -267,6 +234,7 @@
                     <th>Branch</th>
                     <th>Processed by</th>
                     <th>Date</th>
+                    <th>Balance</th>
                 </tr>
             </thead>
             <tbody id="classOverviewBody">
@@ -276,7 +244,7 @@
     </div>
 </section>
 
-<!-- Print-Specific Styles -->
+{{-- <!-- Print-Specific Styles -->
 <style>
     @media print {
         body {
@@ -320,7 +288,7 @@
             margin: 20mm; /* Set margins for A4 */
         }
     }
-</style>
+</style> --}}
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -348,6 +316,16 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<!-- Additional Buttons Dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
     <!-- STUDENT AGE DEMOGRAPHIC AND COURSE DISTRIBUTION -->
 <script>
     // Initialize the demographics chart
@@ -535,42 +513,7 @@
             filterTable(value);
         });
 
-        // Function to fetch transactions
-        function fetchBranchTransactions(startDate = '', endDate = '') {
-            const url = "{{ route('owner-transactions.branch') }}"; // Laravel route
 
-            $.ajax({
-                url: url,
-                method: 'GET',
-                data: { start_date: startDate, end_date: endDate }, // Pass the selected date range
-                success: function(response) {
-                    let tableBody = $('#classOverviewBody');
-                    tableBody.empty(); // Clear the table body
-
-                    if (response.length > 0) {
-                        // Populate the table with transaction data
-                        $.each(response, function(index, transaction) {
-                            const row = `
-                            <tr>
-                                <td>${transaction.student_id}</td>
-                                <td>${transaction.student_name}</td>
-                                <td>${transaction.course_package}</td>
-                                <td>${transaction.price}</td>
-                                <td>${transaction.branch_name}</td> <!-- New branch column -->
-                                <td>${transaction.processed_by}</td>
-                                <td>${transaction.created_at}</td>
-                            </tr>`;
-                            tableBody.append(row);
-                        });
-                    } else {
-                        tableBody.append('<tr><td colspan="6" class="text-center">No transactions found</td></tr>');
-                    }
-                },
-                error: function(error) {
-                    console.error('Error fetching transactions:', error);
-                }
-            });
-        }
 
         // Function to filter the table based on student name
         function filterTable(value) {
@@ -594,6 +537,46 @@
         window.location.reload(); // Reloads the page to restore the original contents
     }
     </script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable with customized options for the owner side
+        $('#transactionsTable').DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print"],
+            dom: 'Bfrtip', // 'B' enables the Buttons at the top
+            "ajax": {
+                "url": "{{ route('owner-transactions.branch') }}",
+                "data": function(d) {
+                    // Pass date range filters as additional parameters
+                    d.start_date = $('#startDate').val();
+                    d.end_date = $('#endDate').val();
+                },
+                "dataSrc": "" // Specify data source for response array
+            },
+            "columns": [
+                { "data": "student_id" },
+                { "data": "student_name" },
+                { "data": "course_package" },
+                { "data": "price" },
+                { "data": "branch_name" }, // New branch column
+                { "data": "processed_by" },
+                { "data": "created_at" },
+                { "data": "balance", "render": function(data) {
+                    return `<span style="color: ${data == 0.00 ? 'green' : 'red'}">${data}</span>`;
+                }},
+            ]
+        }).buttons().container().appendTo('#ownerTransactionsTable_wrapper .col-md-6:eq(0)');
+
+        // Reload data on date range change
+        $('#startDate, #endDate').change(function() {
+            $('#transactionsTable').DataTable().ajax.reload();
+        });
+    });
+</script>
+
 
 </body>
 

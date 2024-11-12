@@ -202,6 +202,8 @@ class OwnerReportsController extends Controller
             DB::raw("CONCAT(students.first_name, ' ', students.last_name) as student_name"), // Concatenate first and last name
             DB::raw("COALESCE(courses.name, packages.name) as course_package"), // Use COALESCE to get either course name or package name
             'transactions.price',
+            'transactions.balance', // Select balance directly from the transactions table
+            'transactions.payment_method', // Select balance directly from the transactions table
             'users.name as processed_by', // Select the staff name directly
             'branches.name as branch_name', // Select the branch name
             'transactions.created_at'

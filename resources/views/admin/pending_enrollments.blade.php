@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-        <!-- Bootstrap 5.3.0 CDN link -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- SweetAlert CDN -->
+    <!-- Bootstrap 5.3.0 CDN link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
@@ -98,7 +98,8 @@
                                 <p>Student Management</p>
                             </a>
                         </li>
-                        <li class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
+                        <li
+                            class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
                                 <p>
@@ -108,7 +109,8 @@
                             </a>
                             <ul class="nav nav-treeview mt-0">
                                 <li class="nav-item pl-3">
-                                    <a href="{{ route('pending_enrollments') }}" class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
+                                    <a href="{{ route('pending_enrollments') }}"
+                                        class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-user-plus"></i>
                                         <p>New Students</p>
                                     </a>
@@ -167,80 +169,92 @@
             <!-- Main content -->
             <section class="pending-enrollments m-4">
                 <div class="table-responsive">
-                    @if($pendingEnrollments->isEmpty())
-                    <div class="card text-center w-100">
-                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                            <i class="fas fa-frown fa-5x text-muted"></i>
-                            <h5 class="card-title mt-3">Nothing to See Here!</h5>
-                            <p class="card-text">There are currently no pending enrollments.</p>
+                    @if ($pendingEnrollments->isEmpty())
+                        <div class="card text-center w-100">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                <i class="fas fa-frown fa-5x text-muted"></i>
+                                <h5 class="card-title mt-3">Nothing to See Here!</h5>
+                                <p class="card-text">There are currently no pending enrollments.</p>
+                            </div>
                         </div>
-                    </div>
-
                     @else
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Student ID</th>
-                                <th>Student Name</th>
-                                <th>Course/Package</th> <!-- Combined column -->
-                                <th>Price</th> <!-- Price column -->
-                                <th>Enrolled on</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pendingEnrollments as $enrollment)
-                            <tr>
-                                <td>{{ $enrollment->id }}</td>
-                                <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
-                                <td>
-                                    @if($enrollment->course)
-                                        {{ $enrollment->course->name }} (Course)
-                                    @elseif($enrollment->package)
-                                        {{ $enrollment->package->name }} (Package)
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($enrollment->course)
-                                        {{ number_format($enrollment->course->price, 2) }} <!-- Display course price -->
-                                    @elseif($enrollment->package)
-                                        {{ number_format($enrollment->package->price, 2) }} <!-- Display package price -->
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
-                                <td class="actions">
-                                    <button class="btn btn-sm btn-success" onclick="confirmPayment('{{ $enrollment->id }}')">Confirm Payment</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete Enrollment</button> <!-- Delete button -->
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Course/Package</th> <!-- Combined column -->
+                                    <th>Price</th> <!-- Price column -->
+                                    <th>Payment Method</th> <!-- Price column -->
+                                    <th>Enrolled on</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($pendingEnrollments as $enrollment)
+                                    <tr>
+                                        <td>{{ $enrollment->id }}</td>
+                                        <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
+                                        <td>
+                                            @if ($enrollment->course)
+                                                {{ $enrollment->course->name }} (Course)
+                                            @elseif($enrollment->package)
+                                                {{ $enrollment->package->name }} (Package)
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($enrollment->course)
+                                                {{ number_format($enrollment->course->price, 2) }}
+                                                <!-- Display course price -->
+                                            @elseif($enrollment->package)
+                                                {{ number_format($enrollment->package->price, 2) }}
+                                                <!-- Display package price -->
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>{{ $enrollment->payment_method}}</td>
+                                        <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
+                                        <td class="actions">
+                                            <button class="btn btn-sm btn-success"
+                                            onclick="confirmPayment('{{ $enrollment->id }}',
+                                                                    @if($enrollment->course) {{ $enrollment->course->price }}
+                                                                    @elseif($enrollment->package) {{ $enrollment->package->price }}
+                                                                    @else 0 @endif,
+                                                                    '{{ $enrollment->payment_method }}')">
+                                        Confirm Payment
+                                    </button>
+                                            <button class="btn btn-sm btn-danger"
+                                                onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete
+                                                Enrollment</button> <!-- Delete button -->
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     @endif
                 </div>
             </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-
-    <!-- Main Footer -->
-    <footer class="main-footer">
-        <div class="float-right d-none d-sm-inline">
+            <!-- /.content -->
         </div>
-        <strong>Copyright &copy; 2024 TeamAces Driving Academy.</strong> All rights reserved.
-    </footer>
+        <!-- /.content-wrapper -->
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-inline">
+            </div>
+            <strong>Copyright &copy; 2024 TeamAces Driving Academy.</strong> All rights reserved.
+        </footer>
     </div>
 
     <!-- REQUIRED SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Include Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-       <!-- FullCalendar JS -->
-   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/branch_analytics.js') }}"></script>
@@ -249,98 +263,100 @@
     </script>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    function confirmPayment(studentId) {
-        Swal.fire({
-            title: 'Confirm Payment',
-            text: "Are you sure you want to confirm this payment and add the student to the database?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, confirm!',
-            cancelButtonText: 'No, cancel!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Make AJAX request to confirm payment
-                $.ajax({
-                    url: '/confirm-payment/' + studentId,
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}' // Include CSRF token for security
-                    },
-                    success: function(response) {
-                        Swal.fire(
-                            'Confirmed!',
-                            response.message,
-                            'success'
-                        );
-                        // Optionally, reload the page or remove the row from the table
-                        location.reload(); // Reload the page to refresh the table
-                    },
-                    error: function(xhr) {
-                        Swal.fire(
-                            'Error!',
-                            xhr.responseJSON.message || 'Something went wrong.',
-                            'error'
-                        );
-                    }
-                });
-            } else {
-                Swal.fire(
-                    'Cancelled',
-                    'Payment confirmation cancelled.',
-                    'error'
-                );
-            }
-        });
-    }
 
-    function deleteEnrollment(enrollmentId) {
+    <script>
+        let selectedStudentId;
+
+        function confirmPayment(enrollmentId, price, paymentMethod) {
+    console.log("Enrollment ID:", enrollmentId);
+    console.log("Payment Method:", paymentMethod);  // Log payment method for debugging
+
     Swal.fire({
-        title: 'Delete Enrollment',
-        text: "Are you sure you want to delete this enrollment?",
-        icon: 'warning',
+        title: 'Enter Amount Paid',
+        input: 'number',
+        inputLabel: 'Amount Paid',
+        inputPlaceholder: 'Enter the amount paid',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!'
+        confirmButtonText: 'Confirm Payment',
+        cancelButtonText: 'Cancel',
+        preConfirm: (amountPaid) => {
+            if (!amountPaid || amountPaid <= 0) {
+                Swal.showValidationMessage('Please enter a valid amount');
+                return false;
+            }
+            if (amountPaid > price) {
+                Swal.showValidationMessage('Amount paid cannot exceed the course or package price');
+                return false;
+            }
+            return amountPaid;
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Make AJAX request to delete the enrollment
             $.ajax({
-                url: '/enrollments/' + enrollmentId,
-                type: 'DELETE',
+                url: '/confirm-payment/' + enrollmentId, // Use enrollmentId here
+                type: 'POST',
                 data: {
-                    _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    enrollment_id: enrollmentId, // Send the full enrollment_id
+                    amount_paid: result.value,
+                    payment_method: paymentMethod, // Send the payment method
+                    _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-                    Swal.fire(
-                        'Deleted!',
-                        response.message,
-                        'success'
-                    );
-                    // Optionally reload the page or remove the row from the table
-                    location.reload(); // Reload the page to refresh the table
+                    Swal.fire('Confirmed!', response.message, 'success');
+                    location.reload();
                 },
                 error: function(xhr) {
+                    Swal.fire('Error!', xhr.responseJSON.message || 'Something went wrong.', 'error');
+                }
+            });
+        }
+    });
+}
+        function deleteEnrollment(enrollmentId) {
+            Swal.fire({
+                title: 'Delete Enrollment',
+                text: "Are you sure you want to delete this enrollment?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Make AJAX request to delete the enrollment
+                    $.ajax({
+                        url: '/enrollments/' + enrollmentId,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}' // Include CSRF token for security
+                        },
+                        success: function(response) {
+                            Swal.fire(
+                                'Deleted!',
+                                response.message,
+                                'success'
+                            );
+                            // Optionally reload the page or remove the row from the table
+                            location.reload(); // Reload the page to refresh the table
+                        },
+                        error: function(xhr) {
+                            Swal.fire(
+                                'Error!',
+                                xhr.responseJSON.message || 'Something went wrong.',
+                                'error'
+                            );
+                        }
+                    });
+                } else {
                     Swal.fire(
-                        'Error!',
-                        xhr.responseJSON.message || 'Something went wrong.',
+                        'Cancelled',
+                        'Enrollment deletion cancelled.',
                         'error'
                     );
                 }
             });
-        } else {
-            Swal.fire(
-                'Cancelled',
-                'Enrollment deletion cancelled.',
-                'error'
-            );
         }
-    });
-}
     </script>
 </body>
 

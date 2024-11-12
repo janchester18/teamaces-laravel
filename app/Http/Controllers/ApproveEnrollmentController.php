@@ -10,13 +10,21 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\StudentCourse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Student; // Import Student model
 use App\Models\Enrollment; // Import Enrollment model
+use App\Mail\EnrollmentConfirmation;
 
 class ApproveEnrollmentController extends Controller
 {
-    public function confirmPayment($id)
+    public function confirmPayment(Request $request, $id)
     {
+            // Validate the amount paid input
+        $validated = $request->validate([
+            'amount_paid' => 'required|numeric|min:0',
+            'payment_method' => 'required|string',
+        ]);
+
         // Log the enrollment ID for debugging
         \Log::info('Confirming payment for enrollment ID: ' . $id);
 
@@ -34,6 +42,32 @@ class ApproveEnrollmentController extends Controller
                 'message' => 'Enrollment must have either a course or a package associated.'
             ], 400);
         }
+
+            // Determine the price from the course or package
+    $price = 0;
+    if (!empty($enrollment->course_id)) {
+        $course = Course::find($enrollment->course_id);
+        if (!$course) {
+            return response()->json(['message' => 'Course not found.'], 404);
+        }
+        $price = $course->price;
+    } elseif (!empty($enrollment->package_id)) {
+        $package = Package::find($enrollment->package_id);
+        if (!$package) {
+            return response()->json(['message' => 'Package not found.'], 404);
+        }
+        $price = $package->price;
+    }
+
+    // Calculate the balance
+    $balance = $price - $validated['amount_paid'];
+
+    if ($balance < 0) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Amount paid cannot exceed the course or package price.'
+        ], 400);
+    }
 
         // Create a new student record
         $student = Student::create([
@@ -111,7 +145,7 @@ class ApproveEnrollmentController extends Controller
         }
 
         // Create a transaction entry for the student
-        $this->createTransaction($student, $enrollment->course_id, $enrollment->package_id);
+        $this->createTransaction($student, $enrollment->course_id, $enrollment->package_id,  $balance,  $validated['payment_method']);
 
         // Remove the enrollment entry after successful approval
         $enrollment->delete();
@@ -271,19 +305,23 @@ private function createTDCSchedules(Student $student, $courseId, $startDate, $ho
 
 
 
-    private function createTransaction(Student $student, $courseId, $packageId = null)
+    private function createTransaction(Student $student, $courseId, $packageId = null, $balance, $paymentMethod)
     {
         Transaction::create([
             'student_id' => $student->id,
             'course_id' => $courseId,
             'package_id' => $packageId,
+            'balance' => $balance, // Store the balance in the transaction
             'price' => $packageId ? Package::find($packageId)->price : Course::find($courseId)->price,
             'transaction_date' => Carbon::now(),
             'staff_id' => Auth::user()->id, // Assuming the current admin user is authenticated
             'branch_id' => Auth::user()->branch_id,
+            'payment_method' => $paymentMethod,
         ]);
 
         \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}");
+
+        Mail::to($student->email)->send(new EnrollmentConfirmation($student, $courseId, $packageId, $balance, $paymentMethod));
     }
     public function getStudentSchedules($studentId)
     {

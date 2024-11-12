@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Models\StudentCourse;
+use GuzzleHttp\Client;
 
 class EnrollmentController extends Controller
 {
@@ -60,6 +61,7 @@ class EnrollmentController extends Controller
             ],
             'course_id' => 'nullable|exists:courses,id', // Dropdown for courses
             'package_id' => 'nullable|exists:packages,id', // Dropdown for packages
+            'payment_method' => 'required|string',
 
         ], [
             'email.unique' => 'This email address is already taken. Please use a different email address.', // Custom error message
@@ -123,7 +125,38 @@ class EnrollmentController extends Controller
         // Optionally, delete the used code
         DB::table('email_verification_tokens')->where('token', $code)->delete();
 
-        return redirect()->route('enrollment.form')->with('success', 'Email verified successfully!');
+        // Check if the payment method is online
+        $enrollment = Enrollment::where('email', $email)->first();
+
+        if ($enrollment && $enrollment->payment_method == 'online') {
+            // Redirect to the online payment view
+            Mail::raw("Your enrollment is now under processing for online payment. Please wait for the payment confirmation update to be sent to your email. Thank you..", function ($message) use ($enrollment) {
+                $message->to($enrollment->email);
+                $message->subject('Enrollment Under Processing');
+            });
+            return redirect()->route('enrollment.online.payment.view', ['enrollmentId' => $enrollment->id]);
+        }
+
+        // Send an email based on the payment method (online or walk-in)
+        if ($enrollment->payment_method == 'online') {
+            Mail::raw("Your enrollment is now under processing for online payment. Please wait for the payment confirmation update to be sent to your email. Thank you..", function ($message) use ($enrollment) {
+                $message->to($enrollment->email);
+                $message->subject('Enrollment Under Processing');
+            });
+        } else {
+            Mail::raw("Please proceed to your branch of enrollment to settle the payment. Thank you.", function ($message) use ($enrollment) {
+                $message->to($enrollment->email);
+                $message->subject('Walk-in Payment Instructions');
+            });
+        }
+
+
+        return redirect()->route('enrollment.success')->with('success', 'Enrollment submitted! Please check your email for further instructions.');
+    }
+
+    public function success()
+    {
+        return view('user.successful-enrollment'); // Load the successful enrollment view
     }
     public function destroy($id)
     {
@@ -139,5 +172,50 @@ class EnrollmentController extends Controller
         $enrollment->delete();
 
         return response()->json(['message' => 'Enrollment deleted successfully.']);
+    }
+
+    public function showOnlinePaymentView($enrollmentId)
+    {
+        // Fetch the enrollment record
+        $enrollment = Enrollment::findOrFail($enrollmentId);
+
+        // Fetch the course or package details based on the enrollment data
+        $course = Course::find($enrollment->course_id);
+        $package = Package::find($enrollment->package_id);
+
+        // Set amount and description based on the selected course/package
+        $amount = $course ? $course->price : ($package ? $package->price : 0);
+        $description = $course ? $course->name : ($package ? $package->name : 'TDC');
+        $amountInCents = (int) ($amount * 100);
+
+        // Make PayMongo API request to create a payment link
+        $client = new Client();
+        $response = $client->request('POST', 'https://api.paymongo.com/v1/links', [
+            'body' => json_encode([
+                'data' => [
+                    'attributes' => [
+                        'amount' => $amountInCents,
+                        'description' => $description,
+                    ]
+                ]
+            ]),
+            'headers' => [
+                'accept' => 'application/json',
+                'authorization' => 'Basic c2tfdGVzdF9LUjNwd1lOd0d0cTZkRkNzU3RUWUV3SHg6',
+                'content-type' => 'application/json',
+            ]
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+
+        // Get the checkout URL from the PayMongo API response
+        $checkoutUrl = $data['data']['attributes']['checkout_url'];
+
+        // Return the payment view with dynamic data
+        return view('user.online-payment', [
+            'checkoutUrl' => $checkoutUrl,
+            'amount' => $amount,
+            'description' => $description
+        ]);
     }
 }

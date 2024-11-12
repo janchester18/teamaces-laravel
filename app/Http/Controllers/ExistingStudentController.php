@@ -11,6 +11,8 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\StudentCourse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EnrollmentConfirmation;
 
 class ExistingStudentController extends Controller
 {
@@ -25,8 +27,13 @@ class ExistingStudentController extends Controller
         return view('admin.existing_students', compact('notApprovedCourses'));
     }
 
-    public function approveEnrollment($enrollmentId)
+    public function approveEnrollment(Request $request, $enrollmentId)
     {
+        // Validate the amount paid
+        $request->validate([
+            'amount_paid' => 'required|numeric|min:0'
+        ]);
+
         // Find the enrollment using the StudentCourse model
         $enrollment = StudentCourse::findOrFail($enrollmentId);
 
@@ -34,14 +41,20 @@ class ExistingStudentController extends Controller
         $enrollment->is_approved = true; // Set to true to approve
         $enrollment->save();
 
+        // Get the student's course details
+        $course = Course::find($enrollment->course_id);
+        $price = $course->price; // Get the course price
+
+        // Calculate the balance after payment
+        $newBalance = $price - $request->amount_paid;
+
         // Create schedules and transaction entries for the student
         $student = Student::find($enrollment->student_id);
         $this->createSchedules($student, $enrollment->course_id);
-        $this->createTransaction($student, $enrollment->course_id, $enrollment->package_id);
+        $this->createTransaction($student, $enrollment->course_id, $enrollment->package_id, $request->amount_paid, $newBalance);
 
         return response()->json(['message' => 'Enrollment approved successfully, schedules and transaction created.']);
     }
-
     // Function to create schedules
     private function createSchedules(Student $student, $courseId)
     {
@@ -157,19 +170,25 @@ class ExistingStudentController extends Controller
 
 
     // Function to create a transaction entry
-    private function createTransaction(Student $student, $courseId, $packageId = null)
+    private function createTransaction(Student $student, $courseId, $packageId = null, $amountPaid, $newBalance)
     {
-        Transaction::create([
+        // If there's a package, use the package price; otherwise, use the course price
+        $price = $packageId ? Package::find($packageId)->price : Course::find($courseId)->price;
+
+        // Create the transaction entry
+        $transaction = Transaction::create([
             'student_id' => $student->id,
             'course_id' => $courseId,
             'package_id' => $packageId,
-            'price' => $packageId ? Package::find($packageId)->price : Course::find($courseId)->price,
+            'price' => $price,
+            'balance' => $newBalance, // Store the calculated balance
             'transaction_date' => Carbon::now(),
             'staff_id' => Auth::user()->id, // Assuming the current admin user is authenticated
             'branch_id' => Auth::user()->branch_id,
         ]);
 
-        \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}");
+        \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}, amount paid: {$amountPaid}, balance: {$newBalance}");
+        Mail::to($student->email)->send(new EnrollmentConfirmation($student, $courseId, $packageId, $newBalance, 'walk_in'));
     }
 
 

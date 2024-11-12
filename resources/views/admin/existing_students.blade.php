@@ -184,6 +184,7 @@
                     <th>Student Name</th>
                     <th>Course/Package</th>
                     <th>Is Package</th>
+                    <th>Price</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -194,6 +195,7 @@
                     <td>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</td>
                     <td>{{ $enrollment->course->name ?? 'N/A' }}</td>
                     <td>{{ $enrollment->is_package ? 'Yes' : 'No' }}</td>
+                    <td>{{ $enrollment->course->price ?? 'N/A' }}</td>
                     <td class="actions">
                         <button class="btn btn-sm btn-success" onclick="approveEnrollment('{{ $enrollment->id }}')">Approve</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete</button>
@@ -248,28 +250,48 @@ function approveEnrollment(enrollmentId) {
         cancelButtonText: 'No, cancel!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Make AJAX request to approve the enrollment
-            $.ajax({
-                url: '/approve-enrollment/' + enrollmentId,
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}' // Include CSRF token for security
-                },
-                success: function(response) {
-                    Swal.fire(
-                        'Approved!',
-                        response.message,
-                        'success'
-                    );
-                    // Optionally, reload the page or remove the row from the table
-                    location.reload(); // Reload the page to refresh the table
-                },
-                error: function(xhr) {
-                    Swal.fire(
-                        'Error!',
-                        xhr.responseJSON.message || 'Something went wrong.',
-                        'error'
-                    );
+            // Prompt for the amount paid
+            Swal.fire({
+                title: 'Enter Amount Paid',
+                input: 'number',
+                inputLabel: 'Amount Paid',
+                inputPlaceholder: 'Enter the amount paid',
+                showCancelButton: true,
+                confirmButtonText: 'Approve and Pay',
+                cancelButtonText: 'Cancel',
+                preConfirm: (amountPaid) => {
+                    if (!amountPaid || amountPaid <= 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return amountPaid;
+                }
+            }).then((amountResult) => {
+                if (amountResult.isConfirmed) {
+                    // Make AJAX request to approve the enrollment and pass the amount paid
+                    $.ajax({
+                        url: '/approve-enrollment/' + enrollmentId,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            amount_paid: amountResult.value // Include the amount paid in the data
+                        },
+                        success: function(response) {
+                            Swal.fire(
+                                'Approved!',
+                                response.message,
+                                'success'
+                            );
+                            location.reload(); // Reload the page to refresh the table
+                        },
+                        error: function(xhr) {
+                            Swal.fire(
+                                'Error!',
+                                xhr.responseJSON.message || 'Something went wrong.',
+                                'error'
+                            );
+                        }
+                    });
                 }
             });
         } else {

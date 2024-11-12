@@ -109,8 +109,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@demomailtrap.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'info@teamaces-driving.com'),
+        'name' => env('MAIL_FROM_NAME', 'TeamAces Driving Academy'),
     ],
 
 ];

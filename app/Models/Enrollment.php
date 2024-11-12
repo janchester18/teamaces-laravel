@@ -22,6 +22,7 @@ class Enrollment extends Model
         'course_id',
         'branch_id',
         'package_id',  // Add this line
+        'payment_method', // Add this line
         'is_email_verified',
         'is_approved',
     ];

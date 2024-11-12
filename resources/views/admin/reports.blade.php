@@ -281,8 +281,11 @@
                     <th>Student Name</th>
                     <th>Course/Package</th>
                     <th>Price</th>
+                    <th>Balance</th>
+                    <th>Payment Method</th>
                     <th>Processed by</th>
                     <th>Date</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="classOverviewBody">
@@ -559,6 +562,7 @@
             filterTable(value);
         });
 
+
         // Function to fetch transactions
         function fetchBranchTransactions(startDate = '', endDate = '') {
             const url = "{{ route('transactions.branch') }}"; // Laravel route
@@ -574,19 +578,26 @@
                     if (response.length > 0) {
                         // Populate the table with transaction data
                         $.each(response, function(index, transaction) {
+                            const updateButton = transaction.balance != 0.00
+                                ? `<button class="btn btn-warning btn-sm" data-student-id="${transaction.student_id}" data-price="${transaction.balance}">Update Payment</button>`
+                                : ''; // Add button only if balance is not 0.00
+
                             const row = `
                                 <tr>
                                     <td>${transaction.student_id}</td>
                                     <td>${transaction.student_name}</td>
                                     <td>${transaction.course_package}</td>
                                     <td>${transaction.price}</td>
+                                    <td style="color: ${transaction.balance == 0.00 ? 'green' : 'red'}">${transaction.balance}</td>
+                                    <td>${transaction.payment_method}</td>
                                     <td>${transaction.processed_by}</td>
                                     <td>${transaction.created_at}</td>
+                                    <td>${updateButton}</td> <!-- Add the button here -->
                                 </tr>`;
                             tableBody.append(row);
                         });
                     } else {
-                        tableBody.append('<tr><td colspan="6" class="text-center">No transactions found</td></tr>');
+                        tableBody.append('<tr><td colspan="7" class="text-center">No transactions found</td></tr>');
                     }
                 },
                 error: function(error) {
@@ -595,6 +606,7 @@
             });
         }
 
+
         // Function to filter the table based on student name
         function filterTable(value) {
             $('#classOverviewBody tr').filter(function() {
@@ -602,6 +614,73 @@
             });
         }
     });
+
+</script>
+
+<script>
+    // Function to handle payment update
+    function confirmPayment(studentId, price) {
+            Swal.fire({
+                title: 'Enter Amount Paid',
+                input: 'number',
+                inputLabel: 'Amount Paid',
+                inputPlaceholder: 'Enter the amount paid',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm Payment',
+                cancelButtonText: 'Cancel',
+                preConfirm: (amountPaid) => {
+                    // Validation to ensure a valid amount
+                    if (!amountPaid || amountPaid <= 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    if (amountPaid > price) {
+                        Swal.showValidationMessage('Amount paid cannot exceed the price');
+                        return false;
+                    }
+                    return amountPaid;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // AJAX request to update the transaction
+                    $.ajax({
+                        url: '/update-payment', // Laravel route to handle payment update
+                        type: 'POST',
+                        data: {
+                            student_id: studentId,
+                            amount_paid: result.value,
+                            _token: '{{ csrf_token() }}' // CSRF token for security
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Success!', 'Payment updated successfully!', 'success').then((result) => {
+                                    if (result.isConfirmed) {
+                                        // Reload the page only after the user clicks "OK"
+                                        location.reload(); // This will reload the current page
+                                }
+                            });
+                            } else {
+                                Swal.fire('Error!', 'Failed to update payment. Please try again.', 'error');
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error!', 'Something went wrong.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+</script>
+
+<script>
+    $(document).ready(function() {
+    // Use event delegation to bind the click event to dynamically created buttons
+    $('#classOverviewBody').on('click', '.btn-warning', function() {
+        const studentId = $(this).data('student-id'); // Get student ID from data attribute
+        const price = $(this).data('price'); // Get price from data attribute
+        confirmPayment(studentId, price); // Call the confirmPayment function
+    });
+});
 </script>
 
 <!-- JavaScript Function to Print the Table -->

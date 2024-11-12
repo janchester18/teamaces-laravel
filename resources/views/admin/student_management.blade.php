@@ -289,6 +289,10 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="amountPaid" class="form-label">Amount Paid</label>
+                            <input type="number" class="form-control" id="amountPaid" name="amount_paid" placeholder="Enter amount paid" min="0" step="0.01" required>
+                        </div>
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary">Add Student</button>
                         </div>
@@ -355,6 +359,18 @@
   document.getElementById('addStudentForm').addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent the default form submission
 
+    // Show a loading alert
+    let loadingAlert = Swal.fire({
+        title: 'Processing...',
+        text: 'Please wait while we process your request.',
+        icon: 'info',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading(); // Show loading spinner
+        }
+    });
+
     // Create a FormData object from the form
     let formData = new FormData(this);
 
@@ -374,6 +390,8 @@
         return response.json();
     })
     .then(data => {
+        Swal.close(); // Close the loading alert once a response is received
+
         console.log('Received Data:', data); // Log the received data
 
         if (data.success) {
@@ -393,7 +411,7 @@
             var modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
             modal.hide();
         } else {
-            console.error('Error from server:', data.message); // Log server error
+            console.error('Error from server:', data.message);
             Swal.fire({
                 title: 'Error!',
                 text: data.message,
@@ -404,6 +422,7 @@
     })
     .catch(error => {
         console.error('Error:', error);
+        Swal.close(); // Close the loading alert on error
         Swal.fire({
             title: 'Error!',
             text: 'There was an error processing your request.',
@@ -412,6 +431,43 @@
         });
     });
 });
+
+document.getElementById('course').addEventListener('change', function () {
+    updateAmountPaid(); // Update the amount when the course is changed
+});
+
+document.getElementById('package').addEventListener('change', function () {
+    updateAmountPaid(); // Update the amount when the package is changed
+});
+
+function updateAmountPaid() {
+    // Get the selected course and package
+    let courseSelect = document.getElementById('course');
+    let packageSelect = document.getElementById('package');
+
+    // Get the selected course or package price
+    let price = 0;
+
+    if (courseSelect.value) {
+        // Find the selected course price
+        let selectedCourse = courseSelect.options[courseSelect.selectedIndex];
+        price = parseFloat(selectedCourse.textContent.split(' - ₱')[1].replace(',', ''));
+    } else if (packageSelect.value) {
+        // Find the selected package price
+        let selectedPackage = packageSelect.options[packageSelect.selectedIndex];
+        price = parseFloat(selectedPackage.textContent.split(' - ₱')[1].replace(',', ''));
+    }
+
+    // Set the amount paid field to the selected price, if there's a valid price
+    let amountPaidField = document.getElementById('amountPaid');
+    amountPaidField.value = price.toFixed(2); // Set the value to the course/package price
+
+    // Set the max value of the amount paid to the price to avoid exceeding
+    amountPaidField.max = price;
+}
+
+// Initial call to set amount paid when the page loads with a selected course/package
+updateAmountPaid();
 
 document.getElementById('package').addEventListener('change', function() {
         var courseSelect = document.getElementById('course');

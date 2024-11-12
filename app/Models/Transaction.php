@@ -15,8 +15,10 @@ class Transaction extends Model
         'course_id',
         'package_id', // Add package_id to the fillable array
         'price',
+        'balance',
         'staff_id',
         'status',
+        'payment_method', // Add this line
     ];
 
     // Define any relationships if needed

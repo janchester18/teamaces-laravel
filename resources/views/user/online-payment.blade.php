@@ -8,10 +8,6 @@
     <title>TeamAces Driving Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="icon" href="{{ asset('images/aces.png') }}">
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
@@ -137,22 +133,14 @@
     font-size: 14px;
 }
 
-#form-container{
-    margin-top: 120px;
-    margin-bottom: 40px;
-}
-
-#form-container h2{
-    text-align: center;
-}
-
-.button-container{
-    text-align: center;
-}
-
-.button-container button{
-    width: 150px;
-}
+.form-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
 
 
@@ -228,7 +216,7 @@
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="images/aces.png" alt="TeamAces Logo" style="width: 80px; height: auto;">
+                <img src="{{ asset('images/aces.png') }}" alt="TeamAces Logo" style="width: 80px; height: auto;">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -258,141 +246,35 @@
                         <a class="nav-link" href="{{ route('user.portal') }}">Portal</a>
                     </li>
                 </ul>
-
-
             </div>
         </div>
     </nav>
 
-    <div id="form-container" class="container">
-        <h2 class="mb-4"><strong>Register Now!</strong></h2>
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-lg p-4 rounded" style="max-width: 400px; width: 100%;">
+            <h2 class="text-center mb-4">Online Payment</h2>
+            <div class="text-center mb-4">
+                <p>You are about to pay for:</p>
+                <h4 class="font-weight-bold">{{ $description }}</h4>
+            </div>
+            <div class="text-center mb-4">
+                <p><strong>Amount:</strong> ₱{{ number_format($amount , 2) }}</p>
+            </div>
 
-        <!-- Start of the form -->
-        <form action="{{ route('enrollment.store') }}" method="POST">
-            @csrf <!-- CSRF token for Laravel form submission security -->
+            <!-- Note about payment completion -->
+            <div class="text-center mb-4">
+                <p class="text-danger"><small><strong>Note:</strong> Failure to complete the payment will invalidate your enrollment.</small></p>
+            </div>
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+            <form method="GET" action="{{ $checkoutUrl }}" target="_blank">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" id="proceedPaymentBtn">Proceed to Payment</button>
                 </div>
-            @endif
+            </form>
 
-            <!-- Branch Selection Field -->
-            <div class="mb-3">
-                <label for="branch_id" class="form-label">Select Branch:</label>
-                <select class="form-control" name="branch_id" id="branch_id" required>
-                    @foreach($branches as $branch)
-                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- First Name and Last Name Fields -->
-            <div class="row mb-3">
-                <div class="col">
-                    <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="firstName" name="first_name" placeholder="Enter first name" required>
-                </div>
-                <div class="col">
-                    <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Enter last name" required>
-                </div>
-            </div>
-
-            <!-- Date of Birth Field -->
-            <div class="mb-3">
-                <label for="dob" class="form-label">Date of Birth</label>
-                <input type="date" class="form-control" id="dob" name="dob" required>
-            </div>
-
-            <!-- Address Field -->
-            <div class="mb-3">
-                <label for="address" class="form-label">Address</label>
-                <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" required>
-            </div>
-
-            <!-- Phone Number Field -->
-            <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneNumber" name="phone_number" placeholder="Enter phone number" required>
-            </div>
-
-            <!-- Active Email Address Field -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Active Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
-            </div>
-
-                        <!-- Course Selection Field -->
-                        <div class="mb-3">
-                            <label for="course" class="form-label">Course</label>
-                            <select class="form-select" id="course" name="course_id">
-                                <option value="" selected>Select a course</option>
-                                @foreach($courses as $course)
-                                    <option value="{{ $course->id }}">
-                                        {{ $course->name }} - ₱{{ number_format($course->price, 2) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <!-- Package Selection Field -->
-                        <div class="mb-3">
-                            <label for="package" class="form-label">Package</label>
-                            <select class="form-select" id="package" name="package_id">
-                                <option value="" selected>Select a package</option>
-                                @foreach($packages as $package)
-                                    <option value="{{ $package->id }}">
-                                        {{ $package->name }} - ₱{{ number_format($package->price, 2) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
- <!-- Payment Method Selection Field with Cards -->
- <div class="mb-3">
-    <label for="payment_method" class="form-label">Payment Method</label>
-    <div class="row">
-        <!-- Walk-in Card -->
-        <div class="col-md-6 mb-3">
-            <div class="card border-primary">
-                <input type="radio" id="walk_in" name="payment_method" value="walk_in" class="form-check-input" required>
-                <label for="walk_in">
-                    <div class="card-body text-center">
-                        <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
-                        <h5 class="card-title">Walk-in</h5>
-                        <p class="card-text">Pay in person at the branch.</p>
-                    </div>
-                </label>
-            </div>
-        </div>
-
-        <!-- Online Card -->
-        <div class="col-md-6 mb-3">
-            <div class="card border-success">
-                <input type="radio" id="online" name="payment_method" value="online" class="form-check-input">
-                <label for="online">
-                    <div class="card-body text-center">
-                        <i class="bi bi-credit-card" style="font-size: 3rem;"></i>
-                        <h5 class="card-title">Online</h5>
-                        <p class="card-text">Pay through online methods.</p>
-                    </div>
-                </label>
-            </div>
         </div>
     </div>
-</div>
 
-            <!-- Submit Button -->
-            <div class="button-container">
-                <button type="submit" class="btn btn-primary">Register</button>
-            </div>
-        </form>
-
-    </div>
 
 
 
@@ -447,38 +329,25 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <!-- Add this script before the closing </body> tag -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var navbar = document.querySelector('.navbar');
-            var heroHeight = document.querySelector('.hero').offsetHeight;
 
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > heroHeight) {
-                    navbar.classList.add('navbar-hidden');
-                } else {
-                    navbar.classList.remove('navbar-hidden');
-                }
+    <script>
+window.addEventListener('DOMContentLoaded', (event) => {
+            const proceedPaymentBtn = document.getElementById('proceedPaymentBtn');
+            const goBackBtnContainer = document.getElementById('goBackBtnContainer');
+
+            // Initial state of the Go Back button
+            goBackBtnContainer.style.display = 'none';
+
+            // When the Proceed to Payment button is clicked, show the Go Back button
+            proceedPaymentBtn.addEventListener('click', function() {
+                // Hide the Proceed to Payment button
+                proceedPaymentBtn.style.display = 'none';
+
+                // Show the Go Back to Home Page button
+                goBackBtnContainer.style.display = 'block';
             });
         });
-        document.getElementById('package').addEventListener('change', function() {
-        var courseSelect = document.getElementById('course');
-
-        // If a package is selected, clear the course selection
-        if (this.value !== "") {
-            courseSelect.selectedIndex = 0; // Reset to the default "Select a course" option
-        }
-    });
-
-    document.getElementById('course').addEventListener('change', function() {
-        var packageSelect = document.getElementById('package');
-
-        // If a course is selected, clear the package selection
-        if (this.value !== "") {
-            packageSelect.selectedIndex = 0; // Reset to the default "Select a package" option
-        }
-    });
     </script>
-
 </body>
 
 </html>

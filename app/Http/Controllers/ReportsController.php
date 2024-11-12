@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use App\Models\Student;
+use App\Models\Transaction;
+use App\Mail\PaymentUpdated;
 use Illuminate\Http\Request;
 use App\Models\StudentCourse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ReportsController extends Controller
 {
@@ -204,6 +207,8 @@ public function getBranchTransactions(Request $request)
             DB::raw("CONCAT(students.first_name, ' ', students.last_name) as student_name"), // Concatenate first and last name
             DB::raw("COALESCE(courses.name, packages.name) as course_package"), // Use COALESCE to get either course name or package name
             'transactions.price',
+            'transactions.balance', // Select balance directly from the transactions table
+            'transactions.payment_method', // Select balance directly from the transactions table
             'users.name as processed_by', // Select the staff name directly
             'transactions.created_at'
         )
@@ -228,6 +233,41 @@ public function getBranchTransactions(Request $request)
     $transactions = $query->get();
 
     return response()->json($transactions);
+}
+
+public function updatePayment(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|string', // Validate as string to handle dash
+        'amount_paid' => 'required|numeric|min:0',
+    ]);
+
+    // Find the transaction based on student_id
+    $transaction = Transaction::where('student_id', $request->student_id)
+                               ->where('balance', '>', 0) // Make sure balance is not already 0
+                               ->first();
+
+    if ($transaction) {
+        // Subtract the paid amount from the current balance
+        $newBalance = $transaction->balance - $request->amount_paid;
+        if ($newBalance < 0) {
+            return response()->json(['success' => false, 'message' => 'Paid amount exceeds the balance.'], 400);
+        }
+
+        // Update the transaction balance
+        $transaction->balance = $newBalance;
+        $transaction->save();
+
+        // Fetch the student
+        $student = $transaction->student;
+
+        // Send the email reminder after payment update
+        Mail::to($student->email)->send(new PaymentUpdated($student, $transaction));
+
+        return response()->json(['success' => true, 'message' => 'Payment updated successfully.']);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Transaction not found or already fully paid.'], 404);
 }
 
 

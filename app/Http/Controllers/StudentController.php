@@ -11,6 +11,8 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\StudentCourse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EnrollmentConfirmation;
 
 class StudentController extends Controller
 {
@@ -27,8 +29,10 @@ class StudentController extends Controller
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:15',
             'email' => 'required|email|unique:students,email',
+            'amount_paid' => 'required|numeric|min:0',
             'course_id' => 'nullable|exists:courses,id', // Dropdown for courses
             'package_id' => 'nullable|exists:packages,id', // Dropdown for packages
+
         ]);
 
         // Check if both course_id and package_id are missing
@@ -130,7 +134,7 @@ if (isset($validatedData['package_id']) && !empty($validatedData['package_id']))
 
 
         // Create a transaction entry
-        $this->createTransaction($student, $validatedData['course_id'], $validatedData['package_id']); // course_id is used for transaction
+        $this->createTransaction($student, $validatedData['course_id'], $validatedData['package_id'], $validatedData['amount_paid']); // course_id is used for transaction
 
         // Return a success response
         return response()->json([
@@ -287,21 +291,32 @@ private function createTDCSchedules(Student $student, $courseId, $startDate, $ho
 
 
 
-    private function createTransaction(Student $student, $courseId, $packageId = null)
-    {
-        Transaction::create([
-            'student_id' => $student->id,
-            'course_id' => $courseId,
-            'package_id' => $packageId,
-            'price' => $packageId ? Package::find($packageId)->price : Course::find($courseId)->price,
-            'transaction_date' => Carbon::now(),
-            'staff_id' => Auth::user()->id, // Assuming the current admin user is authenticated
-            'branch_id' => Auth::user()->branch_id,
-        ]);
+private function createTransaction(Student $student, $courseId, $packageId = null, $amountPaid)
+{
+    // Fetch the price of the selected course or package
+    $price = $packageId ? Package::find($packageId)->price : Course::find($courseId)->price;
 
-        \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}");
-    }
-    public function getStudentSchedules($studentId)
+    // Calculate the balance as price - amount paid
+    $balance = $price - $amountPaid;
+
+    // Create the transaction
+    Transaction::create([
+        'student_id' => $student->id,
+        'course_id' => $courseId,
+        'package_id' => $packageId,
+        'price' => $price,
+        'amount_paid' => $amountPaid, // Ensure amount paid is stored as well
+        'balance' => $balance, // Add the balance to the transaction
+        'transaction_date' => Carbon::now(),
+        'staff_id' => Auth::user()->id, // Assuming the current admin user is authenticated
+        'branch_id' => Auth::user()->branch_id,
+    ]);
+
+    \Log::info("Transaction created for student ID: {$student->id}, course ID: {$courseId}, package ID: {$packageId}, amount paid: {$amountPaid}, balance: {$balance}");
+    Mail::to($student->email)->send(new EnrollmentConfirmation($student, $courseId, $packageId, $balance, 'walk_in'));
+}
+
+public function getStudentSchedules($studentId)
     {
         // Fetch schedules for the specified student ID and order by scheduled_date in ascending order
         $schedules = Schedule::where('student_id', $studentId)

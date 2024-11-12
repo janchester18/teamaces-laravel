@@ -329,9 +329,18 @@ Route::get('/transactions', [ReportsController::class, 'getBranchTransactions'])
 
 
 //owner reports
-Route::post('/api/owner-generate-insights', [OwnerReportsController::class, 'owner-generateInsights']);
+Route::post('/api/owner-generate-insights', [OwnerReportsController::class, 'generateInsights']);
 Route::get('/owner-reports', [OwnerReportsController::class, 'getStudentDemographics'])->name('owner-reports');
 // Popular Courses routes
-Route::post('/api/owner-generate-course-insights', [OwnerReportsController::class, 'owner-generateCourseInsights']);
+Route::post('/api/owner-generate-course-insights', [OwnerReportsController::class, 'generateCourseInsights']);
 Route::get('/owner-transactions', [OwnerReportsController::class, 'getBranchTransactions'])
     ->name('owner-transactions.branch');
+
+
+//added features
+//payment update
+Route::post('/update-payment', [ReportsController::class, 'updatePayment'])->name('update.payment');
+
+//online payment
+Route::get('/enrollment/online-payment/{enrollmentId}', [EnrollmentController::class, 'showOnlinePaymentView'])->name('enrollment.online.payment.view');
+Route::get('/enrollment/success', [EnrollmentController::class, 'success'])->name('enrollment.success');

@@ -45,21 +45,6 @@
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-bell"></i>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user-circle"></i> Profile
-                    </a>
-                </li>
-            </ul>
         </nav>
         <!-- /.navbar -->
 
@@ -393,126 +378,148 @@
 <!-- STUDENT AGE DEMOGRAPHIC AND COURSE DISTRIBUTION -->
 <script>
     // Initialize the demographics chart
-    const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
-    const ageGroups = @json($ageGroups);
+// Function to disable the buttons
+function disableButtons() {
+    document.getElementById('generateInsights').disabled = true;
+    document.getElementById('generateCourseInsights').disabled = true;
+}
 
-    const demographicsLabels = Object.keys(ageGroups);
-    const demographicsData = Object.values(ageGroups);
+// Function to enable the buttons
+function enableButtons() {
+    document.getElementById('generateInsights').disabled = false;
+    document.getElementById('generateCourseInsights').disabled = false;
+}
 
-    const demographicsChart = new Chart(demographicsCtx, {
-        type: 'bar', // or 'pie'
-        data: {
-            labels: demographicsLabels,
-            datasets: [{
-                label: 'Number of Students',
-                data: demographicsData,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+// Initialize the demographics chart
+const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
+const ageGroups = @json($ageGroups);
+
+const demographicsLabels = Object.keys(ageGroups);
+const demographicsData = Object.values(ageGroups);
+
+const demographicsChart = new Chart(demographicsCtx, {
+    type: 'bar', // or 'pie'
+    data: {
+        labels: demographicsLabels,
+        datasets: [{
+            label: 'Number of Students',
+            data: demographicsData,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
             }
         }
-    });
+    }
+});
 
-    document.getElementById('generateInsights').addEventListener('click', function() {
-        // Show the loader
-        const loader = document.getElementById('loader');
-        loader.style.display = 'block'; // Show the loader
-        document.getElementById('generateInsights').style.display = 'none'; // Hide the button
-        document.getElementById('insights').innerText = ''; // Clear any previous insights
+// Demographic Insights Button
+document.getElementById('generateInsights').addEventListener('click', function() {
+    // Show the loader
+    const loader = document.getElementById('loader');
+    loader.style.display = 'block'; // Show the loader
+    document.getElementById('generateInsights').style.display = 'none'; // Hide the button
+    document.getElementById('insights').innerText = ''; // Clear any previous insights
 
-        // Call an endpoint to generate insights based on the demographics data
-        fetch('/api/generate-insights', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': '{{ csrf_token() }}',
-            },
-            body: JSON.stringify({ demographics: ageGroups })
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('insights').innerText = data.insights; // Show insights
-        })
-        .catch(error => {
-            console.error('Error generating insights:', error);
-            document.getElementById('insights').innerText = 'Error generating insights.'; // Show error message
-        })
-        .finally(() => {
-            // Hide the loader and show the button again
-            loader.style.display = 'none'; // Hide the loader
-        });
-    });
+    // Disable both buttons
+    disableButtons();
 
-    // Initialize the popular courses chart
-    const coursesCtx = document.getElementById('popularCoursesChart').getContext('2d');
-    const popularCourses = @json($popularCourses); // Assuming you pass this data from the controller
-
-    // Extracting labels and data correctly
-    const courseLabels = popularCourses.map(course => course.course_name); // Adjust to fetch actual course names if needed
-    const courseData = popularCourses.map(course => course.total);
-
-    const popularCoursesChart = new Chart(coursesCtx, {
-        type: 'pie', // or 'pie'
-        data: {
-            labels: courseLabels,
-            datasets: [{
-                label: 'Number of Enrollments',
-                data: courseData,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1
-            }]
+    // Call an endpoint to generate insights based on the demographics data
+    fetch('/api/generate-insights', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': '{{ csrf_token() }}',
         },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+        body: JSON.stringify({ demographics: ageGroups })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('insights').innerText = data.insights; // Show insights
+    })
+    .catch(error => {
+        console.error('Error generating insights:', error);
+        document.getElementById('insights').innerText = 'Error generating insights.'; // Show error message
+    })
+    .finally(() => {
+        // Hide the loader and re-enable the buttons
+        loader.style.display = 'none'; // Hide the loader
+        enableButtons(); // Re-enable the buttons
+    });
+});
+
+// Initialize the popular courses chart
+const coursesCtx = document.getElementById('popularCoursesChart').getContext('2d');
+const popularCourses = @json($popularCourses); // Assuming you pass this data from the controller
+
+// Extracting labels and data correctly
+const courseLabels = popularCourses.map(course => course.course_name); // Adjust to fetch actual course names if needed
+const courseData = popularCourses.map(course => course.total);
+
+const popularCoursesChart = new Chart(coursesCtx, {
+    type: 'pie', // or 'pie'
+    data: {
+        labels: courseLabels,
+        datasets: [{
+            label: 'Number of Enrollments',
+            data: courseData,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
             }
         }
-    });
+    }
+});
 
-    document.getElementById('generateCourseInsights').addEventListener('click', function() {
+// Popular Course Insights Button
+document.getElementById('generateCourseInsights').addEventListener('click', function() {
     // Show the loader
     const loader = document.getElementById('courseLoader');
     loader.style.display = 'block'; // Show the loader
     document.getElementById('generateCourseInsights').style.display = 'none'; // Hide the button
     document.getElementById('courseInsights').innerText = ''; // Clear any previous insights
+
+    // Disable both buttons
+    disableButtons();
 
     // Prepare the popular courses data
     const popularCoursesData = popularCourses.map(course => ({
@@ -538,8 +545,9 @@
         document.getElementById('courseInsights').innerText = 'Error generating insights.'; // Show error message
     })
     .finally(() => {
-        // Hide the loader and show the button again
+        // Hide the loader and re-enable the buttons
         loader.style.display = 'none'; // Hide the loader
+        enableButtons(); // Re-enable the buttons
     });
 });
 
@@ -633,57 +641,68 @@
 <script>
     // Function to handle payment update
     function confirmPayment(studentId, price) {
-            Swal.fire({
-                title: 'Enter Amount Paid',
-                input: 'number',
-                inputLabel: 'Amount Paid',
-                inputPlaceholder: 'Enter the amount paid',
-                showCancelButton: true,
-                confirmButtonText: 'Confirm Payment',
-                cancelButtonText: 'Cancel',
-                preConfirm: (amountPaid) => {
-                    // Validation to ensure a valid amount
-                    if (!amountPaid || amountPaid <= 0) {
-                        Swal.showValidationMessage('Please enter a valid amount');
-                        return false;
-                    }
-                    if (amountPaid > price) {
-                        Swal.showValidationMessage('Amount paid cannot exceed the price');
-                        return false;
-                    }
-                    return amountPaid;
+        Swal.fire({
+            title: 'Enter Amount Paid',
+            input: 'number',
+            inputLabel: 'Amount Paid',
+            inputPlaceholder: 'Enter the amount paid',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm Payment',
+            cancelButtonText: 'Cancel',
+            preConfirm: (amountPaid) => {
+                // Validation to ensure a valid amount
+                if (!amountPaid || amountPaid <= 0) {
+                    Swal.showValidationMessage('Please enter a valid amount');
+                    return false;
                 }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // AJAX request to update the transaction
-                    $.ajax({
-                        url: '/update-payment', // Laravel route to handle payment update
-                        type: 'POST',
-                        data: {
-                            student_id: studentId,
-                            amount_paid: result.value,
-                            _token: '{{ csrf_token() }}' // CSRF token for security
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire('Success!', 'Payment updated successfully!', 'success').then((result) => {
-                                    if (result.isConfirmed) {
-                                        // Reload the page only after the user clicks "OK"
-                                        location.reload(); // This will reload the current page
+                if (amountPaid > price) {
+                    Swal.showValidationMessage('Amount paid cannot exceed the price');
+                    return false;
+                }
+                return amountPaid;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading spinner before the AJAX request
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while the payment is being processed.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // Show loading spinner
+                    }
+                });
+
+                // AJAX request to update the transaction
+                $.ajax({
+                    url: '/update-payment', // Laravel route to handle payment update
+                    type: 'POST',
+                    data: {
+                        student_id: studentId,
+                        amount_paid: result.value,
+                        _token: '{{ csrf_token() }}' // CSRF token for security
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Success!', 'Payment updated successfully!', 'success').then((result) => {
+                                if (result.isConfirmed) {
+                                    // Reload the page only after the user clicks "OK"
+                                    location.reload(); // This will reload the current page
                                 }
                             });
-                            } else {
-                                Swal.fire('Error!', 'Failed to update payment. Please try again.', 'error');
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error!', 'Something went wrong.', 'error');
+                        } else {
+                            Swal.fire('Error!', 'Failed to update payment. Please try again.', 'error');
                         }
-                    });
-                }
-            });
-        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error!', 'Something went wrong.', 'error');
+                    }
+                });
+            }
+        });
+    }
 </script>
+
 
 <script>
     $(document).ready(function() {

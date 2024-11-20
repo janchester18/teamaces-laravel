@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use App\Models\StudentCourse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student; // Import the Student model
@@ -14,10 +16,13 @@ use App\Models\Transaction; // Import the Transaction model
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Get the branch ID of the authenticated user
         $branchId = auth()->user()->branch_id;
+
+        // Determine the year to filter by (default to the current year)
+        $yearFilter = $request->get('year', Carbon::now()->year);
 
         // Count the number of students in the students table for the current user's branch
         $totalStudents = Student::where('branch_id', $branchId)->count();
@@ -33,12 +38,13 @@ class DashboardController extends Controller
         // Sum the revenue from the transactions table for the current user's branch
         $totalRevenue = Transaction::where('branch_id', $branchId)->sum('price');
 
-       // Fetch revenue per month from the transactions table for the current user's branch
-       $monthlyRevenue = Transaction::select(DB::raw('SUM(price) as total_revenue'), DB::raw('MONTH(created_at) as month'))
-       ->where('branch_id', $branchId)
-       ->groupBy('month')
-       ->orderBy('month')
-       ->pluck('total_revenue', 'month');
+        // Fetch revenue per month for the selected year
+        $monthlyRevenue = Transaction::select(DB::raw('SUM(price) as total_revenue'), DB::raw('MONTH(created_at) as month'))
+        ->where('branch_id', $branchId)
+        ->whereYear('created_at', $yearFilter)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->pluck('total_revenue', 'month');
 
         // Prepare data for the chart
         $months = range(1, 12); // Months from January to December
@@ -51,67 +57,91 @@ class DashboardController extends Controller
 
         $revenueMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-        // Map revenue data for each month
-        $revenueData = array_map(function ($month) use ($monthlyRevenue) {
-            return $monthlyRevenue->get($month, 0);
-        }, range(1, 12));
+        // Pending New Enrollments
+        $newEnrollments = Enrollment::where('branch_id', $branchId)
+            ->where('is_email_verified', 1)
+            ->count();
 
-        return view('admin.branch_analytics', compact('totalStudents', 'scheduledSessionsToday', 'totalRevenue', 'revenueData', 'revenueMonths')); // Pass revenue data to the view
+        // Existing Student Enrollments (not approved)
+        $existingStudentsEnrollments = StudentCourse::with('student', 'course') // Assuming you have relationships defined
+            ->where('is_approved', 0)
+            ->count();
+
+
+        return view('admin.branch_analytics', compact(
+            'totalStudents',
+            'scheduledSessionsToday',
+            'totalRevenue',
+            'revenueData',
+            'revenueMonths',
+            'newEnrollments',
+            'existingStudentsEnrollments',
+            'yearFilter'
+        ));
     }
 
-    public function getRevenueInsights()
-{
-    // Fetch the transactions and group by month
-    $transactions = Transaction::where('branch_id', Auth::user()->branch_id)
-        ->selectRaw('SUM(price) as total, MONTH(created_at) as month')
-        ->groupBy('month')
-        ->orderBy('month')
-        ->get();
+    public function getRevenueInsights(Request $request)
+    {
+        $yearFilter = $request->input('year', Carbon::now()->year); // Default to current year if not passed
+        \Log::debug('Year received in controller: ' . $yearFilter); // Debugging line
 
-    // Prepare data for insights
-    $labels = $transactions->pluck('month')->map(fn($month) => date('F', mktime(0, 0, 0, $month, 1)))->toArray();
-    $data = $transactions->pluck('total')->toArray();
+        // Fetch the transactions and group by month, using the year filter
+        $transactions = Transaction::where('branch_id', Auth::user()->branch_id)
+            ->whereYear('created_at', $yearFilter) // Filter transactions by the selected year
+            ->selectRaw('SUM(price) as total, MONTH(created_at) as month')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
 
-    // Format data for the prompt
-    $formattedData = array_map(function ($label, $value) {
-        return "$label - $value";
-    }, $labels, $data);
+        // Prepare data for insights
+        $labels = $transactions->pluck('month')->map(fn($month) => date('F', mktime(0, 0, 0, $month, 1)))->toArray();
+        $data = $transactions->pluck('total')->toArray();
 
-    $formattedDataString = implode(', ', $formattedData);
+        // Format data for the prompt
+        $formattedData = array_map(function ($label, $value) {
+            return "$label - $value";
+        }, $labels, $data);
 
-    // Craft the prompt
-    $prompt = "Here is the revenue data per month for the bar chart sales per month: $formattedDataString. Generate a 3-sentence business insights based on this graph. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Don't include holidays and seasons. And provide suggestions. Again, don't include an introductory sentence or colon. The currency is Philippine pesos or pesos.";
+        $formattedDataString = implode(', ', $formattedData);
 
-    // Set up the Mistral API request
-    $client = new \GuzzleHttp\Client();
-    $url = 'https://api.mistralai.com/v1/chat/completions';
-    $apiKey = env('MISTRAL_API_KEY'); // Ensure your API key is set in the .env file
+        // Craft the prompt
+        $prompt = "Here is the revenue data per month for the bar chart sales per month: $formattedDataString. Generate a 3-sentence business insights based on this graph. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Don't include holidays and seasons. And provide suggestions. Again, don't include an introductory sentence or colon. The currency is Philippine pesos or pesos.";
 
-    try {
-        $response = $client->post($url, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => "Bearer $apiKey"
-            ],
-            'json' => [
-                'model' => 'mistral-large-latest', // Use the specified model
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a helpful and accurate business analyst.'],
-                    ['role' => 'staff', 'content' => $prompt]
+        // Set up the Arli AI API request
+        $client = new \GuzzleHttp\Client();
+        $url = 'https://api.arliai.com/v1/chat/completions';
+        $apiKey = env('API_KEY_ARLI'); // Ensure your API key is set in the .env file
+
+        try {
+            $response = $client->post($url, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => "Bearer $apiKey"
+                ],
+                'json' => [
+                    'model' => 'Meta-Llama-3.1-8B-Instruct', // Use the Arli AI model
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a helpful business analyst.'],
+                        ['role' => 'user', 'content' => $prompt]
+                    ],
+                    'max_tokens' => 1024,
+                    'temperature' => 0.7
                 ]
-            ]
-        ]);
+            ]);
 
-        $body = json_decode($response->getBody()->getContents(), true);
-        $insights = $body['choices'][0]['message']['content'] ?? 'No insights generated.';
+            $body = json_decode($response->getBody()->getContents(), true);
+            $insights = $body['choices'][0]['message']['content'] ?? 'No insights generated.';
 
-        return response()->json(['insights' => $insights]);
+            // Log formatted data string for debugging
+            Log::info('Formatted Data String:', [$formattedDataString]);
 
-    } catch (\Exception $e) {
-        Log::error('Mistral API Request Failed: ' . $e->getMessage());
-        return response()->json(['insights' => 'Error generating insights.'], 500);
+            return response()->json(['insights' => $insights]);
+
+        } catch (\Exception $e) {
+            Log::error('API Request Failed: ' . $e->getMessage());
+            return response()->json(['insights' => 'Error generating insights.'], 500);
+        }
     }
-}
 
 
 

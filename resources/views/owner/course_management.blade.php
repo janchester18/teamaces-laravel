@@ -34,21 +34,6 @@
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-bell"></i>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user-circle"></i> Profile
-                    </a>
-                </li>
-            </ul>
         </nav>
         <!-- /.navbar -->
 

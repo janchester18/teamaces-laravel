@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="icon" href="{{ asset('images/aces.png') }}">
@@ -219,6 +220,74 @@
                 font-size: 2rem !important;
             }
         }
+
+        /* Keyframes for animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Form Container Animation */
+#form-container {
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Headline Animation */
+#form-container h2 {
+    animation: slideInFromLeft 1s ease-in-out;
+}
+
+/* Form Fields Animation */
+#form-container .mb-3 {
+    animation: fadeIn 0.8s ease-in-out;
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
+}
+
+/* Cards Animation */
+#form-container .card {
+    animation: bounceIn 1s ease-in-out;
+    animation-delay: 0.8s;
+    animation-fill-mode: both;
+}
+
+/* Buttons Animation */
+#form-container button {
+    animation: fadeIn 1s ease-in-out;
+    animation-delay: 1.2s;
+    animation-fill-mode: both;
+}
+
     </style>
 </head>
 

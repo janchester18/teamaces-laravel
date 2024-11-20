@@ -177,15 +177,11 @@
                     @csrf <!-- Add this for Laravel's CSRF protection -->
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="example@gmail.com" required>
                     </div>
                     <div class="mb-3">
                         <label for="student_id" class="form-label">Student ID</label>
-                        <input type="text" class="form-control" id="student_id" name="student_id" required>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
-                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                        <input type="text" class="form-control" id="student_id" name="student_id" placeholder="Enter your Student ID" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Sign In</button>
                 </form>

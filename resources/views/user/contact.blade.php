@@ -88,6 +88,7 @@
             padding-top: 200px;
             padding-bottom: 100px;
             margin-top: 0px;
+            height: 80vh;
         }
 
         .hero h1 {
@@ -349,7 +350,7 @@
     </div>
 </div>
 
-<div class="franchise-info m-5 py-4 bg-white">
+{{-- <div class="franchise-info m-5 py-4 bg-white">
     <h2 class="text-center font-weight-bold mb-4">Secure a Driving School Franchise in Your Area</h2>
     <p class="text-center">
         TeamAces Driving Academy Inc. is excited to offer franchise opportunities. We currently have over 10 franchise branches nationwide, with our latest addition in Naic, Cavite, and more branches opening soon!
@@ -602,7 +603,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 <style>
     @media (max-width: 767.98px) {
@@ -618,13 +619,13 @@
 </style>
 
 
-        <!-- Franchise CTA -->
+{{--         <!-- Franchise CTA -->
         <div class="text-center">
             <a href="images/teamaces_application_form.pdf" download target="_blank" class="btn btn-custom btn-franchise">Download Franchise Application Form</a>
             <p class="mt-3">Have questions? Contact us at <a href="tel:+639081875826">0908-187-5826</a> or <a href="mailto:bodegasjohnny@gmail.com">bodegasjohnny@gmail.com</a></p>
         </div>
     </div>
-</section>
+</section> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>

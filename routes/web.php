@@ -217,7 +217,7 @@ Route::get('/branch_analytics/revenue-insights', [DashboardController::class, 'g
 Route::get('/owner/branch_analytics', [OwnerDashboardController::class, 'index'])
     ->name('owner.branch_analytics');
 
-Route::get('/branch_analytics/revenue-insights', [OwnerDashboardController::class, 'getRevenueInsights'])->name('revenue_insights');
+Route::get('/branch_analytics/owner_revenue-insights', [OwnerDashboardController::class, 'getRevenueInsights'])->name('owner_revenue_insights');
 
 Route::prefix('student')->group(function () {
     // Show the login form

@@ -37,22 +37,6 @@
                             class="fas fa-bars"></i></a>
                 </li>
             </ul>
-
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-bell"></i>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user-circle"></i> Profile
-                    </a>
-                </li>
-            </ul>
         </nav>
         <!-- /.navbar -->
 
@@ -157,8 +141,8 @@
             <!-- Content Header -->
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
+                    <div class="row mb-0">
+                        <div class="col-sm-12">
                             <h1 class="m-0">New Student Enrollments</h1>
                         </div>
                     </div>
@@ -166,8 +150,63 @@
             </div>
             <!-- /.content-header -->
 
+<!-- Modal -->
+<div class="modal fade" id="onlinePaymentsModal" tabindex="-1" aria-labelledby="onlinePaymentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 100%; width: 1500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="onlinePaymentsModalLabel">Online Payments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Table for online payments -->
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment Type</th>
+                                <th>Description</th>
+                                <th>Date Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($paymentDetails as $index => $payment)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ htmlspecialchars($payment['name']) }}</td>
+                                    <td>{{ $payment['email'] }}</td>
+                                    <td>{{ $payment['phone'] }}</td>
+                                    <td>{{ '₱' . number_format($payment['amount'] / 100, 2) }}</td>
+                                    <td>{{ ucfirst($payment['status']) }}</td>
+                                    <td>{{ $payment['payment_type'] }}</td>
+                                    <td>{{ $payment['description'] }}</td>
+                                    <td>{{ $payment['paid_at'] ? \Carbon\Carbon::parse($payment['paid_at'])->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
             <!-- Main content -->
             <section class="pending-enrollments m-4">
+                <div class="row mb-4">
+                    <div class="col-sm-12"> <!-- Center the button below the title -->
+                        <button class="btn btn-primary rounded" data-bs-toggle="modal" data-bs-target="#onlinePaymentsModal">
+                            Show Online Payments
+                        </button>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     @if ($pendingEnrollments->isEmpty())
                         <div class="card text-center w-100">

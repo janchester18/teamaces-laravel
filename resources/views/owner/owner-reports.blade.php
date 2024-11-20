@@ -37,21 +37,7 @@
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-bell"></i>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user-circle"></i> Profile
-                    </a>
-                </li>
-            </ul>
+
         </nav>
         <!-- /.navbar -->
 
@@ -327,159 +313,172 @@
 <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
     <!-- STUDENT AGE DEMOGRAPHIC AND COURSE DISTRIBUTION -->
-<script>
-    // Initialize the demographics chart
-    const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
-    const ageGroups = @json($ageGroups);
+    <script>
+        // Initialize the demographics chart
+        const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
+        const ageGroups = @json($ageGroups);
 
-    const demographicsLabels = Object.keys(ageGroups);
-    const demographicsData = Object.values(ageGroups);
+        const demographicsLabels = Object.keys(ageGroups);
+        const demographicsData = Object.values(ageGroups);
 
-    const demographicsChart = new Chart(demographicsCtx, {
-        type: 'bar', // or 'pie'
-        data: {
-            labels: demographicsLabels,
-            datasets: [{
-                label: 'Number of Students',
-                data: demographicsData,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    document.getElementById('generateInsights').addEventListener('click', function() {
-        // Show the loader
-        const loader = document.getElementById('loader');
-        loader.style.display = 'block'; // Show the loader
-        document.getElementById('generateInsights').style.display = 'none'; // Hide the button
-        document.getElementById('insights').innerText = ''; // Clear any previous insights
-
-        // Call an endpoint to generate insights based on the demographics data
-        fetch('/api/owner-generate-insights', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': '{{ csrf_token() }}',
+        const demographicsChart = new Chart(demographicsCtx, {
+            type: 'bar', // or 'pie'
+            data: {
+                labels: demographicsLabels,
+                datasets: [{
+                    label: 'Number of Students',
+                    data: demographicsData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                    ],
+                    borderWidth: 1
+                }]
             },
-            body: JSON.stringify({ demographics: ageGroups })
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('insights').innerText = data.insights; // Show insights
-        })
-        .catch(error => {
-            console.error('Error generating insights:', error);
-            document.getElementById('insights').innerText = 'Error generating insights.'; // Show error message
-        })
-        .finally(() => {
-            // Hide the loader and show the button again
-            loader.style.display = 'none'; // Hide the loader
-        });
-    });
-
-    // Initialize the popular courses chart
-    const coursesCtx = document.getElementById('popularCoursesChart').getContext('2d');
-    const popularCourses = @json($popularCourses); // Assuming you pass this data from the controller
-
-    // Extracting labels and data correctly
-    const courseLabels = popularCourses.map(course => course.course_name); // Adjust to fetch actual course names if needed
-    const courseData = popularCourses.map(course => course.total);
-
-    const popularCoursesChart = new Chart(coursesCtx, {
-        type: 'pie', // or 'pie'
-        data: {
-            labels: courseLabels,
-            datasets: [{
-                label: 'Number of Enrollments',
-                data: courseData,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
 
-    document.getElementById('generateCourseInsights').addEventListener('click', function() {
-    // Show the loader
-    const loader = document.getElementById('courseLoader');
-    loader.style.display = 'block'; // Show the loader
-    document.getElementById('generateCourseInsights').style.display = 'none'; // Hide the button
-    document.getElementById('courseInsights').innerText = ''; // Clear any previous insights
+        document.getElementById('generateInsights').addEventListener('click', function() {
+            // Disable the second button while processing
+            document.getElementById('generateCourseInsights').disabled = true;
 
-    // Prepare the popular courses data
-    const popularCoursesData = popularCourses.map(course => ({
-        course_name: course.course_name,
-        total: course.total
-    }));
+            // Show the loader
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block'; // Show the loader
+            document.getElementById('generateInsights').style.display = 'none'; // Hide the button
+            document.getElementById('insights').innerText = ''; // Clear any previous insights
 
-    // Call an endpoint to generate insights based on the popular courses data
-    fetch('/api/owner-generate-course-insights', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': '{{ csrf_token() }}',
-        },
-        body: JSON.stringify({ popularCourses: popularCoursesData }) // Pass the data for insights generation
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('courseInsights').innerText = data.insights; // Show insights
-    })
-    .catch(error => {
-        console.error('Error generating insights:', error);
-        document.getElementById('courseInsights').innerText = 'Error generating insights.'; // Show error message
-    })
-    .finally(() => {
-        // Hide the loader and show the button again
-        loader.style.display = 'none'; // Hide the loader
-    });
-});
+            // Call an endpoint to generate insights based on the demographics data
+            fetch('/api/owner-generate-insights', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ demographics: ageGroups })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('insights').innerText = data.insights; // Show insights
+            })
+            .catch(error => {
+                console.error('Error generating insights:', error);
+                document.getElementById('insights').innerText = 'Error generating insights.'; // Show error message
+            })
+            .finally(() => {
+                // Hide the loader and show the button again
+                loader.style.display = 'none'; // Hide the loader
+                document.getElementById('generateInsights').style.display = 'none'; // Show the button again
 
-</script>
+                // Re-enable the second button after processing
+                document.getElementById('generateCourseInsights').disabled = false;
+            });
+        });
+
+        // Initialize the popular courses chart
+        const coursesCtx = document.getElementById('popularCoursesChart').getContext('2d');
+        const popularCourses = @json($popularCourses); // Assuming you pass this data from the controller
+
+        // Extracting labels and data correctly
+        const courseLabels = popularCourses.map(course => course.course_name); // Adjust to fetch actual course names if needed
+        const courseData = popularCourses.map(course => course.total);
+
+        const popularCoursesChart = new Chart(coursesCtx, {
+            type: 'pie', // or 'pie'
+            data: {
+                labels: courseLabels,
+                datasets: [{
+                    label: 'Number of Enrollments',
+                    data: courseData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        document.getElementById('generateCourseInsights').addEventListener('click', function() {
+            // Disable the first button while processing
+            document.getElementById('generateInsights').disabled = true;
+
+            // Show the loader
+            const loader = document.getElementById('courseLoader');
+            loader.style.display = 'block'; // Show the loader
+            document.getElementById('generateCourseInsights').style.display = 'none'; // Hide the button
+            document.getElementById('courseInsights').innerText = ''; // Clear any previous insights
+
+            // Prepare the popular courses data
+            const popularCoursesData = popularCourses.map(course => ({
+                course_name: course.course_name,
+                total: course.total
+            }));
+
+            // Call an endpoint to generate insights based on the popular courses data
+            fetch('/api/owner-generate-course-insights', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ popularCourses: popularCoursesData }) // Pass the data for insights generation
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('courseInsights').innerText = data.insights; // Show insights
+            })
+            .catch(error => {
+                console.error('Error generating insights:', error);
+                document.getElementById('courseInsights').innerText = 'Error generating insights.'; // Show error message
+            })
+            .finally(() => {
+                // Hide the loader and show the button again
+                loader.style.display = 'none'; // Hide the loader
+                document.getElementById('generateCourseInsights').style.display = 'none'; // Show the button again
+
+                // Re-enable the first button after processing
+                document.getElementById('generateInsights').disabled = false;
+            });
+        });
+    </script>
 
 <!-- Include this script at the bottom of your HTML file -->
 <script>

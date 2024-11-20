@@ -497,7 +497,7 @@ text-decoration:none;
                         <ul>
                             <li>Comprehensive theory lessons on road safety and traffic laws</li>
                         </ul>
-                        <a href="#" class="price_btn">Enroll Now</a>
+                        <a href="{{ route('enrollment.form') }}" class="price_btn">Enroll Now</a>
                     </div>
                 </div>
             </div><!--- END COL -->
@@ -514,7 +514,7 @@ text-decoration:none;
                         <ul>
                             <li>Flexible online learning with all theoretical course content</li>
                         </ul>
-                        <a href="#" class="price_btn">Enroll Now</a>
+                        <a href="{{ route('enrollment.form') }}" class="price_btn">Enroll Now</a>
                     </div>
                 </div>
             </div><!--- END COL -->
@@ -531,7 +531,7 @@ text-decoration:none;
                         <ul>
                             <li>Hands-on training for motorcycle operation and safety</li>
                         </ul>
-                        <a href="#" class="price_btn">Enroll Now</a>
+                        <a href="{{ route('enrollment.form') }}" class="price_btn">Enroll Now</a>
                     </div>
                 </div>
             </div><!--- END COL -->
@@ -548,7 +548,7 @@ text-decoration:none;
                         <ul>
                             <li>Comprehensive driving lessons for 4-wheel vehicles</li>
                         </ul>
-                        <a href="#" class="price_btn">Enroll Now</a>
+                        <a href="{{ route('enrollment.form') }}" class="price_btn">Enroll Now</a>
                     </div>
                 </div>
             </div><!--- END COL -->

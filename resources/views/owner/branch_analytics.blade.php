@@ -31,21 +31,7 @@
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-bell"></i>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user-circle"></i> Profile
-                    </a>
-                </li>
-            </ul>
+
         </nav>
         <!-- /.navbar -->
 
@@ -202,38 +188,66 @@
 
                     </div>
 
-                    <!-- Revenue Chart Section -->
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-8">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Revenue per Month</h3>
                                 </div>
                                 <div class="card-body d-flex flex-column flex-md-row">
-                                    <!-- Chart -->
-                                    <div class="flex-grow-1 mb-3 mb-md-0"> <!-- Margin bottom for mobile view -->
+                                    <!-- Chart Section -->
+                                    <div class="flex-grow-1 mb-3 mb-md-0">
+                                        <div class="form-group d-flex align-items-center">
+                                            <label for="yearFilter" class="mr-3 mb-0">Select Year:</label>
+                                            <select id="yearFilter" class="form-control w-auto">
+                                                @foreach(range(Carbon\Carbon::now()->year, 2000) as $year)
+                                                    <option value="{{ $year }}" {{ $year == $yearFilter ? 'selected' : '' }}>
+                                                        {{ $year }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         <canvas id="revenueChart"></canvas>
                                     </div>
                                     <!-- Insights for Revenue -->
                                     <div class="insights-container ms-md-3" style="min-width: 300px;">
-                                        <!-- Set a min-width for insights -->
                                         <h4>LLM Generated Insights</h4>
                                         <div class="text-center">
-                                            <button id="fetch-insights-button" class="btn btn-primary rounded">Get
-                                                Insights</button>
+                                            <button id="fetch-insights-button" class="btn btn-primary rounded">Get Insights</button>
                                         </div>
                                         <div id="loader" class="text-center" style="display: none;">
                                             <div class="spinner-border" role="status">
                                                 <span class="sr-only">Loading...</span>
                                             </div>
                                         </div>
-
                                         <p id="insights-placeholder"></p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Right Side Card: Top 10 Branches -->
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Top 10 Branches</h3>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <!-- Example: List of Top 10 Branches -->
+                                         @foreach($topBranches as $branch)
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ $branch->name }}
+                                                <span class="badge badge-primary badge-pill">₱{{ number_format($branch->revenue, 2) }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+
 
 
                 </div>
@@ -263,40 +277,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const yearFilter = document.getElementById('yearFilter');
+
+            // Event listener for year filter change
+            yearFilter.addEventListener('change', function() {
+                const selectedYear = yearFilter.value;
+                const url = new URL(window.location.href);
+                url.searchParams.set('year', selectedYear);
+                window.location.href = url.toString();
+            });
+
             const controller = new AbortController(); // Create an instance of AbortController
             const signal = controller.signal; // Get the signal from the controller
 
             // Fetch insights function
             const fetchInsights = async () => {
+                const selectedYear = yearFilter.value; // Get the selected year value
                 // Show the loader and hide the button
                 document.getElementById('loader').style.display = 'block'; // Show loader
                 document.getElementById('fetch-insights-button').style.display = 'none'; // Hide the button
-                document.getElementById('insights-placeholder').innerText =
-                ''; // Clear insights placeholder
+                document.getElementById('insights-placeholder').innerText = ''; // Clear insights placeholder
 
                 try {
-                    const response = await fetch('{{ route('revenue_insights') }}', {
-                        signal
-                    });
+                    const response = await fetch('{{ route('owner_revenue_insights') }}?year=' + selectedYear, { signal });
                     const data = await response.json();
-                    document.getElementById('insights-placeholder').innerText = data
-                    .insights; // Show insights
+                    document.getElementById('insights-placeholder').innerText = data.insights; // Show insights
                 } catch (error) {
                     if (error.name === 'AbortError') {
                         console.log('Fetch aborted');
                     } else {
                         console.error('Error fetching insights:', error);
-                        document.getElementById('insights-placeholder').innerText =
-                            'Error fetching insights.';
+                        document.getElementById('insights-placeholder').innerText = 'Error fetching insights.';
                     }
                 } finally {
                     // Hide the loader and show the button again
                     document.getElementById('loader').style.display = 'none'; // Hide loader
-                    document.getElementById('fetch-insights-button').style.display =
-                    'none'; // Show the button again
+                    document.getElementById('fetch-insights-button').style.display = 'none'; // Show the button again
                 }
             };
-
 
             // Line chart (Revenue)
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');

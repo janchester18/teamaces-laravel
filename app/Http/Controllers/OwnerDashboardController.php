@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,8 +15,11 @@ use App\Models\Transaction; // Import the Transaction model
 
 class OwnerDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Determine the year to filter by (default to the current year)
+        $yearFilter = $request->get('year', Carbon::now()->year);
+
         // Count the total number of students in the students table
         $totalStudents = Student::count();
 
@@ -30,6 +34,7 @@ class OwnerDashboardController extends Controller
 
         // Fetch revenue per month from the transactions table
         $monthlyRevenue = Transaction::select(DB::raw('SUM(price) as total_revenue'), DB::raw('MONTH(created_at) as month'))
+            ->whereYear('created_at', $yearFilter)
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total_revenue', 'month');
@@ -50,13 +55,23 @@ class OwnerDashboardController extends Controller
             return $monthlyRevenue->get($month, 0);
         }, range(1, 12));
 
-        return view('owner.branch_analytics', compact('totalStudents', 'scheduledSessionsToday', 'totalRevenue', 'revenueData', 'revenueMonths')); // Pass revenue data to the view
+        // Fetch top 10 branches by revenue
+        $topBranches = Branch::select('branches.name', DB::raw('SUM(transactions.price) as revenue'))
+        ->join('transactions', 'transactions.branch_id', '=', 'branches.id')
+        ->groupBy('branches.name')
+        ->orderByDesc('revenue')
+        ->take(10)
+        ->get();
+
+        return view('owner.branch_analytics', compact('totalStudents', 'scheduledSessionsToday', 'totalRevenue', 'revenueData', 'revenueMonths', 'yearFilter', 'topBranches')); // Pass revenue data to the view
     }
 
-    public function getRevenueInsights()
+    public function getRevenueInsights(Request $request)
     {
+        $yearFilter = $request->input('year', Carbon::now()->year); // Default to current year if not passed
         // Fetch the transactions and group by month
         $transactions = Transaction::selectRaw('SUM(price) as total, MONTH(created_at) as month')
+            ->whereYear('created_at', $yearFilter) // Filter transactions by the selected year
             ->groupBy('month')
             ->orderBy('month')
             ->get();

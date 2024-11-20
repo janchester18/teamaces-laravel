@@ -31,21 +31,7 @@
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-bell"></i>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user-circle"></i> Profile
-                    </a>
-                </li>
-            </ul>
+
         </nav>
         <!-- /.navbar -->
 
@@ -160,88 +146,127 @@
             <section class="content">
                 <div class="container-fluid">
                     <!-- Analytics Overview Section -->
-                    <div class="row">
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box bg-info">
-                                <div class="inner">
-                                    <h3>{{ $totalStudents }}</h3>
-                                    <p>Total Students</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-user-graduate"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3>{{ $scheduledSessionsToday }}</h3>
-                                    <p>Scheduled Sessions Today</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box bg-warning">
-                                <div class="inner">
-                                    <h3>
-                                        <span class="d-none d-md-inline">
-                                            ₱{{ number_format($totalRevenue, 2) }} <!-- For wider screens -->
-                                        </span>
-                                        <span class="d-md-none">
-                                            @if ($totalRevenue < 1000)
-                                                ₱{{ number_format($totalRevenue, 2) }} <!-- For values less than 1k -->
-                                            @elseif ($totalRevenue < 1000000)
-                                                ₱{{ round($totalRevenue / 1000) }}k <!-- For thousands -->
-                                            @else
-                                                ₱{{ round($totalRevenue / 1000000, 1) }}M <!-- For millions -->
-                                            @endif
-                                        </span>
-                                    </h3>
-                                    <p>Revenue</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-dollar-sign"></i>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-
-                    <!-- Revenue Chart Section -->
 <div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Revenue per Month</h3>
+    <!-- Total Students Card -->
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ $totalStudents }}</h3>
+                <p>Total Students</p>
             </div>
-            <div class="card-body d-flex flex-column flex-md-row">
-                <!-- Chart -->
-                <div class="flex-grow-1 mb-3 mb-md-0"> <!-- Margin bottom for mobile view -->
-                    <canvas id="revenueChart"></canvas>
-                </div>
-                <!-- Insights for Revenue -->
-                <div class="insights-container ms-md-3" style="min-width: 300px;"> <!-- Set a min-width for insights -->
-                    <h4>LLM Generated Insights</h4>
-                    <div class="text-center">
-                        <button id="fetch-insights-button" class="btn btn-primary rounded">Get Insights</button>
-                    </div>
-                    <div id="loader" class="text-center" style="display: none;">
-                        <div class="spinner-border" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
+            <div class="icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+        </div>
+    </div>
 
-                    <p id="insights-placeholder"></p>
-                </div>
+    <!-- Scheduled Sessions Today Card -->
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ $scheduledSessionsToday }}</h3>
+                <p>Scheduled Sessions Today</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Card -->
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>
+                    <span class="d-none d-md-inline">
+                        ₱{{ number_format($totalRevenue, 2) }}
+                    </span>
+                    <span class="d-md-none">
+                        @if ($totalRevenue < 1000)
+                            ₱{{ number_format($totalRevenue, 2) }}
+                        @elseif ($totalRevenue < 1000000)
+                            ₱{{ round($totalRevenue / 1000) }}k
+                        @else
+                            ₱{{ round($totalRevenue / 1000000, 1) }}M
+                        @endif
+                    </span>
+                </h3>
+                <p>Revenue</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Enrollments Card -->
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-primary">
+            <div class="inner">
+                <h3>{{ $newEnrollments }}</h3>
+                <p>New Students' Enrollments</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Students' Enrollments Card -->
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3>{{ $existingStudentsEnrollments }}</h3>
+                <p>Existing Students' Enrollments</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-check"></i>
             </div>
         </div>
     </div>
 </div>
+
+
+                    <!-- Revenue Chart Section -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Revenue per Month</h3>
+                                </div>
+                                <div class="card-body d-flex flex-column flex-md-row">
+                                    <!-- Chart Section -->
+                                    <div class="flex-grow-1 mb-3 mb-md-0"> <!-- Margin bottom for mobile view -->
+                                        <div class="form-group d-flex align-items-center">
+                                            <label for="yearFilter" class="mr-3 mb-0">Select Year:</label>
+                                            <select id="yearFilter" class="form-control w-auto"> <!-- w-auto for smaller size -->
+                                                @foreach(range(Carbon\Carbon::now()->year, 2000) as $year)
+                                                    <option value="{{ $year }}" {{ $year == $yearFilter ? 'selected' : '' }}>
+                                                        {{ $year }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
+                                    <!-- Insights for Revenue -->
+                                    <div class="insights-container ms-md-3" style="min-width: 300px;">
+                                        <h4>LLM Generated Insights</h4>
+                                        <div class="text-center">
+                                            <button id="fetch-insights-button" class="btn btn-primary rounded">Get Insights</button>
+                                        </div>
+                                        <div id="loader" class="text-center" style="display: none;">
+                                            <div class="spinner-border" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </div>
+                                        <p id="insights-placeholder"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
 
                 </div>
@@ -271,18 +296,29 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const yearFilter = document.getElementById('yearFilter');
+
+        yearFilter.addEventListener('change', function() {
+            const selectedYear = yearFilter.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('year', selectedYear);
+            window.location.href = url.toString();
+        });
             const controller = new AbortController(); // Create an instance of AbortController
             const signal = controller.signal; // Get the signal from the controller
 
             // Fetch insights function
             const fetchInsights = async () => {
+                const selectedYear = yearFilter.value; // Get the selected year value
     // Show the loader and hide the button
     document.getElementById('loader').style.display = 'block'; // Show loader
     document.getElementById('fetch-insights-button').style.display = 'none'; // Hide the button
     document.getElementById('insights-placeholder').innerText = ''; // Clear insights placeholder
 
+
+
     try {
-        const response = await fetch('{{ route('revenue_insights') }}', { signal });
+        const response = await fetch('{{ route('revenue_insights') }}?year=' + selectedYear, { signal });
         const data = await response.json();
         document.getElementById('insights-placeholder').innerText = data.insights; // Show insights
     } catch (error) {

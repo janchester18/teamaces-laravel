@@ -43,14 +43,21 @@ class ShowApprovedController extends Controller
      */
     public function fetchSchedule($studentId)
     {
+        // Fetch schedules for the student along with the related course data
         $schedules = Schedule::where('student_id', $studentId)
-            ->with(['course']) // Assuming 'course' is the relationship defined in the Schedule model
-            ->orderBy('scheduled_date', 'asc') // Sort by scheduled_date in ascending order
+            ->with(['course:id,acronym']) // Eager load course relationship, selecting only the 'id' and 'name' columns
+            ->orderBy('scheduled_date', 'asc')
             ->get();
 
         if ($schedules->isEmpty()) {
             return response()->json(['message' => 'No schedules found for this student.'], 404);
         }
+
+        // Add the course name directly to each schedule object
+        $schedules->map(function($schedule) {
+            $schedule->course_name = $schedule->course->acronym ?? 'N/A'; // Add course name to each schedule
+            return $schedule;
+        });
 
         return response()->json($schedules);
     }

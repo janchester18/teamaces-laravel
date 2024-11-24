@@ -262,7 +262,7 @@ private function createTDCSchedules(Student $student, $courseId, $startDate, $ho
     \Log::info("Created TDC schedules for student ID: {$student->id} on {$firstSessionTime->format('Y-m-d')} and {$secondSessionTime->format('Y-m-d')}");
 }
 
-    private function scheduleWithLimit(Student $student, $courseId, $date, $hoursPerSession)
+private function scheduleWithLimit(Student $student, $courseId, $date, $hoursPerSession)
 {
     $startTimes = [
         8 => '08:00:00',
@@ -278,15 +278,18 @@ private function createTDCSchedules(Student $student, $courseId, $startDate, $ho
     $maxStudentsPerSlot = 2; // Set the limit of students per time slot
 
     foreach ($startTimes as $hour => $time) {
-        // Count how many students are already scheduled for this course, branch, and time slot
-        $studentCount = Schedule::where('course_id', $courseId)
+        // Check if there are existing schedules for this course, branch, and time slot
+        $existingSchedules = Schedule::where('course_id', $courseId)
             ->where('branch_id', $student->branch_id)
             ->whereDate('scheduled_date', $date->format('Y-m-d'))
             ->whereTime('scheduled_date', $time)
-            ->count();
+            ->get();
 
-        // If the current time slot has not reached the limit, schedule the student
-        if ($studentCount < $maxStudentsPerSlot) {
+        // Count how many students are scheduled for this slot with a status other than 'done'
+        $studentCount = $existingSchedules->where('status', '!=', 'done')->count();
+
+        // If there is space or a 'done' status, schedule the student
+        if ($studentCount < $maxStudentsPerSlot || $existingSchedules->where('status', 'done')->count() > 0) {
             Schedule::create([
                 'student_id' => $student->id,
                 'branch_id' => $student->branch_id,

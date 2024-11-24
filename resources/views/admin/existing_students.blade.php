@@ -181,9 +181,19 @@
                     <td>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</td>
                     <td>{{ $enrollment->course->name ?? 'N/A' }}</td>
                     <td>{{ $enrollment->is_package ? 'Yes' : 'No' }}</td>
-                    <td>{{ $enrollment->course->price ?? 'N/A' }}</td>
+                    <td>
+                        @if($enrollment->is_package)
+                            Package Price
+                        @else
+                            {{ $enrollment->course->price ?? 'N/A' }}
+                        @endif
+                    </td>
                     <td class="actions">
-                        <button class="btn btn-sm btn-success" onclick="approveEnrollment('{{ $enrollment->id }}')">Approve</button>
+                        <button
+                            class="btn btn-sm btn-success"
+                            onclick="approveEnrollment('{{ $enrollment->id }}', {{ $enrollment->is_package ? 'true' : 'false' }}, {{ $enrollment->is_package ? $enrollment->course->price : 'null' }})">
+                            Approve
+                        </button>
                         <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete</button>
                     </td>
                 </tr>
@@ -224,7 +234,7 @@
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-function approveEnrollment(enrollmentId) {
+function approveEnrollment(enrollmentId, isPackage, price) {
     Swal.fire({
         title: 'Approve Enrollment',
         text: "Are you sure you want to approve this enrollment?",
@@ -236,50 +246,77 @@ function approveEnrollment(enrollmentId) {
         cancelButtonText: 'No, cancel!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Prompt for the amount paid
-            Swal.fire({
-                title: 'Enter Amount Paid',
-                input: 'number',
-                inputLabel: 'Amount Paid',
-                inputPlaceholder: 'Enter the amount paid',
-                showCancelButton: true,
-                confirmButtonText: 'Approve and Pay',
-                cancelButtonText: 'Cancel',
-                preConfirm: (amountPaid) => {
-                    if (!amountPaid || amountPaid <= 0) {
-                        Swal.showValidationMessage('Please enter a valid amount');
-                        return false;
+            if (isPackage) {
+                // Automatically use the package price
+                $.ajax({
+                    url: '/approve-enrollment/' + enrollmentId,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        amount_paid: price // Use the package price directly
+                    },
+                    success: function(response) {
+                        Swal.fire(
+                            'Approved!',
+                            response.message,
+                            'success'
+                        );
+                        location.reload(); // Reload the page to refresh the table
+                    },
+                    error: function(xhr) {
+                        Swal.fire(
+                            'Error!',
+                            xhr.responseJSON.message || 'Something went wrong.',
+                            'error'
+                        );
                     }
-                    return amountPaid;
-                }
-            }).then((amountResult) => {
-                if (amountResult.isConfirmed) {
-                    // Make AJAX request to approve the enrollment and pass the amount paid
-                    $.ajax({
-                        url: '/approve-enrollment/' + enrollmentId,
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            amount_paid: amountResult.value // Include the amount paid in the data
-                        },
-                        success: function(response) {
-                            Swal.fire(
-                                'Approved!',
-                                response.message,
-                                'success'
-                            );
-                            location.reload(); // Reload the page to refresh the table
-                        },
-                        error: function(xhr) {
-                            Swal.fire(
-                                'Error!',
-                                xhr.responseJSON.message || 'Something went wrong.',
-                                'error'
-                            );
+                });
+            } else {
+                // Prompt for the amount paid
+                Swal.fire({
+                    title: 'Enter Amount Paid',
+                    input: 'number',
+                    inputLabel: 'Amount Paid',
+                    inputPlaceholder: 'Enter the amount paid',
+                    showCancelButton: true,
+                    confirmButtonText: 'Approve and Pay',
+                    cancelButtonText: 'Cancel',
+                    preConfirm: (amountPaid) => {
+                        if (!amountPaid || amountPaid <= 0) {
+                            Swal.showValidationMessage('Please enter a valid amount');
+                            return false;
                         }
-                    });
-                }
-            });
+                        return amountPaid;
+                    }
+                }).then((amountResult) => {
+                    if (amountResult.isConfirmed) {
+                        // Make AJAX request to approve the enrollment and pass the amount paid
+                        $.ajax({
+                            url: '/approve-enrollment/' + enrollmentId,
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                amount_paid: amountResult.value // Include the amount paid in the data
+                            },
+                            success: function(response) {
+                                Swal.fire(
+                                    'Approved!',
+                                    response.message,
+                                    'success'
+                                );
+                                location.reload(); // Reload the page to refresh the table
+                            },
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Error!',
+                                    xhr.responseJSON.message || 'Something went wrong.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            }
         } else {
             Swal.fire(
                 'Cancelled',

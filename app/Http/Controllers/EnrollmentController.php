@@ -25,7 +25,7 @@ class EnrollmentController extends Controller
         $students = Student::with('courses')->get();
 
         // Fetch students along with their courses
-        $branches = Branch::all();
+        $branches = Branch::where('status', 'active')->get();
 
         // Fetch courses from the database
         $courses = Course::all(); // Fetch all courses from the database

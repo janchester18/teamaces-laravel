@@ -51,7 +51,10 @@ class ExistingStudentController extends Controller
         // Create schedules and transaction entries for the student
         $student = Student::find($enrollment->student_id);
         $this->createSchedules($student, $enrollment->course_id);
-        $this->createTransaction($student, $enrollment->course_id, $enrollment->package_id, $request->amount_paid, $newBalance);
+        // Only create a transaction if the course is not part of a package
+        if ($enrollment->is_package == 0) {
+            $this->createTransaction($student, $enrollment->course_id, $enrollment->package_id, $request->amount_paid, $newBalance);
+        }
 
         return response()->json(['message' => 'Enrollment approved successfully, schedules and transaction created.']);
     }
@@ -140,24 +143,27 @@ class ExistingStudentController extends Controller
         16 => '16:00:00',
     ];
 
-    $maxStudentsPerSlot = 2; // Limit of students per time slot
+    $maxStudentsPerSlot = 2; // Set the limit of students per time slot
 
     foreach ($startTimes as $hour => $time) {
-        // Count students already scheduled for this time slot, course, and branch
-        $studentCount = Schedule::where('course_id', $courseId)
+        // Check if there are existing schedules for this course, branch, and time slot
+        $existingSchedules = Schedule::where('course_id', $courseId)
             ->where('branch_id', $student->branch_id)
             ->whereDate('scheduled_date', $date->format('Y-m-d'))
             ->whereTime('scheduled_date', $time)
-            ->count();
+            ->get();
 
-        // If there's an available slot, schedule the student
-        if ($studentCount < $maxStudentsPerSlot) {
+        // Count how many students are scheduled for this slot with a status other than 'done'
+        $studentCount = $existingSchedules->where('status', '!=', 'done')->count();
+
+        // If there is space or a 'done' status, schedule the student
+        if ($studentCount < $maxStudentsPerSlot || $existingSchedules->where('status', 'done')->count() > 0) {
             Schedule::create([
                 'student_id' => $student->id,
                 'branch_id' => $student->branch_id,
                 'course_id' => $courseId,
                 'scheduled_date' => $date->setTime($hour, 0),
-                'schedule_finish' => $date->copy()->addHours($hoursPerSession),
+                'schedule_finish' => $date->copy()->addHours($hoursPerSession), // Ensure finish time is set correctly
                 'status' => 'pending',
             ]);
 
@@ -167,7 +173,6 @@ class ExistingStudentController extends Controller
 
     return false; // No available slots found
 }
-
 
     // Function to create a transaction entry
     private function createTransaction(Student $student, $courseId, $packageId = null, $amountPaid, $newBalance)

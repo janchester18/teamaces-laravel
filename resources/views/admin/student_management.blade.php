@@ -161,7 +161,9 @@
         </div>
 
         <!-- Add Student Button on the right -->
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">Add Student</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+            <i class="fas fa-user-plus"></i> Add Student
+        </button>
     </div>
     <div class="table-responsive">
         <table class="table">
@@ -203,8 +205,12 @@
 
 
                         <td class="actions">
-                            <a href="{{ route('students.show', ['student' => $student->id]) }}" class="btn btn-sm btn-primary">Edit Schedule</a>
-                            <button class="btn btn-sm btn-warning">Update Progress</button>
+                            <a href="{{ route('students.show', ['student' => $student->id]) }}" class="btn btn-sm btn-primary mb-2">
+                                <i class="fas fa-edit"></i> Edit Schedule
+                            </a>
+                            <button class="btn btn-sm btn-warning">
+                                <i class="fas fa-arrow-up"></i> Update Progress
+                            </button>
                         </td>
                     </tr>
                 @endforeach
@@ -227,34 +233,47 @@
                 <div class="modal-body">
                     <form id="addStudentForm">
                         @csrf <!-- CSRF token for Laravel form submission security -->
+
+                        <!-- First Name Field -->
                         <div class="mb-3">
                             <label for="firstName" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="firstName" name="first_name" placeholder="Enter first name" required>
+                            <input type="text" class="form-control" id="firstName" name="first_name" placeholder="Enter first name" required pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" aria-label="First name">
                         </div>
+
+                        <!-- Last Name Field -->
                         <div class="mb-3">
                             <label for="lastName" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Enter last name" required>
+                            <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Enter last name" required pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" aria-label="Last name">
                         </div>
+
+                        <!-- Date of Birth Field -->
                         <div class="mb-3">
                             <label for="dob" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" id="dob" name="dob" required>
+                            <input type="date" class="form-control" id="dob" name="dob" required max="2004-12-31" aria-label="Date of Birth">
                         </div>
+
+                        <!-- Address Field -->
                         <div class="mb-3">
                             <label for="address" class="form-label">Address</label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" required>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" required aria-label="Address">
                         </div>
+
+                        <!-- Phone Number Field -->
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone Number</label>
-                            <input type="text" class="form-control" id="phone" name="phone_number" placeholder="Enter phone number" required>
+                            <input type="text" class="form-control" id="phone" name="phone_number" placeholder="Enter phone number" required pattern="\d{11}" title="Phone number must be 11 digits" aria-label="Phone number">
                         </div>
+
+                        <!-- Email Field -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Active Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required aria-label="Email address">
                         </div>
+
                         <!-- Course Selection Field -->
                         <div class="mb-3">
                             <label for="course" class="form-label">Course</label>
-                            <select class="form-select" id="course" name="course_id">
+                            <select class="form-select" id="course" name="course_id" required aria-label="Course">
                                 <option value="" selected>Select a course</option>
                                 @foreach($courses as $course)
                                     <option value="{{ $course->id }}">
@@ -263,10 +282,11 @@
                                 @endforeach
                             </select>
                         </div>
+
                         <!-- Package Selection Field -->
                         <div class="mb-3">
                             <label for="package" class="form-label">Package</label>
-                            <select class="form-select" id="package" name="package_id">
+                            <select class="form-select" id="package" name="package_id" aria-label="Package">
                                 <option value="" selected>Select a package</option>
                                 @foreach($packages as $package)
                                     <option value="{{ $package->id }}">
@@ -275,14 +295,19 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <!-- Amount Paid Field -->
                         <div class="mb-3">
                             <label for="amountPaid" class="form-label">Amount Paid</label>
-                            <input type="number" class="form-control" id="amountPaid" name="amount_paid" placeholder="Enter amount paid" min="0" step="0.01" required>
+                            <input type="number" class="form-control" id="amountPaid" name="amount_paid" placeholder="Enter amount paid" min="0" step="0.01" required aria-label="Amount Paid">
                         </div>
+
+                        <!-- Submit Button -->
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary">Add Student</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Add Student</button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -303,6 +328,7 @@
                     <thead>
                         <tr>
                             <th>Scheduled Date</th>
+                            <th>Course</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -512,6 +538,7 @@ document.getElementById('package').addEventListener('change', function() {
                     $('#modalScheduleBody').append(`
                         <tr>
                             <td>${schedule.scheduled_date}</td>
+                            <td>${schedule.course_name || 'N/A'}</td> <!-- Added course column -->
                             <td>
                                 <select class="form-control" onchange="updateScheduleStatus(${schedule.id}, this.value)">
                                     <option value="pending" ${schedule.status === 'pending' ? 'selected' : ''}>Pending</option>

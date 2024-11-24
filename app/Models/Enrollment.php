@@ -47,14 +47,17 @@ class Enrollment extends Model
         parent::boot();
 
         self::creating(function ($model) {
-            $currentYear = date('y');
-            $randomNumber = sprintf('%05d', mt_rand(0, 99999));
-            $model->id = $currentYear . '-' . $randomNumber;
-
-            while (self::where('id', $model->id)->exists()) {
+            do {
+                // Generate the unique ID
+                $currentYear = date('y');
                 $randomNumber = sprintf('%05d', mt_rand(0, 99999));
                 $model->id = $currentYear . '-' . $randomNumber;
-            }
+
+                // Check if the ID already exists in both enrollments and students tables
+                $idExistsInEnrollments = self::where('id', $model->id)->exists();
+                $idExistsInStudents = \App\Models\Student::where('id', $model->id)->exists();
+
+            } while ($idExistsInEnrollments || $idExistsInStudents);
         });
     }
 }

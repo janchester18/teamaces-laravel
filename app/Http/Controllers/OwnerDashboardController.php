@@ -26,8 +26,10 @@ class OwnerDashboardController extends Controller
         // Get today's date
         $today = Carbon::today();
 
-        // Count how many students have scheduled sessions today in the schedules table
-        $scheduledSessionsToday = Schedule::whereDate('scheduled_date', $today)->count();
+        // Count how many students have scheduled sessions today with a status of 'pending' without filtering by branch_id
+        $scheduledSessionsToday = Schedule::whereDate('scheduled_date', $today)
+        ->where('status', 'pending') // Filter by 'pending' status
+        ->count();
 
         // Sum the total revenue from the transactions table
         $totalRevenue = Transaction::sum('price');

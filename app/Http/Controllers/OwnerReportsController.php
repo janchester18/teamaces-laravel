@@ -33,7 +33,11 @@ class OwnerReportsController extends Controller
 
         // Calculate age and group them
         foreach ($students as $student) {
-            $age = $currentDate->diffInYears(Carbon::parse($student->dob));
+                    // Parse the student's date of birth
+        $dob = Carbon::parse($student->dob);
+
+        // Calculate the age using Carbon's age method (more reliable than diffInYears)
+        $age = $dob->age;
 
             if ($age <= 17) {
                 $ageGroups['0-17']++;
@@ -51,13 +55,14 @@ class OwnerReportsController extends Controller
         }
 
         // Fetch popular courses
-        $popularCourses = DB::table('student_courses')
-            ->join('courses', 'student_courses.course_id', '=', 'courses.id') // Join with the courses table
-            ->select('courses.name as course_name', DB::raw('count(*) as total'))
-            ->groupBy('courses.name') // Group by course name instead of course ID
-            ->orderBy('total', 'desc')
-            ->take(5) // Adjust the number of courses displayed as needed
-            ->get();
+        $popularCourses = DB::table('transactions')
+        ->leftJoin('courses', 'transactions.course_id', '=', 'courses.id') // Join with courses
+        ->leftJoin('course_package', 'transactions.course_id', '=', 'course_package.course_id') // Join with course_package
+        ->whereNotNull('courses.name') // Remove rows with NULL course names
+        ->select('courses.name as course_name', DB::raw('count(*) as total')) // Select course name and count
+        ->groupBy('courses.name') // Group by course name
+        ->orderByDesc('total') // Order by total count in descending order
+        ->get(); // Execute the query and retrieve the results
 
         return view('owner.owner-reports', compact('ageGroups', 'popularCourses'));
     }

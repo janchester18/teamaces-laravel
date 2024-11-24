@@ -30,21 +30,27 @@ class DashboardController extends Controller
         // Get today's date
         $today = Carbon::today();
 
-        // Count how many students have scheduled sessions today in the schedules table
+        // Count how many students have scheduled sessions today with a status of 'pending' in the schedules table
         $scheduledSessionsToday = Schedule::where('branch_id', $branchId)
             ->whereDate('scheduled_date', $today)
+            ->where('status', 'pending') // Filter by 'pending' status
             ->count();
 
-        // Sum the revenue from the transactions table for the current user's branch
-        $totalRevenue = Transaction::where('branch_id', $branchId)->sum('price');
+        // Calculate the total revenue for the current user's branch
+        $totalRevenue = Transaction::where('branch_id', $branchId)
+            ->sum(DB::raw('price - balance'));
 
         // Fetch revenue per month for the selected year
-        $monthlyRevenue = Transaction::select(DB::raw('SUM(price) as total_revenue'), DB::raw('MONTH(created_at) as month'))
+        $monthlyRevenue = Transaction::select(
+            DB::raw('SUM(price - COALESCE(balance, 0)) as total_revenue'), // Subtract balance from price
+            DB::raw('MONTH(created_at) as month')
+        )
         ->where('branch_id', $branchId)
         ->whereYear('created_at', $yearFilter)
         ->groupBy('month')
         ->orderBy('month')
         ->pluck('total_revenue', 'month');
+
 
         // Prepare data for the chart
         $months = range(1, 12); // Months from January to December

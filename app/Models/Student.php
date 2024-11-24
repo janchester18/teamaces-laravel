@@ -48,5 +48,10 @@ class Student extends Authenticatable
     {
         return $this->hasMany(StudentCourse::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }
 

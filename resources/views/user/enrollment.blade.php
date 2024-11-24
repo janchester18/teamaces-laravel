@@ -334,7 +334,7 @@
     </nav>
 
     <div id="form-container" class="container">
-        <h2 class="mb-4"><strong>Register Now!</strong></h2>
+        <h2 class="mb-4"><strong>Enroll Now!</strong></h2>
 
         <!-- Start of the form -->
         <form action="{{ route('enrollment.store') }}" method="POST">
@@ -359,42 +359,58 @@
                     @endforeach
                 </select>
             </div>
+<!-- First Name and Last Name Fields -->
+<div class="row mb-3">
+    <div class="col">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" class="form-control" id="firstName" name="first_name" placeholder="Enter first name" required pattern="[A-Za-z\s]+" title="First name can only contain letters and spaces.">
+        <div class="invalid-feedback">
+            Please enter a valid first name (only letters and spaces).
+        </div>
+    </div>
+    <div class="col">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Enter last name" required pattern="[A-Za-z\s]+" title="Last name can only contain letters and spaces.">
+        <div class="invalid-feedback">
+            Please enter a valid last name (only letters and spaces).
+        </div>
+    </div>
+</div>
 
-            <!-- First Name and Last Name Fields -->
-            <div class="row mb-3">
-                <div class="col">
-                    <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="firstName" name="first_name" placeholder="Enter first name" required>
-                </div>
-                <div class="col">
-                    <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Enter last name" required>
-                </div>
-            </div>
+<!-- Date of Birth Field -->
+<div class="mb-3">
+    <label for="dob" class="form-label">Date of Birth</label>
+    <input type="date" class="form-control" id="dob" name="dob" required max="2004-12-31" title="You must be at least 16 years old.">
+    <div class="invalid-feedback">
+        Please select a valid date of birth.
+    </div>
+</div>
 
-            <!-- Date of Birth Field -->
-            <div class="mb-3">
-                <label for="dob" class="form-label">Date of Birth</label>
-                <input type="date" class="form-control" id="dob" name="dob" required>
-            </div>
+<!-- Address Field -->
+<div class="mb-3">
+    <label for="address" class="form-label">Address</label>
+    <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" required pattern="[A-Za-z0-9\s,.-]+" title="Address should contain letters, numbers, spaces, and common punctuation marks.">
+    <div class="invalid-feedback">
+        Please enter a valid address (letters, numbers, spaces, and punctuation).
+    </div>
+</div>
 
-            <!-- Address Field -->
-            <div class="mb-3">
-                <label for="address" class="form-label">Address</label>
-                <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" required>
-            </div>
+<!-- Phone Number Field -->
+<div class="mb-3">
+    <label for="phoneNumber" class="form-label">Phone Number</label>
+    <input type="tel" class="form-control" id="phoneNumber" name="phone_number"
+           placeholder="Enter phone number (11 digits)"
+           pattern="^\d{11}$" title="Phone number must be exactly 11 digits" required>
+</div>
 
-            <!-- Phone Number Field -->
-            <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneNumber" name="phone_number" placeholder="Enter phone number" required>
-            </div>
-
-            <!-- Active Email Address Field -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Active Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
-            </div>
+<!-- Active Email Address Field -->
+<div class="mb-3">
+    <label for="email" class="form-label">Active Email Address</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address (e.g., user@example.com)">
+    <div class="invalid-feedback">
+        Please enter a valid email address.
+    </div>
+</div>
 
                         <!-- Course Selection Field -->
                         <div class="mb-3">
@@ -457,7 +473,7 @@
 
             <!-- Submit Button -->
             <div class="button-container">
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" class="btn btn-primary">Enroll</button>
             </div>
         </form>
 
@@ -547,6 +563,69 @@
         }
     });
     </script>
+
+<script>
+    // Bootstrap form validation
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    var formValid = true;
+
+                    // Check phone number validity
+                    var phoneNumber = form.querySelector('#phoneNumber');
+                    if (phoneNumber && !phoneNumber.checkValidity()) {
+                        phoneNumber.classList.add('is-invalid'); // Add Bootstrap's invalid class
+                        formValid = false;
+                    } else {
+                        phoneNumber.classList.remove('is-invalid'); // Remove invalid class if valid
+                    }
+
+                    // Check first name validity
+                    var firstName = form.querySelector('#firstName');
+                    if (firstName && !firstName.checkValidity()) {
+                        firstName.classList.add('is-invalid');
+                        formValid = false;
+                    } else {
+                        firstName.classList.remove('is-invalid');
+                    }
+
+                    // Check last name validity
+                    var lastName = form.querySelector('#lastName');
+                    if (lastName && !lastName.checkValidity()) {
+                        lastName.classList.add('is-invalid');
+                        formValid = false;
+                    } else {
+                        lastName.classList.remove('is-invalid');
+                    }
+
+                    // Check date of birth validity
+                    var dob = form.querySelector('#dob');
+                    if (dob && !dob.checkValidity()) {
+                        dob.classList.add('is-invalid');
+                        formValid = false;
+                    } else {
+                        dob.classList.remove('is-invalid');
+                    }
+
+                    // If form is not valid, prevent submission
+                    if (!formValid) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    // Add 'was-validated' class to show validation feedback
+                    form.classList.add('was-validated');
+                }, false);
+            })
+    })()
+</script>
 
 </body>
 

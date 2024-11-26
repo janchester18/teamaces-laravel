@@ -380,7 +380,7 @@
 <!-- Date of Birth Field -->
 <div class="mb-3">
     <label for="dob" class="form-label">Date of Birth</label>
-    <input type="date" class="form-control" id="dob" name="dob" required max="2004-12-31" title="You must be at least 16 years old.">
+    <input type="date" class="form-control" id="dob" name="dob" required title="You must be at least 16 years old.">
     <div class="invalid-feedback">
         Please select a valid date of birth.
     </div>
@@ -532,6 +532,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <!-- Add this script before the closing </body> tag -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get today's date
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = (today.getMonth() + 1).toString().padStart(2, '0');
+            var day = today.getDate().toString().padStart(2, '0');
+
+            // Calculate the max date as exactly 16 years ago
+            today.setFullYear(today.getFullYear() - 16); // Subtract 16 years
+            var maxDate = today.toISOString().split('T')[0];  // Format to YYYY-MM-DD
+
+            // Set the max date to 16 years ago, no dates after that
+            var dobInput = document.getElementById('dob');
+            dobInput.setAttribute('max', maxDate); // Max is 16 years ago from today
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var navbar = document.querySelector('.navbar');

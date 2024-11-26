@@ -337,7 +337,25 @@
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" required>
+                        <input type="email"
+                               class="form-control"
+                               id="email"
+                               name="email"
+                               placeholder="Enter your email address"
+                               required
+                               pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                               title="Please enter a valid email address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text"
+                               class="form-control"
+                               id="phone_number"
+                               name="phone_number"
+                               placeholder="Enter your phone number (11 digits)"
+                               required
+                               pattern="^09\d{9}$"
+                               title="Please enter a valid 11-digit phone number starting with 09.">
                     </div>
                     <div class="mb-3">
                         <label for="message" class="form-label">Message</label>
@@ -636,6 +654,7 @@
                 // Grab the form data
                 let name = $('#name').val();
                 let email = $('#email').val();
+                let phone_number = $('#phone_number').val(); // Get the phone number
                 let message = $('#message').val();
 
                 $.ajax({
@@ -645,6 +664,7 @@
                         _token: '{{ csrf_token() }}', // CSRF token for security
                         name: name,
                         email: email,
+                        phone_number: phone_number, // Add the phone number
                         message: message,
                     },
                     success: function(response) {
@@ -672,6 +692,7 @@
             });
         });
     </script>
+
 
 </body>
 

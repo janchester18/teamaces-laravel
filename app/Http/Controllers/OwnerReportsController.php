@@ -56,13 +56,21 @@ class OwnerReportsController extends Controller
 
         // Fetch popular courses
         $popularCourses = DB::table('transactions')
-        ->leftJoin('courses', 'transactions.course_id', '=', 'courses.id') // Join with courses
-        ->leftJoin('course_package', 'transactions.course_id', '=', 'course_package.course_id') // Join with course_package
-        ->whereNotNull('courses.name') // Remove rows with NULL course names
-        ->select('courses.name as course_name', DB::raw('count(*) as total')) // Select course name and count
-        ->groupBy('courses.name') // Group by course name
+        ->leftJoin('courses', 'transactions.course_id', '=', 'courses.id') // Join with courses to get course names
+        ->leftJoin('course_package', 'transactions.package_id', '=', 'course_package.package_id') // Join with course_package to get courses in packages
+        ->leftJoin('courses as package_courses', 'course_package.course_id', '=', 'package_courses.id') // Join again to get course names in the package
+        ->where(function ($query) {
+            $query->whereNotNull('transactions.course_id') // Consider transactions with courses
+                  ->orWhereNotNull('transactions.package_id'); // or those with packages
+        })
+        ->select(
+            DB::raw('IFNULL(courses.name, package_courses.name) as course_name'), // If the transaction is for a course, get its name; otherwise, get the course name in the package
+            DB::raw('count(DISTINCT transactions.id) as total') // Count distinct transactions
+        )
+        ->groupBy(DB::raw('IFNULL(courses.name, package_courses.name)')) // Group by course name (from either course or package)
         ->orderByDesc('total') // Order by total count in descending order
-        ->get(); // Execute the query and retrieve the results
+        ->get();
+
 
         return view('owner.owner-reports', compact('ageGroups', 'popularCourses'));
     }

@@ -566,7 +566,8 @@
                 { "data": "balance", "render": function(data) {
                     return `<span style="color: ${data == 0.00 ? 'green' : 'red'}">${data}</span>`;
                 }},
-            ]
+            ],
+            "order": [[6, 'desc']] // Sort by 'created_at' column (index 6) in descending order
         }).buttons().container().appendTo('#ownerTransactionsTable_wrapper .col-md-6:eq(0)');
 
         // Reload data on date range change
@@ -575,6 +576,7 @@
         });
     });
 </script>
+
 
 
 </body>

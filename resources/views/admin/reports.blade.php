@@ -730,48 +730,65 @@ document.getElementById('generateCourseInsights').addEventListener('click', func
     </script>
 
 <script>
-$(document).ready(function() {
-    $('#transactionsTable').DataTable({
-        "responsive": true,
-        "lengthChange": false,
-        "autoWidth": false,
-        "buttons": ["copy", "csv", "excel", "pdf", "print"],
-        dom: 'Bfrtip', // 'B' here enables the Buttons to display at the top
-        "ajax": {
-            "url": "{{ route('transactions.branch') }}",
-            "data": function(d) {
-                // Pass date range filters as additional parameters
-                d.start_date = $('#startDate').val();
-                d.end_date = $('#endDate').val();
+    $(document).ready(function() {
+        // Initialize DataTable first
+        var table = $('#transactionsTable').DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print"],
+            dom: 'Bfrtip', // 'B' here enables the Buttons to display at the top
+            "ajax": {
+                "url": "{{ route('transactions.branch') }}",
+                "data": function(d) {
+                    // Pass date range filters as additional parameters
+                    d.start_date = $('#startDate').val();
+                    d.end_date = $('#endDate').val();
+                },
+                "dataSrc": function(response) {
+                    // If response.data exists, return the data, otherwise return the full response
+                    return response.data || response;
+                }
             },
-            "dataSrc": "" // Specify data source for response array
-        },
-        "columns": [
-            { "data": "student_id" },
-            { "data": "student_name" },
-            { "data": "course_package" },
-            { "data": "price" },
-            { "data": "balance", "render": function(data) {
-                return `<span style="color: ${data == 0.00 ? 'green' : 'red'}">${data}</span>`;
-            }},
-            { "data": "payment_method" },
-            { "data": "processed_by" },
-            { "data": "created_at" },
-            { "data": "balance", "render": function(data, type, row) {
-                return data != 0.00
-                    ? `<button class="btn btn-warning btn-sm" data-student-id="${row.student_id}" data-price="${data}">Update Payment</button>`
-                    : '';
-            }}
-        ]
-    }).buttons().container().appendTo('#transactionsTable_wrapper .col-md-6:eq(0)');
+            "columns": [
+                { "data": "student_id" },
+                { "data": "student_name" },
+                { "data": "course_package" },
+                { "data": "price" },
+                { "data": "balance", "render": function(data) {
+                    return `<span style="color: ${data == 0.00 ? 'green' : 'red'}">${data}</span>`;
+                }},
+                { "data": "payment_method" },
+                { "data": "processed_by" },
+                { "data": "created_at" },
+                { "data": "balance", "render": function(data, type, row) {
+                    return data != 0.00
+                        ? `<button class="btn btn-warning btn-sm" data-student-id="${row.student_id}" data-price="${data}">
+                                <i class="fas fa-edit"></i> Update Payment
+                            </button>`
+                        : '';
+                }}
+            ],
+            "order": [[7, 'desc']] // Sort by the 'created_at' column (index 7) in descending order
+        }).buttons().container().appendTo('#transactionsTable_wrapper .col-md-6:eq(0)');
 
+        // Attach event listener for date range change AFTER DataTable is initialized
+        $('#startDate, #endDate').on('change', function() {
+            // Reload the table when the date range changes
+            table.ajax.reload(null, false);  // false will preserve the current pagination
+        });
 
-    // Reload data on date range change
-    $('#startDate, #endDate').change(function() {
-        $('#transactionsTable').DataTable().ajax.reload();
+        // Optionally, initialize with the current date range to show initial data
+        // You can set default values for #startDate and #endDate here if needed
+        if ($('#startDate').val() && $('#endDate').val()) {
+            table.ajax.reload();
+        }
     });
-});
-  </script>
+</script>
+
+
+
+
 
 </body>
 

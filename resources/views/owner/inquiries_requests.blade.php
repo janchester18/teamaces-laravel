@@ -143,6 +143,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Phone Number</th>
                                 <th>Message</th>
                                 <th>Status</th>
                                 <th>Created At</th>
@@ -154,6 +155,7 @@
                             <tr>
                                 <td>{{ $inquiry->name }}</td>
                                 <td>{{ $inquiry->email }}</td>
+                                <td>{{ $inquiry->phone_number }}</td>
                                 <td>{{ $inquiry->message }}</td>
                                 <td>{{ ucfirst($inquiry->status) }}</td>
                                 <td>{{ $inquiry->created_at->format('Y-m-d') }}</td>

@@ -258,17 +258,19 @@
                                         <td>{{ $enrollment->created_at->format('Y-m-d H:i:s') }}</td>
                                         <td class="actions">
                                             <button class="btn btn-sm btn-success"
-                                            onclick="confirmPayment('{{ $enrollment->id }}',
-                                                                    @if($enrollment->course) {{ $enrollment->course->price }}
-                                                                    @elseif($enrollment->package) {{ $enrollment->package->price }}
-                                                                    @else 0 @endif,
-                                                                    '{{ $enrollment->payment_method }}')">
-                                        Confirm Payment
-                                    </button>
+                                                onclick="confirmPayment('{{ $enrollment->id }}',
+                                                                        @if($enrollment->course) {{ $enrollment->course->price }}
+                                                                        @elseif($enrollment->package) {{ $enrollment->package->price }}
+                                                                        @else 0 @endif,
+                                                                        '{{ $enrollment->payment_method }}')">
+                                                <i class="fas fa-check-circle"></i> Confirm Payment
+                                            </button>
                                             <button class="btn btn-sm btn-danger"
-                                                onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete
-                                                Enrollment</button> <!-- Delete button -->
+                                                onclick="deleteEnrollment('{{ $enrollment->id }}')">
+                                                <i class="fas fa-trash-alt"></i> Delete Enrollment
+                                            </button>
                                         </td>
+
                                     </tr>
                                 @endforeach
                             </tbody>

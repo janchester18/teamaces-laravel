@@ -12,14 +12,16 @@ class InquiryController extends Controller
         // Validate the input
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'message' => 'required|string',
+            'email' => 'required|email|max:255',
+            'phone_number' => 'required|regex:/^09\d{9}$/', // Validate Philippine 11-digit number starting with 09
+            'message' => 'required|string|max:1000',
         ]);
 
         // Create the inquiry
         Inquiry::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
+            'phone_number' => $validatedData['phone_number'], // Add the phone number
             'message' => $validatedData['message'],
             'status' => Inquiry::STATUS_PENDING, // Set the default status as 'pending'
         ]);
@@ -27,6 +29,7 @@ class InquiryController extends Controller
         // Return a success response
         return response()->json(['message' => 'Inquiry submitted successfully!'], 200);
     }
+
 
     public function index()
     {

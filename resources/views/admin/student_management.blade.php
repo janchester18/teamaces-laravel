@@ -249,7 +249,7 @@
                         <!-- Date of Birth Field -->
                         <div class="mb-3">
                             <label for="dob" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" id="dob" name="dob" required max="2004-12-31" aria-label="Date of Birth">
+                            <input type="date" class="form-control" id="dob" name="dob" required aria-label="Date of Birth">
                         </div>
 
                         <!-- Address Field -->
@@ -273,7 +273,7 @@
                         <!-- Course Selection Field -->
                         <div class="mb-3">
                             <label for="course" class="form-label">Course</label>
-                            <select class="form-select" id="course" name="course_id" required aria-label="Course">
+                            <select class="form-select" id="course" name="course_id" aria-label="Course">
                                 <option value="" selected>Select a course</option>
                                 @foreach($courses as $course)
                                     <option value="{{ $course->id }}">
@@ -367,6 +367,23 @@
     </script>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get today's date
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = (today.getMonth() + 1).toString().padStart(2, '0');
+            var day = today.getDate().toString().padStart(2, '0');
+
+            // Calculate the max date as exactly 16 years ago
+            today.setFullYear(today.getFullYear() - 16); // Subtract 16 years
+            var maxDate = today.toISOString().split('T')[0];  // Format to YYYY-MM-DD
+
+            // Set the max date to 16 years ago, no dates after that
+            var dobInput = document.getElementById('dob');
+            dobInput.setAttribute('max', maxDate); // Max is 16 years ago from today
+        });
+    </script>
     <script>
   document.getElementById('addStudentForm').addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent the default form submission

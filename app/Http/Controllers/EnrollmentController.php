@@ -144,7 +144,7 @@ class EnrollmentController extends Controller
                 $message->subject('Enrollment Under Processing');
             });
         } else {
-            Mail::raw("Please proceed to your branch of enrollment to settle the payment. Thank you.", function ($message) use ($enrollment) {
+            Mail::raw("Please proceed to your branch of enrollment to settle the payment within 48 hours. Thank you.", function ($message) use ($enrollment) {
                 $message->to($enrollment->email);
                 $message->subject('Walk-in Payment Instructions');
             });
@@ -201,7 +201,7 @@ class EnrollmentController extends Controller
             ]),
             'headers' => [
                 'accept' => 'application/json',
-                'authorization' => 'Basic c2tfdGVzdF9LUjNwd1lOd0d0cTZkRkNzU3RUWUV3SHg6',
+                'authorization' => 'Basic c2tfbGl2ZV9CWkxRenZQUmJXWUpqbUxCc2RRWE0yQ3Y6',
                 'content-type' => 'application/json',
             ]
         ]);

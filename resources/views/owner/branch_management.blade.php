@@ -150,7 +150,7 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>#</th>
                                 <th>Name</th>
                                 <th>Address</th>
                                 <th>Latitude</th>
@@ -162,7 +162,7 @@
                         <tbody>
                             @foreach ($branches as $branch)
                                 <tr>
-                                    <td>{{ $branch->id }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $branch->name }}</td>
                                     <td>{{ $branch->address }}</td>
                                     <td>{{ $branch->latitude }}</td>

@@ -192,9 +192,11 @@
                         <button
                             class="btn btn-sm btn-success"
                             onclick="approveEnrollment('{{ $enrollment->id }}', {{ $enrollment->is_package ? 'true' : 'false' }}, {{ $enrollment->is_package ? $enrollment->course->price : 'null' }})">
-                            Approve
+                            <i class="fas fa-check-circle"></i> Approve
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">Delete</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteEnrollment('{{ $enrollment->id }}')">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
                     </td>
                 </tr>
                 @endforeach

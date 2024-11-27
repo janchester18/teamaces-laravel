@@ -97,7 +97,7 @@ class OwnerReportsController extends Controller
         $formattedDataString = implode(', ', $formattedData);
 
         // Create the prompt for the API
-        $prompt = "Here is the student demographics data: $formattedDataString. Generate a 3-sentence business insights based on this data. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Focus on marketing strategies that could be beneficial based on the demographics.";
+        $prompt = "Analyze the student demographics data from the bar chart for TeamAces Driving Academy: $formattedDataString, focusing on enrollment trends across different groups. Identify the most and least represented demographics and provide targeted marketing strategies to attract underrepresented groups or strengthen engagement with dominant ones. Exclude introductory sentences and structure the output as a single concise paragraph with actionable insights and recommendations.";
 
         // Call the API to generate insights
         $client = new Client();
@@ -111,7 +111,7 @@ class OwnerReportsController extends Controller
                     'Authorization' => "Bearer $apiKey"
                 ],
                 'json' => [
-                    'model' => 'Meta-Llama-3.1-8B-Instruct',
+                    'model' => 'Mistral-Nemo-12B-Instruct-2407',
                     'messages' => [
                         ['role' => 'system', 'content' => 'You are a helpful business analyst.'],
                         ['role' => 'user', 'content' => $prompt]
@@ -164,7 +164,7 @@ class OwnerReportsController extends Controller
         Log::info('Formatted Data String for API Prompt:', ['formatted_data' => $formattedDataString]);
 
         // Create the prompt for the API
-        $prompt = "Here is the popular courses data: $formattedDataString. Generate a 3-sentence business insights based on this data. This data is the number of students per course and it is a pie chart, dont use percentages only use exact values if you want to mention it, you may choose not to. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Focus on marketing strategies that could be beneficial based on the demographics.";
+        $prompt = "Analyze the number of students enrolled per course at TeamAces Driving Academy in a pie chart: $formattedDataString, focusing on exact enrollment values to identify trends and opportunities. Highlight the most and least popular courses and suggest targeted marketing strategies to attract more students. Exclude percentages and structure the output as a single concise paragraph with actionable insights and recommendations.";
 
         // Call the API to generate insights
         $client = new Client();
@@ -178,7 +178,7 @@ class OwnerReportsController extends Controller
                     'Authorization' => "Bearer $apiKey"
                 ],
                 'json' => [
-                    'model' => 'Meta-Llama-3.1-8B-Instruct',
+                    'model' => 'Mistral-Nemo-12B-Instruct-2407',
                     'messages' => [
                         ['role' => 'system', 'content' => 'You are a helpful business analyst.'],
                         ['role' => 'user', 'content' => $prompt]

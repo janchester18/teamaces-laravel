@@ -42,4 +42,9 @@ class StudentCourse extends Model
     {
         return $this->hasMany(Schedule::class, 'course_id', 'course_id');
     }
+
+    public function package()
+    {
+        return $this->belongsTo(Package::class);
+    }
 }

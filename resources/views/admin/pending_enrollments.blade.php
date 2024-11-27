@@ -222,6 +222,7 @@
                                 <tr>
                                     <th>Student ID</th>
                                     <th>Student Name</th>
+                                    <th>Phone Number</th>
                                     <th>Course/Package</th> <!-- Combined column -->
                                     <th>Price</th> <!-- Price column -->
                                     <th>Payment Method</th> <!-- Price column -->
@@ -234,6 +235,7 @@
                                     <tr>
                                         <td>{{ $enrollment->id }}</td>
                                         <td>{{ $enrollment->first_name }} {{ $enrollment->last_name }}</td>
+                                        <td>{{ $enrollment->phone_number }}</td>
                                         <td>
                                             @if ($enrollment->course)
                                                 {{ $enrollment->course->name }} (Course)
@@ -333,6 +335,18 @@
         }
     }).then((result) => {
         if (result.isConfirmed) {
+            // Show loading screen (SweetAlert loading state)
+            Swal.fire({
+                title: 'Processing Payment...',
+                text: 'Please wait while we confirm your payment.',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(); // Show the loading spinner
+                }
+            });
+
             $.ajax({
                 url: '/confirm-payment/' + enrollmentId, // Use enrollmentId here
                 type: 'POST',
@@ -343,10 +357,12 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
+                    // Close the loading screen and show success message
                     Swal.fire('Confirmed!', response.message, 'success');
-                    location.reload();
+                    location.reload(); // Reload the page to refresh the table
                 },
                 error: function(xhr) {
+                    // Close the loading screen and show error message
                     Swal.fire('Error!', xhr.responseJSON.message || 'Something went wrong.', 'error');
                 }
             });

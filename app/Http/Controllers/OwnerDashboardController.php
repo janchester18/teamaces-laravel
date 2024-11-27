@@ -93,7 +93,7 @@ class OwnerDashboardController extends Controller
 
         $formattedDataString = implode(', ', $formattedData);
 
-        $prompt = "Here is the revenue data per month for the bar chart sales per month: $formattedDataString. Generate a 3-sentence business insights based on this graph. Don't include an introductory sentence. The business is a driving school named TeamAces Driving Academy. Don't include holidays and seasons. And provide suggestions. Again, don't include an introductory sentence or colon. The currency is Philippine pesos or pesos.";
+        $prompt = "Analyze the revenue data for TeamAces Driving Academy displayed in the bar chart for monthly sales: $formattedDataString. Interpret key trends and patterns in revenue, focusing on performance highs or lows. Exclude references to holidays, seasons, or external factors. Provide actionable recommendations for improving revenue and sustaining growth based on the data insights. Output a single concise paragraph with insights and recommendations. The currency is in philippine peso";
 
         try {
             $response = $client->post($url, [
@@ -102,7 +102,7 @@ class OwnerDashboardController extends Controller
                     'Authorization' => "Bearer $apiKey"
                 ],
                 'json' => [
-                    'model' => 'Meta-Llama-3.1-8B-Instruct',
+                    'model' => 'Mistral-Nemo-12B-Instruct-2407',
                     'messages' => [
                         ['role' => 'system', 'content' => 'You are a helpful business analyst.'],
                         ['role' => 'user', 'content' => $prompt]

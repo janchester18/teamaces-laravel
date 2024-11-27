@@ -248,6 +248,18 @@ function approveEnrollment(enrollmentId, isPackage, price) {
         cancelButtonText: 'No, cancel!'
     }).then((result) => {
         if (result.isConfirmed) {
+            // Show loading screen (SweetAlert loading state)
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we process your request.',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(); // Show the loading spinner
+                }
+            });
+
             if (isPackage) {
                 // Automatically use the package price
                 $.ajax({
@@ -258,6 +270,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                         amount_paid: price // Use the package price directly
                     },
                     success: function(response) {
+                        // Close the loading screen and show success message
                         Swal.fire(
                             'Approved!',
                             response.message,
@@ -266,6 +279,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                         location.reload(); // Reload the page to refresh the table
                     },
                     error: function(xhr) {
+                        // Close the loading screen and show error message
                         Swal.fire(
                             'Error!',
                             xhr.responseJSON.message || 'Something went wrong.',
@@ -292,6 +306,18 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                     }
                 }).then((amountResult) => {
                     if (amountResult.isConfirmed) {
+                        // Show loading screen before making AJAX request
+                        Swal.fire({
+                            title: 'Processing...',
+                            text: 'Please wait while we process your request.',
+                            icon: 'info',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading(); // Show the loading spinner
+                            }
+                        });
+
                         // Make AJAX request to approve the enrollment and pass the amount paid
                         $.ajax({
                             url: '/approve-enrollment/' + enrollmentId,
@@ -301,6 +327,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                                 amount_paid: amountResult.value // Include the amount paid in the data
                             },
                             success: function(response) {
+                                // Close the loading screen and show success message
                                 Swal.fire(
                                     'Approved!',
                                     response.message,
@@ -309,6 +336,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                                 location.reload(); // Reload the page to refresh the table
                             },
                             error: function(xhr) {
+                                // Close the loading screen and show error message
                                 Swal.fire(
                                     'Error!',
                                     xhr.responseJSON.message || 'Something went wrong.',

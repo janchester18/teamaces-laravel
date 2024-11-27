@@ -187,14 +187,20 @@
                         <td>{{ $student->email }}</td>
                         <td>{{ $student->phone_number }}</td>
                         <td>
-                            @if($student->studentCourses->isNotEmpty())
-                                {{-- Get only ongoing courses --}}
-                                @php
-                                    $ongoingCourses = $student->studentCourses->where('status', 'ongoing')->pluck('course_id');
-                                    $courseNames = $student->courses->whereIn('id', $ongoingCourses)->pluck('name');
-                                @endphp
-                                @if($courseNames->isNotEmpty())
-                                    {{ $courseNames->first() }} <!-- Display the first ongoing course only -->
+                            @php
+                                // Fetch the transaction for this student
+                                $transaction = \App\Models\Transaction::where('student_id', $student->id)
+                                    ->where('branch_id', auth()->user()->branch_id)
+                                    ->first();
+                            @endphp
+
+                            @if ($transaction)
+                                @if ($transaction->package_id)
+                                    {{-- Display the package name --}}
+                                    {{ \App\Models\Package::find($transaction->package_id)->name ?? 'N/A' }}
+                                @elseif ($transaction->course_id)
+                                    {{-- Display the course name --}}
+                                    {{ \App\Models\Course::find($transaction->course_id)->name ?? 'N/A' }}
                                 @else
                                     N/A
                                 @endif

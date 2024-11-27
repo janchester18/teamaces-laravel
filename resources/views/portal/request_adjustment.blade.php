@@ -177,6 +177,8 @@
                 <div class="mb-3">
                     <label for="new_schedule_finish" class="form-label">Calculated Finish Time</label>
                     <input type="datetime-local" name="new_schedule_finish" class="form-control" id="newScheduleFinish" readonly>
+                    <input type="hidden" name="branch_id" value="{{ $schedule->branch_id }}">
+                    <input type="hidden" name="course_id" value="{{ $schedule->course_id }}">
                 </div>
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary">Submit Adjustment Request</button>
@@ -203,7 +205,6 @@
                                 <thead>
                                     <tr>
                                         <th>Student</th>
-                                        <th>Phone Number</th>
                                         <th>Time</th>
                                         <th>Course</th>
                                     </tr>
@@ -238,7 +239,7 @@
             var eventsByDate = {};
 
             @foreach ($schedules as $schedule)
-                @if ($schedule->course_id != 1) // Check if course_id is not equal to 1
+            @if ($schedule->course_id != 1 && $schedule->course_id != 2)
                     <?php
                     // Extracting the date without the time part
                     $date = \Carbon\Carbon::parse($schedule->scheduled_date)->toDateString();
@@ -252,7 +253,6 @@
                         id: '{{ $schedule->id }}', // Add schedule ID for updates
                         extendedProps: {
                             student: '{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }}',
-                            phone: '{{ $schedule->student ? $schedule->student->phone_number : 'N/A' }}',
                             course: '{{ $schedule->course ? $schedule->course->acronym : 'N/A' }}',
                             time: '{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format('h:i A') }}',
                             status: '{{ $schedule->status }}' // Include current status
@@ -303,7 +303,6 @@
                             eventDetailsTableBody.append(`
                                 <tr>
                                     <td>${student}</td>
-                                    <td>${phone}</td>
                                     <td>${time}</td>
                                     <td>${course}</td>
                                 </tr>
@@ -344,26 +343,28 @@
 
 
 $(document).ready(function() {
-        $('#adjustmentForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
+    $('#adjustmentForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
 
-            // SweetAlert confirmation
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to submit the schedule adjustment request?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, submit it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Perform AJAX request
-                    $.ajax({
-                        url: $(this).attr('action'),
-                        type: 'POST',
-                        data: $(this).serialize(),
-                        success: function(response) {
+        // SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to submit the schedule adjustment request?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform AJAX request
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        // Check if the response contains success message
+                        if (response.success) {
                             // Show success message
                             Swal.fire(
                                 'Submitted!',
@@ -373,20 +374,28 @@ $(document).ready(function() {
                                 // Redirect to the previous view after confirmation
                                 window.location.href = '{{ route('student.dashboard') }}';
                             });
-                        },
-                        error: function(xhr) {
-                            // Show error message
+                        } else {
+                            // Handle any server-side errors or validation issues
                             Swal.fire(
                                 'Error!',
-                                'There was a problem submitting your request.',
+                                response.message || 'There was an issue submitting your request.',
                                 'error'
                             );
                         }
-                    });
-                }
-            });
+                    },
+                    error: function(xhr) {
+                        // Show error message for failed request
+                        Swal.fire(
+                            'Error!',
+                            xhr.responseJSON.message || 'There was a problem submitting your request.',
+                            'error'
+                        );
+                    }
+                });
+            }
         });
     });
+});
     </script>
 
 </body>

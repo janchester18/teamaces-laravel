@@ -39,6 +39,7 @@ class ExistingStudentController extends Controller
 
         // Update the 'is_approved' field
         $enrollment->is_approved = true; // Set to true to approve
+        $enrollment->status = 'ongoing'; // Set to status to ongoing
         $enrollment->save();
 
         // Get the student's course details

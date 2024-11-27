@@ -29,10 +29,11 @@
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/main.min.css">
     <!-- Bootstrap Datepicker CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 
-<!-- Bootstrap Datepicker JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
@@ -103,7 +104,8 @@
                                 <p>Student Management</p>
                             </a>
                         </li>
-                        <li class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
+                        <li
+                            class="nav-item has-treeview {{ request()->is('pending_enrollments*') /* || request()->is('existing_students*') */ ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user-plus"></i>
                                 <p>
@@ -113,7 +115,8 @@
                             </a>
                             <ul class="nav nav-treeview mt-0">
                                 <li class="nav-item pl-3">
-                                    <a href="{{ route('pending_enrollments') }}" class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
+                                    <a href="{{ route('pending_enrollments') }}"
+                                        class="nav-link {{ request()->routeIs('pending_enrollments') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-user-plus"></i>
                                         <p>New Students</p>
                                     </a>
@@ -174,34 +177,37 @@
                 <div id="calendar"></div>
 
                 <!-- Modal to display schedule events -->
-                <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+                <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel"
+                    aria-hidden="true">
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="eventModalLabel">Scheduled Classes</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <!-- Modal table structure -->
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Student</th>
-                                            <th>Phone Number</th>
-                                            <th>Time</th>
-                                            <th>Course</th>
-                                            <th>Status</th> <!-- New Status column -->
-                                        </tr>
-                                    </thead>
-                                    <tbody id="eventDetailsTableBody">
-                                        <!-- Event details will be injected here by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Student</th>
+                                                <th>Phone Number</th>
+                                                <th>Time</th>
+                                                <th>Course</th>
+                                                <th>Status</th> <!-- New Status column -->
+                                            </tr>
+                                        </thead>
+                                        <tbody id="eventDetailsTableBody">
+                                            <!-- Event details will be injected here by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -214,7 +220,8 @@
                     <div class="filter-section">
                         <label for="scheduleDatePicker" class="form-label">Filter by Date:</label>
                         <div class="input-group mb-3">
-                            <input type="text" id="scheduleDatePicker" class="form-control" placeholder="Select a date" autocomplete="off">
+                            <input type="text" id="scheduleDatePicker" class="form-control"
+                                placeholder="Select a date" autocomplete="off">
                             <div class="input-group-append">
                                 <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                             </div>
@@ -243,17 +250,17 @@
                         </table>
                     </div>
                 </section>
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-
-    <!-- Main Footer -->
-    <footer class="main-footer">
-        <div class="float-right d-none d-sm-inline">
+            </section>
+            <!-- /.content -->
         </div>
-        <strong>Copyright &copy; 2024 TeamAces Driving Academy.</strong> All rights reserved.
-    </footer>
+        <!-- /.content-wrapper -->
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-inline">
+            </div>
+            <strong>Copyright &copy; 2024 TeamAces Driving Academy.</strong> All rights reserved.
+        </footer>
     </div>
 
     <!-- REQUIRED SCRIPTS -->
@@ -273,7 +280,7 @@
                     status: status,
                     _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token here
                 },
-                success: function () {
+                success: function() {
                     Swal.fire({
                         icon: 'success',
                         title: 'Status Updated',
@@ -282,7 +289,7 @@
                         timer: 1500
                     });
                 },
-                error: function () {
+                error: function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Update Failed',
@@ -301,199 +308,206 @@
             // Call the update function when status is changed
             updateScheduleStatus(scheduleId, status);
         });
-        </script>
+    </script>
     <script>
-// Global variables
-var eventMap = new Map();
-var calendar; // Declare calendar in the global scope
+        // Global variables
+        var eventMap = new Map();
+        var calendar; // Declare calendar in the global scope
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Group events by date
-    var eventsByDate = {};
+        document.addEventListener('DOMContentLoaded', function() {
+            // Group events by date
+            var eventsByDate = {};
 
-    @foreach ($schedules as $schedule)
-        @if ($schedule->course_id != 1) // Check if course_id is not equal to 1
-            <?php
-                // Extracting the date without the time part
-                $date = \Carbon\Carbon::parse($schedule->scheduled_date)->toDateString();
-            ?>
-            // Add event to the respective date
-            eventsByDate['{{ $date }}'] = eventsByDate['{{ $date }}'] || [];
-            var eventObj = {
-                title: '{{ $schedule->student ? $schedule->student->first_name : "N/A" }} {{ $schedule->student ? $schedule->student->last_name : "N/A" }} - {{ $schedule->course ? $schedule->course->acronym : "N/A" }}',
-                start: '{{ $schedule->scheduled_date }}',
-                end: '{{ $schedule->schedule_finish }}',
-                id: '{{ $schedule->id }}', // Add schedule ID for updates
-                extendedProps: {
-                    student: '{{ $schedule->student ? $schedule->student->first_name : "N/A" }} {{ $schedule->student ? $schedule->student->last_name : "N/A" }}',
-                    phone: '{{ $schedule->student ? $schedule->student->phone_number : "N/A" }}',
-                    course: '{{ $schedule->course ? $schedule->course->acronym : "N/A" }}',
-                    time: '{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format("h:i A") }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format("h:i A") }}',
-                    status: '{{ $schedule->status }}' // Include current status
+            @foreach ($schedules as $schedule)
+                @if ($schedule->course_id != 1 && $schedule->course_id != 2)
+                    <?php
+                    // Extracting the date without the time part
+                    $date = \Carbon\Carbon::parse($schedule->scheduled_date)->toDateString();
+                    ?>
+                    // Add event to the respective date
+                    eventsByDate['{{ $date }}'] = eventsByDate['{{ $date }}'] || [];
+                    var eventObj = {
+                        title: '{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }} - {{ $schedule->course ? $schedule->course->acronym : 'N/A' }}',
+                        start: '{{ $schedule->scheduled_date }}',
+                        end: '{{ $schedule->schedule_finish }}',
+                        id: '{{ $schedule->id }}', // Add schedule ID for updates
+                        extendedProps: {
+                            student: '{{ $schedule->student ? $schedule->student->first_name : 'N/A' }} {{ $schedule->student ? $schedule->student->last_name : 'N/A' }}',
+                            phone: '{{ $schedule->student ? $schedule->student->phone_number : 'N/A' }}',
+                            course: '{{ $schedule->course ? $schedule->course->acronym : 'N/A' }}',
+                            time: '{{ \Carbon\Carbon::parse($schedule->scheduled_date)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->schedule_finish)->format('h:i A') }}',
+                            status: '{{ $schedule->status }}' // Include current status
+                        },
+                        classNames: '{{ $schedule->status === 'missed' ? 'event-missed' : '' }}' // Add class for missed status
+                    };
+                    eventsByDate['{{ $date }}'].push(eventObj);
+                    eventMap.set('{{ $schedule->id }}', eventObj); // Store event in the map
+                @endif
+            @endforeach
+
+            // Flatten the events for FullCalendar
+            var events = [];
+            for (const [date, dayEvents] of Object.entries(eventsByDate)) {
+                const displayedEvents = dayEvents.slice(0, 3); // Get the first 3 events
+                events.push(...displayedEvents);
+
+                if (dayEvents.length > 3) {
+                    // Add a "more+" event if there are more than 3
+                    events.push({
+                        title: `+${dayEvents.length - 3} more`,
+                        start: date,
+                        allDay: true
+                    });
                 }
-            };
-            eventsByDate['{{ $date }}'].push(eventObj);
-            eventMap.set('{{ $schedule->id }}', eventObj); // Store event in the map
-        @endif
-    @endforeach
+            }
 
-    // Flatten the events for FullCalendar
-    var events = [];
-    for (const [date, dayEvents] of Object.entries(eventsByDate)) {
-        const displayedEvents = dayEvents.slice(0, 3); // Get the first 3 events
-        events.push(...displayedEvents);
+            // Initialize FullCalendar
+            var calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+                events: events,
+                dateClick: function(info) {
+                    // Show all events for the clicked date
+                    var eventDetailsTableBody = $('#eventDetailsTableBody');
+                    eventDetailsTableBody.empty();
 
-        if (dayEvents.length > 3) {
-            // Add a "more+" event if there are more than 3
-            events.push({
-                title: `+${dayEvents.length - 3} more`,
-                start: date,
-                allDay: true
-            });
-        }
-    }
+                    // Retrieve all events for the clicked date
+                    const allEventsForTheDay = eventsByDate[info.dateStr] || [];
 
-    // Initialize FullCalendar
-    var calendarEl = document.getElementById('calendar');
-    calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        height: 'auto',
-        events: events,
-        dateClick: function (info) {
-            // Show all events for the clicked date
-            var eventDetailsTableBody = $('#eventDetailsTableBody');
-            eventDetailsTableBody.empty();
+                    if (allEventsForTheDay.length) {
+                        allEventsForTheDay.forEach(event => {
+                            const student = event.extendedProps?.student || "N/A";
+                            const phone = event.extendedProps?.phone || "N/A";
+                            const course = event.extendedProps?.course || "N/A";
+                            const time = event.extendedProps?.time || "N/A";
+                            const status = event.extendedProps?.status || "N/A"; // Get status
 
-            // Retrieve all events for the clicked date
-            const allEventsForTheDay = eventsByDate[info.dateStr] || [];
+                            const nameClass = status === 'missed' ? 'text-danger' :
+                            ''; // Apply red text for missed status
 
-            if (allEventsForTheDay.length) {
-                allEventsForTheDay.forEach(event => {
-                    const student = event.extendedProps?.student || "N/A";
-                    const phone = event.extendedProps?.phone || "N/A";
-                    const course = event.extendedProps?.course || "N/A";
-                    const time = event.extendedProps?.time || "N/A";
-                    const status = event.extendedProps?.status || "N/A"; // Get status
-
-                    eventDetailsTableBody.append(`
-                        <tr>
-                            <td>${student}</td>
-                            <td>${phone}</td>
-                            <td>${time}</td>
-                            <td>${course}</td>
-                            <td>
-                                <select class="form-select" onchange="updateScheduleStatus(${event.id}, this.value)">
-                                    <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
-                                    <option value="missed" ${status === 'missed' ? 'selected' : ''}>Missed</option>
-                                </select>
-                            </td>
-                        </tr>
-                    `);
-                });
-            } else {
-                eventDetailsTableBody.append(`
+                            eventDetailsTableBody.append(`
+                            <tr>
+                                <td class="${nameClass}">${student}</td>
+                                <td>${phone}</td>
+                                <td>${time}</td>
+                                <td>${course}</td>
+                                <td>
+                                    <select class="form-select" onchange="updateScheduleStatus(${event.id}, this.value)">
+                                        <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
+                                        <option value="missed" ${status === 'missed' ? 'selected' : ''}>Missed</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `);
+                        });
+                    } else {
+                        eventDetailsTableBody.append(`
                     <tr>
                         <td colspan="5" class="text-center">No scheduled classes for this day.</td>
                     </tr>
                 `);
-            }
+                    }
 
-            var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-            eventModal.show();
-        }
-    });
-
-    calendar.render();
-});
-
-function updateScheduleStatus(scheduleId, status) {
-    $.ajax({
-        url: `/schedules/${scheduleId}/update`, // Define your route for updating schedule
-        method: 'PUT',
-        data: {
-            status: status,
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function () {
-            Swal.fire({
-                icon: 'success',
-                title: 'Status Updated',
-                text: 'Schedule status has been updated successfully!',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                location.reload(); // Reload the page after the success message is dismissed
-            });
-
-            // Get the event by ID and update it directly
-            const eventToUpdate = eventMap.get(scheduleId);
-            if (eventToUpdate) {
-                eventToUpdate.extendedProps.status = status; // Update the status in extendedProps
-
-                // Update the calendar event title to reflect the new status
-                calendar.getEventById(scheduleId)?.setProp('title', `${eventToUpdate.extendedProps.student} - ${eventToUpdate.extendedProps.course} (${status})`);
-
-                // If the status is "done", remove it from the calendar
-                if (status === 'done') {
-                    calendar.getEventById(scheduleId)?.remove(); // Remove from calendar
-                    eventMap.delete(scheduleId); // Remove from the map
+                    var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                    eventModal.show();
                 }
-            }
-        },
-        error: function () {
-            Swal.fire({
-                icon: 'error',
-                title: 'Update Failed',
-                text: 'There was an error updating the schedule status.',
-                showConfirmButton: true
+            });
+
+            calendar.render();
+        });
+
+        function updateScheduleStatus(scheduleId, status) {
+            $.ajax({
+                url: `/schedules/${scheduleId}/update`, // Define your route for updating schedule
+                method: 'PUT',
+                data: {
+                    status: status,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: 'Schedule status has been updated successfully!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload(); // Reload the page after the success message is dismissed
+                    });
+
+                    // Get the event by ID and update it directly
+                    const eventToUpdate = eventMap.get(scheduleId);
+                    if (eventToUpdate) {
+                        eventToUpdate.extendedProps.status = status; // Update the status in extendedProps
+
+                        // Update the calendar event title to reflect the new status
+                        calendar.getEventById(scheduleId)?.setProp('title',
+                            `${eventToUpdate.extendedProps.student} - ${eventToUpdate.extendedProps.course} (${status})`
+                        );
+
+                        // If the status is "done", remove it from the calendar
+                        if (status === 'done') {
+                            calendar.getEventById(scheduleId)?.remove(); // Remove from calendar
+                            eventMap.delete(scheduleId); // Remove from the map
+                        }
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Failed',
+                        text: 'There was an error updating the schedule status.',
+                        showConfirmButton: true
+                    });
+                }
             });
         }
-    });
-}
-
     </script>
 
     <script>
-$(document).ready(function() {
-    // Initialize the Bootstrap date picker
-    $("#scheduleDatePicker").datepicker({
-        format: 'yyyy-mm-dd', // Format to match the database date format
-        autoclose: true, // Automatically close the datepicker after selection
-        todayHighlight: true // Highlight today's date
-    }).on('changeDate', function(e) {
-        // When a date is selected, fetch filtered TDC schedules
-        fetchTDCSchedules(e.format());
-    });
+        $(document).ready(function() {
+            // Initialize the Bootstrap date picker
+            $("#scheduleDatePicker").datepicker({
+                format: 'yyyy-mm-dd', // Format to match the database date format
+                autoclose: true, // Automatically close the datepicker after selection
+                todayHighlight: true // Highlight today's date
+            }).on('changeDate', function(e) {
+                // When a date is selected, fetch filtered TDC schedules
+                fetchTDCSchedules(e.format());
+            });
 
-    // Reset button functionality
-    $("#resetSchedules").click(function() {
-        $("#scheduleDatePicker").datepicker('clearDates'); // Clear the selected date
-        fetchTDCSchedules(); // Fetch all schedules
-    });
+            // Reset button functionality
+            $("#resetSchedules").click(function() {
+                $("#scheduleDatePicker").datepicker('clearDates'); // Clear the selected date
+                fetchTDCSchedules(); // Fetch all schedules
+            });
 
-    // Fetch all schedules initially when the page loads
-    fetchTDCSchedules();
+            // Fetch all schedules initially when the page loads
+            fetchTDCSchedules();
 
-    function fetchTDCSchedules(selectedDate = null) {
-        $.ajax({
-            url: "{{ route('tdc_schedules') }}",
-            method: 'GET',
-            data: {
-                date: selectedDate // Pass the selected date as a parameter
-            },
-            success: function(data) {
-                var tdcTableBody = $('#classOverviewBody');
-                tdcTableBody.empty(); // Clear the existing rows
+            function fetchTDCSchedules(selectedDate = null) {
+                $.ajax({
+                    url: "{{ route('tdc_schedules') }}",
+                    method: 'GET',
+                    data: {
+                        date: selectedDate // Pass the selected date as a parameter
+                    },
+                    success: function(data) {
+                        var tdcTableBody = $('#classOverviewBody');
+                        tdcTableBody.empty(); // Clear the existing rows
 
-                if (data.length === 0) {
-                    tdcTableBody.append('<tr><td colspan="5" class="text-center">No schedules found for this date</td></tr>');
-                    return; // Exit the function if no data is found
-                }
+                        if (data.length === 0) {
+                            tdcTableBody.append(
+                                '<tr><td colspan="5" class="text-center">No schedules found for this date</td></tr>'
+                            );
+                            return; // Exit the function if no data is found
+                        }
 
-                // Populate the table with the retrieved schedules
-                data.forEach(function(schedule) {
-                    tdcTableBody.append(`
+                        // Populate the table with the retrieved schedules
+                        data.forEach(function(schedule) {
+                            tdcTableBody.append(`
                         <tr>
                             <td>${schedule.scheduled_date}</td>
                             <td>${schedule.student.first_name} ${schedule.student.last_name}</td>
@@ -508,15 +522,15 @@ $(document).ready(function() {
                             </td>
                         </tr>
                     `);
+                        });
+                    },
+                    error: function() {
+                        alert('Failed to fetch TDC schedules.');
+                    }
                 });
-            },
-            error: function() {
-                alert('Failed to fetch TDC schedules.');
             }
         });
-    }
-});
-</script>
+    </script>
 
 
 </body>

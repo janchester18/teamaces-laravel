@@ -317,3 +317,9 @@ button.dt-button,
 .dataTables_wrapper .dt-buttons {
     margin-bottom: 10px;
 }
+
+.event-missed {
+    background-color: red !important;
+    color: white !important;
+    border: none;
+}

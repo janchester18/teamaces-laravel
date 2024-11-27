@@ -43,6 +43,7 @@ class StudentRequestAdjustmentController extends Controller
         $schedules = Schedule::with(['student', 'course']) // Eager load student and course
             ->where('branch_id', $studentBranchId)
             ->where('status', '!=', 'done') // Exclude schedules with 'done' status
+            ->orderBy('scheduled_date', 'asc') // Sort by scheduled_date in ascending order
             ->get();
 
         // Define the time slots (adjust as necessary)
@@ -82,18 +83,31 @@ class StudentRequestAdjustmentController extends Controller
     $startTime = Carbon::parse($request->input('new_schedule'));
     $endTime = Carbon::parse($request->input('new_schedule_finish'));
 
-    // Check if there is an exact match of the schedule time for the student
-    $exactMatchSchedule = Schedule::where('student_id', $studentId)
-        ->where('scheduled_date', $startTime)
-        ->where('schedule_finish', $endTime)
+    // Check for overlapping schedules for the student
+    $overlappingSchedule = Schedule::where('student_id', $studentId)
         ->where('id', '!=', $request->input('schedule_id')) // Exclude the current schedule being updated
-        ->exists();  // Check if any existing schedule matches the exact same date and time
+        ->where(function ($query) use ($startTime, $endTime) {
+            $query->where(function ($subQuery) use ($startTime, $endTime) {
+                // Check if the new start time is within an existing schedule
+                $subQuery->where('scheduled_date', '<=', $startTime)
+                    ->where('schedule_finish', '>', $startTime);
+            })->orWhere(function ($subQuery) use ($startTime, $endTime) {
+                // Check if the new end time is within an existing schedule
+                $subQuery->where('scheduled_date', '<', $endTime)
+                    ->where('schedule_finish', '>=', $endTime);
+            })->orWhere(function ($subQuery) use ($startTime, $endTime) {
+                // Check if the new schedule completely overlaps an existing schedule
+                $subQuery->where('scheduled_date', '>=', $startTime)
+                    ->where('schedule_finish', '<=', $endTime);
+            });
+        })
+        ->exists();
 
-    // If an exact match is found, return an error message
-    if ($exactMatchSchedule) {
+    // If an overlapping schedule is found, return an error message
+    if ($overlappingSchedule) {
         return response()->json([
             'success' => false,
-            'message' => 'You already have this schedule timeslot.'
+            'message' => 'This schedule overlaps with another timeslot you have already booked.'
         ]);
     }
 

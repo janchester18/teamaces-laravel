@@ -80,18 +80,31 @@ class ScheduleController extends Controller
     \Log::info("Attempting to schedule: Start - {$newStartDate}, Finish - {$newFinishDate}");
 
     // Check if the student already has a schedule with the exact same start and finish time
-    $exactMatchSchedule = Schedule::where('student_id', $studentId)
-        ->where('scheduled_date', $newStartDate)
-        ->where('schedule_finish', $newFinishDate)
-        ->where('id', '!=', $id) // Exclude the current schedule being updated
-        ->exists();  // Check if any existing schedule matches the exact same date and time
+    $conflictingSchedule = Schedule::where('student_id', $studentId)
+    ->where('id', '!=', $id) // Exclude the current schedule being updated
+    ->where(function ($query) use ($newStartDate, $newFinishDate) {
+        $query->where(function ($subQuery) use ($newStartDate, $newFinishDate) {
+            // Overlaps if the new start time is within an existing schedule
+            $subQuery->where('scheduled_date', '<=', $newStartDate)
+                ->where('schedule_finish', '>', $newStartDate);
+        })->orWhere(function ($subQuery) use ($newStartDate, $newFinishDate) {
+            // Overlaps if the new finish time is within an existing schedule
+            $subQuery->where('scheduled_date', '<', $newFinishDate)
+                ->where('schedule_finish', '>=', $newFinishDate);
+        })->orWhere(function ($subQuery) use ($newStartDate, $newFinishDate) {
+            // Fully overlaps an existing schedule
+            $subQuery->where('scheduled_date', '>=', $newStartDate)
+                ->where('schedule_finish', '<=', $newFinishDate);
+        });
+    })
+    ->exists();
 
-    // If an exact match is found, return an error message
-    if ($exactMatchSchedule) {
-        return response()->json([
-            'success' => false,
-            'message' => 'This schedule time has already been taken by the same student.'
-        ]);
+    // If a conflict is found, return an error message
+    if ($conflictingSchedule) {
+    return response()->json([
+        'success' => false,
+        'message' => 'This schedule time conflicts with an existing schedule for the same student.'
+    ]);
     }
 
     // Check if the course is "TDC" (course_id = 1)
@@ -136,11 +149,6 @@ class ScheduleController extends Controller
 
     return response()->json(['success' => true]);
 }
-
-
-
-
-
 
 
     public function updateScheduleStatus(Request $request, $scheduleId)

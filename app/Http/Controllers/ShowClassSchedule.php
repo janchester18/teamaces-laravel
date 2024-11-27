@@ -17,6 +17,7 @@ class ShowClassSchedule extends Controller
         $schedules = Schedule::with(['student', 'course']) // Eager load student and course
             ->where('branch_id', $adminBranchId)
             ->where('status', '!=', 'done') // Exclude schedules with 'done' status
+            ->orderBy('scheduled_date', 'asc') // Sort by scheduled_date in ascending order
             ->get();
 
         // Define the time slots (adjust as necessary)

@@ -273,17 +273,17 @@ private function scheduleWithLimit(Student $student, $courseId, $date, $hoursPer
             ->whereTime('scheduled_date', $time)
             ->get();
 
-        // Count how many students are scheduled for this slot with a status other than 'done'
-        $studentCount = $existingSchedules->where('status', '!=', 'done')->count();
+        // Count how many students are scheduled for this slot with a status of 'pending' (not 'done' or 'missed')
+        $studentCount = $existingSchedules->whereIn('status', ['pending'])->count();
 
-        // If there is space or a 'done' status, schedule the student
-        if ($studentCount < $maxStudentsPerSlot || $existingSchedules->where('status', 'done')->count() > 0) {
+        // If there is space in the slot, schedule the student
+        if ($studentCount < $maxStudentsPerSlot) {
             Schedule::create([
                 'student_id' => $student->id,
                 'branch_id' => $student->branch_id,
                 'course_id' => $courseId,
-                'scheduled_date' => $date->setTime($hour, 0),
-                'schedule_finish' => $date->copy()->addHours($hoursPerSession), // Ensure finish time is set correctly
+                'scheduled_date' => $date->copy()->setTime($hour, 0),
+                'schedule_finish' => $date->copy()->setTime($hour, 0)->addHours($hoursPerSession),
                 'status' => 'pending',
             ]);
 
@@ -293,6 +293,7 @@ private function scheduleWithLimit(Student $student, $courseId, $date, $hoursPer
 
     return false; // No available slots found
 }
+
 
 
 

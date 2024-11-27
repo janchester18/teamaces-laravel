@@ -257,7 +257,7 @@
                     </div>
                     <div class="mb-3" id="reasonContainer" style="display: none;">
                         <label for="reason" class="form-label">Reason for Denial</label>
-                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                        <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>

@@ -248,18 +248,6 @@ function approveEnrollment(enrollmentId, isPackage, price) {
         cancelButtonText: 'No, cancel!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Show loading screen (SweetAlert loading state)
-            Swal.fire({
-                title: 'Processing...',
-                text: 'Please wait while we process your request.',
-                icon: 'info',
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading(); // Show the loading spinner
-                }
-            });
-
             if (isPackage) {
                 // Automatically use the package price
                 $.ajax({
@@ -270,7 +258,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                         amount_paid: price // Use the package price directly
                     },
                     success: function(response) {
-                        // Close the loading screen and show success message
+                        // Show success message
                         Swal.fire(
                             'Approved!',
                             response.message,
@@ -279,7 +267,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                         location.reload(); // Reload the page to refresh the table
                     },
                     error: function(xhr) {
-                        // Close the loading screen and show error message
+                        // Show error message
                         Swal.fire(
                             'Error!',
                             xhr.responseJSON.message || 'Something went wrong.',
@@ -311,8 +299,8 @@ function approveEnrollment(enrollmentId, isPackage, price) {
                             title: 'Processing...',
                             text: 'Please wait while we process your request.',
                             icon: 'info',
-                            showConfirmButton: false,
-                            allowOutsideClick: false,
+                            showConfirmButton: false, // Hide confirm button
+                            allowOutsideClick: false, // Prevent outside clicks
                             didOpen: () => {
                                 Swal.showLoading(); // Show the loading spinner
                             }
@@ -356,6 +344,7 @@ function approveEnrollment(enrollmentId, isPackage, price) {
         }
     });
 }
+
 
 function deleteEnrollment(enrollmentId) {
     Swal.fire({

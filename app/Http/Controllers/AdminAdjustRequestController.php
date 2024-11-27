@@ -39,6 +39,7 @@ class AdminAdjustRequestController extends Controller
         // Assuming new_scheduled_date and new_schedule_finish are columns in the schedule_adjustment_requests table
         $schedule->scheduled_date = $adjustmentRequest->new_scheduled_date;
         $schedule->schedule_finish = $adjustmentRequest->new_schedule_finish;
+        $schedule->status = 'pending';
 
         $schedule->save(); // Save the updated schedule
     } else {

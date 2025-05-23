@@ -201,7 +201,7 @@ class EnrollmentController extends Controller
             ]),
             'headers' => [
                 'accept' => 'application/json',
-                'authorization' => 'Basic c2tfbGl2ZV9CWkxRenZQUmJXWUpqbUxCc2RRWE0yQ3Y6',
+                'authorization' => 'secret key',
                 'content-type' => 'application/json',
             ]
         ]);
